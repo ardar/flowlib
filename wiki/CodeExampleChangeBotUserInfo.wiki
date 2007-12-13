@@ -4,8 +4,6 @@
 
 _[CodeExamplesConnectToHub To learn on how to connect to hub click here.]_
 
-This code continues on [CodeExamplesConnectToHub Connect to hub]
-
 = Code =
 {{{
 using FlowLib.Connections;
