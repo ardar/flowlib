@@ -7,4 +7,4 @@ Every example will have a description to tell little what problem it solves or w
 
 = Examples =
 
-CodeExamplesConnectToHub
+[CodeExamplesConnectToHub Connect to hub]
