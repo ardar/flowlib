@@ -6,4 +6,5 @@ Here I will add code examples telling how stuff can be done.
 Every example will have a description to tell little what problem it solves or what it does.
 
 = Examples =
-_No example has been added yet_
+
+[Connect to hub | CodeExamplesConnectToHub]
