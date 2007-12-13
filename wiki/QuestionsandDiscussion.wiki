@@ -1,0 +1,6 @@
+#labels Question,Discussion
+#Questions and Discussion.
+
+= Introduction =
+
+Here you should write if you have some question or want to discuss something.
