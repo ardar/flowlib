@@ -9,3 +9,4 @@ Every example will have a description to tell little what problem it solves or w
 = Examples =
 
 [CodeExamplesConnectToHub Connect to hub]
+[CodeExampleChangeBotUserInfo Change bot info (MyInfo)]
