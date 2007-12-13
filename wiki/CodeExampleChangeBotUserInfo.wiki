@@ -1,0 +1,20 @@
+#Code Example - Change Bot UserInfo
+
+= Description =
+
+_[CodeExamplesConnectToHub To learn on how to connect to hub click here.]_
+This code continues on [CodeExamplesConnectToHub Connect to hub]
+
+= Code =
+{{{
+            _*[...]*_
+            // Connection mode in UserInfo. Direct/Passive/Socket5
+            hubConnection.Me.Mode = FlowLib.Enums.ConnectionTypes.Direct;
+            // Client/Bot name and version in UserInfo.
+            hubConnection.Me.TagInfo.Version = "SpeedBot V:2.0";
+            // Connection in UserInfo
+            hubConnection.Me.Connection = "104KiB/s";
+            // User Description in UserInfo
+            hubConnection.Me.Description = "Testing you for a better feature";
+            hubConnection.Connect();
+}}}
