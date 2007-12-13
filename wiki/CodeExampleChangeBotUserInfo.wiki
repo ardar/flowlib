@@ -3,11 +3,12 @@
 = Description =
 
 _[CodeExamplesConnectToHub To learn on how to connect to hub click here.]_
+
 This code continues on [CodeExamplesConnectToHub Connect to hub]
 
 = Code =
 {{{
-            _*[...]*_
+            [...]
             // Connection mode in UserInfo. Direct/Passive/Socket5
             hubConnection.Me.Mode = FlowLib.Enums.ConnectionTypes.Direct;
             // Client/Bot name and version in UserInfo.
