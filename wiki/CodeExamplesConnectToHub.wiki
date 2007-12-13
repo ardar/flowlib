@@ -4,8 +4,8 @@
 
 With the below code we will connect to a hub.
 HubSetting is used to specify connection settings like address and bot display name.
-Then we are specify when protocol to use for this connection.
-This can be done in 3 ways.
+Then we specify what protocol to use for this connection.
+This can be done in 2 ways.
 *First* is to set Protocol property for settings object.
 This can only use inbuilt protocols (Auto, Nmdc, Adc)
 *Second* is to set Protocol property for the hub object it self.
