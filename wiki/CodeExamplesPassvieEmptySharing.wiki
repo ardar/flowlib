@@ -4,6 +4,14 @@
 
 _[CodeExamplesConnectToHub To learn on how to connect to hub click here.]_
 
+First of all we need to create a Share.
+Yes, this needs to be done even if we are not sharing anything.
+Secondly we need to add filelist(s) to share.
+If we are not doing this everyone will get a message saying that our filelist is not there.
+Thirdly we need to add this newly created share to our hub.
+Last thing that needs to be done is letting us know when a transfer is beeing created so we can start it and store it somewhere.
+We are doing this by listening to the update event in hub.
+
 = Code =
 {{{
 using FlowLib.Connections;
@@ -34,10 +42,10 @@ namespace ConsoleDemo.Examples
             setting.DisplayName = "FlowLib";
 
             Hub hubConnection = new Hub(setting);
-            hubConnection.Update += new FmdcEventHandler(hubConnection_Update);
-            hubConnection.Protocol = new HubNmdcProtocol(hubConnection);
             // Adds share to hub
             hubConnection.Share = share;
+            hubConnection.Protocol = new HubNmdcProtocol(hubConnection);
+            hubConnection.Update += new FmdcEventHandler(hubConnection_Update);
             hubConnection.Connect();
         }
 
