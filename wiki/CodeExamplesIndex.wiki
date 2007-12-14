@@ -10,4 +10,4 @@ Every example will have a description to tell little what problem it solves or w
 
 || [CodeExamplesConnectToHub Connect to hub] ||
 || [CodeExampleChangeBotUserInfo Change bot info (MyInfo)] ||
-|| [CodeExamplesPassvieEmptySharing ] Enable passive sharing (Empty) ||
+|| [CodeExamplesPassvieEmptySharing Enable passive sharing (Empty)] ||
