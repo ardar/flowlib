@@ -52,7 +52,7 @@ namespace ConsoleDemo.Examples
         void AddFilelistsToShare(Share s)
         {
             // This will add common filelists to share and save them in directory specified.
-            General.AddCommonFilelistsToShare(s, @"C:\Private\FMDC\PiP\FlowLibDemo\ConsoleDemo\bin\Debug\MyFileLists\");
+            General.AddCommonFilelistsToShare(s, "C:\\Private\\FMDC\\PiP\\FlowLibDemo\\ConsoleDemo\\bin\\Debug\\MyFileLists\\");
         }
 
         void hubConnection_Update(object sender, FmdcEventArgs e)
