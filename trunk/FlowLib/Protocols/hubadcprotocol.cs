@@ -32,7 +32,7 @@ namespace FlowLib.Protocols
     /// <summary>
     /// ADC Protocol
     /// </summary>
-    public class HubAdcProtocol : IProtocol
+    public class HubAdcProtocol : IProtocolHub
     {
         #region Variables
         // Variables to remember
@@ -276,6 +276,15 @@ namespace FlowLib.Protocols
         {
 
         }
+        #endregion
+
+        #region IProtocolHub Members
+
+        public bool OnStartTransfer(User usr)
+        {
+            throw new System.Exception("The method or operation is not implemented.");
+        }
+
         #endregion
     }
 }

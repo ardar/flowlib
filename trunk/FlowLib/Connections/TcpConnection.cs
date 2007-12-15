@@ -232,10 +232,7 @@ namespace FlowLib.Connections
                 this.ConnectionStatusChange(this, new FmdcEventArgs(Disconnected, new FmdcException(msg)));
                 socket.Disconnect(true);
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
+            catch (Exception) { }
         }
 
         protected virtual void OnConnect(System.IAsyncResult ar)

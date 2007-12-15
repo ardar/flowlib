@@ -72,11 +72,11 @@ namespace ConsoleDemo
                     UserInfo userInfo = e.Data as UserInfo;
                     if (userInfo == null)
                         return;
-                    if (!userInfo.IsOperator)
+                    if (!userInfo.IsOperator && !userInfo.ID.Equals(hub.Me.ID))
                     {
                         transferManager.AddTransferReq(userInfo.ID, hub, userInfo);
                         ContentInfo content = new ContentInfo(userInfo.ID, FlowLib.Enums.ContentIdTypes.Filelist);
-                        content.SystemPath = @"C:\Private\FMDC\PiP\FlowLibDemo\ConsoleDemo\bin\Debug\FileLists\" + userInfo.ID + ".filelist";
+                        content.SystemPath =  System.AppDomain.CurrentDomain.BaseDirectory + @"\FileLists\" + userInfo.ID + ".filelist";
                         downloadManager.AddDownload(new DownloadItem(content), new Source(null, userInfo.ID));
                         hub.Send(new FlowLib.Protocols.HubNmdc.ConnectToMe(userInfo.ID, hub.Share.Port, hub));
                     }

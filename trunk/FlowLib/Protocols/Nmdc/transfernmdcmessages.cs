@@ -64,7 +64,7 @@ namespace FlowLib.Protocols.TransferNmdc
     {
         /********
          * SUPPORTS:
-         * BZList, Bz2 compressed Huffman filelist
+         * BZList, Bz2 compressed filelist
          * XmlBZList, Bz2 compressed xml filelist
          * GetZBlock, ZLib compressed UGetBlock, ($UGetZBlock command)
          * ADCGet, Get command from ADC protocol draft.
@@ -153,7 +153,7 @@ namespace FlowLib.Protocols.TransferNmdc
         }
         /// <summary>
         /// BZList: http://dcpp.net/wiki/index.php/BZList
-        /// Supporting this means supporting compressed huffman filelists.
+        /// Support for a bzip2 compressed filelist
         /// </summary>
         public bool BZList
         {
@@ -207,12 +207,16 @@ namespace FlowLib.Protocols.TransferNmdc
             : base(con, null)
         {
             xmlBZList = true;
-            getZBlock = false;
+            getZBlock = true;
             adcGet = true;
             zlig = false;
             tthf = true;
             tthl = false;
             miniSlots = false;
+            bzList = true;
+
+            // TODO : Remove this when we have enabled ZLib compression
+            //getZBlock = false;
             SetValuesToRaw();
         }
         /// <summary>
@@ -255,26 +259,26 @@ namespace FlowLib.Protocols.TransferNmdc
         {
             if (support == null)
                 return;
-            ZLIG = false;
-            TTHL = false;
-            TTHF = false;
-            MiniSlots = false;
-            XmlBZList = false;
-            BZList = false;
-            ADCGet = false;
-            GetZBlock = false;
+            zlig = false;
+            tthl = false;
+            tthf = false;
+            miniSlots = false;
+            xmlBZList = false;
+            bzList = false;
+            adcGet = false;
+            getZBlock = false;
             for (int i = 0; i < support.Length; i++)
             {
                 switch (support[i])
                 {
-                    case "ZLIG": ZLIG = true; break;
-                    case "TTHL": TTHL = true; break;
-                    case "TTHF": TTHF = true; break;
-                    case "MiniSlots": MiniSlots = true; break;
-                    case "XmlBZList": XmlBZList = true; break;
-                    case "BZList": BZList = true; break;
-                    case "ADCGet": ADCGet = true; break;
-                    case "GetZBlock": GetZBlock = true; break;
+                    case "ZLIG": zlig = true; break;
+                    case "TTHL": tthl = true; break;
+                    case "TTHF": tthf = true; break;
+                    case "MiniSlots": miniSlots = true; break;
+                    case "XmlBZList": xmlBZList = true; break;
+                    case "BZList": bzList = true; break;
+                    case "ADCGet": adcGet = true; break;
+                    case "GetZBlock": getZBlock = true; break;
                 }
             }
         }
@@ -624,8 +628,9 @@ namespace FlowLib.Protocols.TransferNmdc
         public Get(IConnection con, string file, long start)
             : base(con, null)
         {
+            this.file = file;
             this.start = start;
-            Raw = string.Format("$Get ,{0}${1}|", File, Start +1);
+            Raw = string.Format("$Get {0}${1}|", File, Start +1);
         }
 
         public Get(IConnection con, string raw)
@@ -827,6 +832,11 @@ namespace FlowLib.Protocols.TransferNmdc
             this.type = type;
             this.content = content;
             MakeRaw();
+        }
+        public ADCGET(IConnection con, string type, string content, long start, long length, bool zlib)
+            : this(con, type, content, start, length)
+        {
+            ZL1 = zlib;
         }
 
         public ADCGET(IConnection con, string type, string content, long start, long length)
