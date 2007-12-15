@@ -19,12 +19,13 @@
  *
  */
 
-using System;
+using FlowLib.Events;
+using FlowLib.Containers;
 
-namespace FlowLib.Plugins
+namespace FlowLib.Interfaces
 {
-    public class PluginBase : MarshalByRefObject
+    public interface IProtocolHub : IProtocol
     {
-
+        bool OnStartTransfer(User usr);
     }
 }

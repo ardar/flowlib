@@ -38,6 +38,7 @@ namespace FlowLib.Protocols
         protected ITransfer trans = null;
         protected string received = string.Empty;
         protected bool rawData = false;
+        protected bool compressedZLib = false;
         protected bool download = true;
         protected Direction userDir = null;
         protected int downloadRandom = -1;
@@ -58,11 +59,7 @@ namespace FlowLib.Protocols
         /// $GetZBlock needs SupportGetZBlock.
         /// $ADCGET needs SupportADCGet.
         /// </summary>
-        protected bool SupportGetZBlock = false;
-        protected bool SupportXmlBZList = false;
-        protected bool SupportADCGet = false;
-        protected bool SupportBZList = false;
-
+        Supports userSupport = null;
 
         public event FmdcEventHandler MessageReceived;
         public event FmdcEventHandler MessageToSend;
@@ -113,8 +110,6 @@ namespace FlowLib.Protocols
             MessageToSend = new FmdcEventHandler(OnMessageToSend);
             ChangeDownloadItem = new FmdcEventHandler(OnChangeDownloadItem);
             RequestTransfer = new FmdcEventHandler(OnRequestTransfer);
-
-            mySupport = new Supports(trans);
 
             trans.ConnectionStatusChange += new FmdcEventHandler(trans_ConnectionStatusChange);
         }
@@ -178,6 +173,7 @@ namespace FlowLib.Protocols
                                 if (currentSegmentInfo.Length < length)
                                 {
                                     trans.Disconnect("You are sending more then i want.. Why?!");
+                                    return;
                                 }
 
                                 if (!Utils.FileOperations.PathExists(trans.DownloadItem.ContentInfo.SystemPath))
@@ -393,12 +389,20 @@ namespace FlowLib.Protocols
                         }
                         else if (trans.DownloadItem.ContentInfo.IsFilelist)
                         {
-                            if (SupportXmlBZList && mySupport.XmlBZList)
+                            if (userSupport != null && userSupport.XmlBZList && mySupport.XmlBZList)
+                            {
                                 trans.Content.Id = "files.xml.bz2";
-                            else if (SupportBZList && mySupport.BZList)
+                                trans.DownloadItem.ContentInfo.IdType = ContentIdTypes.FilelistXmlBz;
+                            }
+                            else if (userSupport != null && userSupport.BZList && mySupport.BZList)
+                            {
                                 trans.Content.Id = "MyList.bz2";
+                                trans.DownloadItem.ContentInfo.IdType = ContentIdTypes.FilelistBz;
+                            }
                             else
+                            {
                                 trans.Content.Id = "MyList.DcLst";
+                            }
                         }
 
                         // Set that we are actually downloading stuff
@@ -407,31 +411,34 @@ namespace FlowLib.Protocols
                             trans.DownloadItem.Start(currentSegmentInfo.Position);
                         }
                         rawData = false;
+                        compressedZLib = false;
 
                         /// $UGetZBlock needs both SupportGetZBlock and SupportXmlBZList.
                         /// $UGetBlock needs SupportXmlBZList.
                         /// $GetZBlock needs SupportGetZBlock.
                         /// $ADCGET needs SupportADCGet.
                         /// $Get needs nothing
-                        if (SupportADCGet && mySupport.ADCGet)
+                        if (userSupport != null && userSupport.ADCGet && mySupport.ADCGet)
                         {
-                            trans.Send(new ADCGET(trans, "file", trans.Content.Id, currentSegmentInfo.Start, currentSegmentInfo.Length));
+                            trans.Send(new ADCGET(trans, "file", trans.Content.Id, currentSegmentInfo.Start, currentSegmentInfo.Length, compressedZLib));
                         }
                         else if (
-                            (this.SupportGetZBlock || this.SupportXmlBZList)
+                            (userSupport != null && userSupport.GetZBlock || userSupport.XmlBZList)
                             && (mySupport.GetZBlock || mySupport.XmlBZList))
                         {
-                            if (SupportGetZBlock && SupportXmlBZList)
+                            if ((userSupport.GetZBlock && userSupport.XmlBZList) && (mySupport.GetZBlock && mySupport.XmlBZList))
                             {
                                 trans.Send(new UGetZBlock(trans, trans.Content.Id, currentSegmentInfo.Start, currentSegmentInfo.Length));
+                                compressedZLib = true;
                             }
-                            else if (SupportXmlBZList)
+                            else if (userSupport.XmlBZList && mySupport.XmlBZList)
                             {
                                 trans.Send(new UGetBlock(trans, trans.Content.Id, currentSegmentInfo.Start, currentSegmentInfo.Length));
                             }
                             else
                             {
                                 trans.Send(new GetZBlock(trans, trans.Content.Id, currentSegmentInfo.Start, currentSegmentInfo.Length));
+                                compressedZLib = true;
                             }
                         }
                         else
@@ -456,7 +463,7 @@ namespace FlowLib.Protocols
             {
                 Lock lk = (Lock)message;
                 if (lk.Extended)
-                    trans.Send(new Supports(trans));
+                    trans.Send(mySupport = new Supports(trans));
 
                 GetDownloadItem();
 
@@ -501,10 +508,7 @@ namespace FlowLib.Protocols
             {
                 // Sets Supports for protocol.
                 Supports sup = (Supports)message;
-                this.SupportGetZBlock = sup.GetZBlock;
-                this.SupportADCGet = sup.ADCGet;
-                this.SupportXmlBZList = sup.XmlBZList;
-                this.SupportBZList = sup.BZList;
+                userSupport = sup;
             }
             else if (message is Direction)
             {
@@ -521,6 +525,23 @@ namespace FlowLib.Protocols
                     currentSegmentInfo = trans.DownloadItem.GetAvailable();
                 }
                 else if (currentSegmentInfo.Length != sending.Length)
+                {
+                    trans.Disconnect("Why would i want to get a diffrent length of bytes then i asked for?");
+                    return;
+                }
+                this.rawData = true;
+            }
+            else if (message is FileLength)
+            {
+                FileLength fileLength = (FileLength)message;
+                if (trans.DownloadItem.ContentInfo.Size == -1)
+                {
+                    trans.DownloadItem.ContentInfo.Size = fileLength.Length;
+                    segmentLength = fileLength.Length;
+                    trans.DownloadItem.SegmentSize = segmentLength;
+                    currentSegmentInfo = trans.DownloadItem.GetAvailable();
+                }
+                else if (currentSegmentInfo.Length != fileLength.Length)
                 {
                     trans.Disconnect("Why would i want to get a diffrent length of bytes then i asked for?");
                     return;

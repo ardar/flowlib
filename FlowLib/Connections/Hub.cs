@@ -82,6 +82,13 @@ namespace FlowLib.Connections
                 keepAliveTimer.Change(interval, interval);
             }
         }
+
+        public new IProtocolHub Protocol
+        {
+            get { return (IProtocolHub)protocol; }
+            set { protocol = (IProtocol)value; }
+        }
+
         /// <summary>
         /// Share related to this hub
         /// </summary>
@@ -163,14 +170,20 @@ namespace FlowLib.Connections
                 UpdateRegMode();
             }
         }
+        /// <summary>
+        /// Online users in hub
+        /// </summary>
+        public SortedList<string, User> Userlist
+        {
+            get { return userlist; }
+            set { userlist = value; }
+        }
         #endregion
 
         #region Functions
-        private void Hub_RegModeUpdated(object sender, FmdcEventArgs e)
+        public bool StartTransfer(User usr)
         {
-            Hub hub = sender as Hub;
-            if (!e.Handled)
-                UpdateRegMode();
+            return Protocol.OnStartTransfer(usr);
         }
 
         protected void UpdateRegMode()
@@ -216,6 +229,14 @@ namespace FlowLib.Connections
         ~Hub()
         {
             keepAliveTimer.Dispose();
+        }
+
+
+
+        protected void UpdateShare()
+        {
+            if (share != null)
+                me.UserInfo.Share = share.HashedSize.ToString();
         }
 
         public void FireUpdate(int action, object obj)
@@ -295,9 +316,9 @@ namespace FlowLib.Connections
                     default:
                         FmdcEventArgs e = new FmdcEventArgs(0);
                         UnknownProtocolId(this, e);
-                        if (e.Handled && e.Data is IProtocol)
+                        if (e.Handled && e.Data is IProtocolHub)
                         {
-                            Protocol = (IProtocol)e.Data;
+                            Protocol = (IProtocolHub)e.Data;
                         }
                         else
                         {
@@ -335,15 +356,18 @@ namespace FlowLib.Connections
         #endregion
         #endregion
         #region OnEvent(s)
+        private void Hub_RegModeUpdated(object sender, FmdcEventArgs e)
+        {
+            Hub hub = sender as Hub;
+            if (!e.Handled)
+                UpdateRegMode();
+        }
+
         private void share_LastModifiedChanged(object sender, FmdcEventArgs e) 
         {
             UpdateShare();
         }
-        private void UpdateShare()
-        {
-            if (share != null)
-                me.UserInfo.Share = share.HashedSize.ToString();
-        }
+
         protected override void OnConnectionStatusChanged(object sender, FmdcEventArgs e)
         {
             base.OnConnectionStatusChanged(sender, e);

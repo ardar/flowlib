@@ -43,7 +43,7 @@ namespace FlowLib.Connections
         protected int downloadSegmentId = -1;
         protected ContentInfo info = new ContentInfo();
 
-        public IProtocolTransfer Protocol
+        public new IProtocolTransfer Protocol
         {
             get { return (IProtocolTransfer)protocol; }
             set { protocol = (IProtocol)value; }

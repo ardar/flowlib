@@ -27,13 +27,14 @@ using FlowLib.Containers;
 using FlowLib.Protocols.HubNmdc;
 using FlowLib.Connections;
 using FlowLib.Managers;
+using FlowLib.Enums;
 
 namespace FlowLib.Protocols
 {
     /// <summary>
     /// Hub NMDC Protocol
     /// </summary>
-    public class HubNmdcProtocol : IProtocol
+    public class HubNmdcProtocol : IProtocolHub
     {
         #region Variables
         protected Hub hub = null;
@@ -74,6 +75,30 @@ namespace FlowLib.Protocols
             MessageToSend = new FmdcEventHandler(OnMessageToSend);
         }
         #endregion
+
+        public bool OnStartTransfer(User usr)
+        {
+            switch (hub.Me.Mode)
+            {
+                case ConnectionTypes.Direct:
+                case ConnectionTypes.UPnP:
+                case ConnectionTypes.Forward:
+                    hub.FireUpdate(Actions.TransferRequest, new TransferRequest(usr.ID, hub, usr.UserInfo));
+                    hub.Send(new ConnectToMe(usr.ID, hub.Share.Port, hub));
+                    return true;
+                case ConnectionTypes.Passive:
+                case ConnectionTypes.Socket5:
+                case ConnectionTypes.Unknown:
+                default:
+                    if (usr.UserInfo.Mode == ConnectionTypes.Passive)
+                    {
+                        return false;
+                    }
+                    hub.Send(new RevConnectToMe(usr.ID, hub));
+                    return true;
+            }
+        }
+
         #region Parse
         public void ParseRaw(byte[] b, int length)
         {
