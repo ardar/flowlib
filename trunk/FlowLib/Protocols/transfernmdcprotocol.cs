@@ -160,7 +160,7 @@ namespace FlowLib.Protocols
                 // Do we have a working byte array?
                 if (b != null && length != 0)
                 {
-                    ConMessage conMsg = new ConMessage(trans, b);
+                    BinaryMessage conMsg = new BinaryMessage(trans, b);
                     // Plugin handling here
                     FmdcEventArgs e = new FmdcEventArgs(Actions.CommandIncomming, conMsg);
                     MessageReceived(trans, e);
@@ -338,7 +338,9 @@ namespace FlowLib.Protocols
         protected void GetDownloadItem()
         {
             // Get content
-            DownloadItem dwnItem = trans.DownloadItem;
+            trans.DownloadItem = null;
+            DownloadItem dwnItem = null;
+            //DownloadItem dwnItem = trans.DownloadItem;
             UserInfo usrInfo = trans.User;
             if (usrInfo != null)
             {

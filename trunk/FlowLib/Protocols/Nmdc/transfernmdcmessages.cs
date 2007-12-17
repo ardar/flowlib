@@ -216,7 +216,7 @@ namespace FlowLib.Protocols.TransferNmdc
             bzList = true;
 
             // TODO : Remove this when we have enabled ZLib compression
-            //getZBlock = false;
+            getZBlock = false;
             SetValuesToRaw();
         }
         /// <summary>

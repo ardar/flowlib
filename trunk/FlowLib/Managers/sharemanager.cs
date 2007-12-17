@@ -223,6 +223,7 @@ namespace FlowLib.Managers
             }
             if (sb.Length > 0)
                 setting.Add(IndexShareNames, new SettingItem(sb.ToString(), null));
+            FlowLib.Utils.FileOperations.PathExists(dir);
             SettingsGroup.Save(dir + FileName + ".xml", setting, FileName);
             setting = null;
         }

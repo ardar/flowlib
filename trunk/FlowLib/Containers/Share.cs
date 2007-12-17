@@ -979,6 +979,7 @@ namespace FlowLib.Containers
             }
 
             // Saves info on disc
+            FlowLib.Utils.FileOperations.PathExists(directory);
             SettingsGroup.Save(directory + "Share" + name + ".xml", setting, "Share");
             isSaving = false;
         }

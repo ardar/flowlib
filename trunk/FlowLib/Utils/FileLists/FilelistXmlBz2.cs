@@ -41,6 +41,7 @@ namespace FlowLib.Utils.FileLists
         protected string systemPath = null;
         protected string virtualFileName = string.Empty;
         protected string generator = string.Empty;
+        protected string cid = string.Empty;
         protected bool bz2 = true;
         protected string extention = ".xml.bz2";
         protected long size = 0;
@@ -97,6 +98,12 @@ namespace FlowLib.Utils.FileLists
         {
             get { return generator; }
             set { generator = value; }
+        }
+
+        public string CID
+        {
+            get { return cid; }
+            set { cid = value; }
         }
 
         public FilelistXmlBz2(byte[] content, bool isBz2)
@@ -210,9 +217,7 @@ namespace FlowLib.Utils.FileLists
                                 else if (reader.Name.Equals("FileListing", StringComparison.OrdinalIgnoreCase))
                                 {
                                     generator = reader.GetAttribute("Generator");
-
-                                    string id = reader.GetAttribute("CID");
-                                    Console.WriteLine("ID:{0}", id);
+                                    cid = reader.GetAttribute("CID");
                                 }
                             }
                             break;

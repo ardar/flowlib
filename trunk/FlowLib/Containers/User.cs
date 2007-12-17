@@ -40,6 +40,15 @@ namespace FlowLib.Containers
             userinfo.Mode = 0;
             //userinfo.OP = false;
         }
+
+        /// <summary>
+        /// Creating User with userinfo
+        /// </summary>
+        /// <param name="usrInfo">UserInfo to create user from</param>
+        public User(UserInfo usrInfo)
+        {
+            userinfo = usrInfo;
+        }
         /// <summary>
         /// User information for current user
         /// </summary>
