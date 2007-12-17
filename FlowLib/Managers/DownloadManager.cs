@@ -117,7 +117,7 @@ namespace FlowLib.Managers
                     }
                 }
                 sourceItems.Remove(s);
-                SourceRemoved(null, new FmdcEventArgs(0, s));
+                SourceRemoved(this, new FmdcEventArgs(0, s));
             }
         }
         /// <summary>
@@ -144,7 +144,11 @@ namespace FlowLib.Managers
                     }
                 }
                 downloadItems.Remove(d);
-                DownloadRemoved(null, new FmdcEventArgs(0, d));
+                DownloadRemoved(this, new FmdcEventArgs(0, d));
+                d.DownloadCompleted -= d_DownloadCompleted;
+                d.SegmentCanceled -= d_SegmentCanceled;
+                d.SegmentCompleted -= d_SegmentCompleted;
+                d.SegmentStarted -= d_SegmentStarted;
             }
         }
         /// <summary>
@@ -160,10 +164,13 @@ namespace FlowLib.Managers
             if (!downloadItems.ContainsKey(d))
             {
                 tmpDwn = new FlowSortedList<Source>();
-                downloadItems.Add(d, tmpDwn);
-                // TODO : Adding events for downloadItem
                 d.DownloadCompleted += new FmdcEventHandler(d_DownloadCompleted);
-                DownloadAdded(null, new FmdcEventArgs(0, d));
+                d.SegmentCanceled += new FmdcEventHandler(d_SegmentCanceled);
+                d.SegmentCompleted += new FmdcEventHandler(d_SegmentCompleted);
+                d.SegmentStarted += new FmdcEventHandler(d_SegmentStarted);
+
+                downloadItems.Add(d, tmpDwn);
+                DownloadAdded(this, new FmdcEventArgs(0, d));
             }
             else
             {
@@ -179,7 +186,7 @@ namespace FlowLib.Managers
                 {
                     tmpSrc = new FlowSortedList<DownloadItem>();
                     sourceItems.Add(s, tmpSrc);
-                    SourceAdded(null, new FmdcEventArgs(0, s));
+                    SourceAdded(this, new FmdcEventArgs(0, s));
                 }
                 else
                 {
@@ -187,6 +194,20 @@ namespace FlowLib.Managers
                 }
                 tmpSrc.Add(d);
             }
+        }
+
+        void d_SegmentStarted(object sender, FmdcEventArgs e)
+        {
+            SegmentStarted(sender, e);
+        }
+        void d_SegmentCompleted(object sender, FmdcEventArgs e)
+        {
+            SegmentCompleted(sender, e);
+        }
+
+        void d_SegmentCanceled(object sender, FmdcEventArgs e)
+        {
+            SegmentCanceled(sender, e);
         }
 
         private void d_DownloadCompleted(object sender, FmdcEventArgs e)

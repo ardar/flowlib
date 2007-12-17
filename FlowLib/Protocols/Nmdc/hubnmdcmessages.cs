@@ -227,7 +227,7 @@ namespace FlowLib.Protocols.HubNmdc
             tag.Append(info.TagInfo.Normal.ToString() + "/");   // Normal
             tag.Append(info.TagInfo.Regged.ToString() + "/");   // Regged
             tag.Append(info.TagInfo.OP.ToString() + "");    // OP
-            tag.Append(",S:" + info.TagInfo.Slots.ToString() + ">");
+            tag.Append(",S:" + (info.TagInfo.Slots == -1 ? 0 : info.TagInfo.Slots).ToString() + ">");
 
             Raw = "$MyINFO $ALL "
                 + info.DisplayName

@@ -50,6 +50,7 @@
     <Compile Include="Connections\TcpConnectionListener.cs" />
     <Compile Include="Connections\Transfer.cs" />
     <Compile Include="Connections\UdpConnection.cs" />
+    <Compile Include="Containers\BinaryMessage.cs" />
     <Compile Include="Containers\ConMessage.cs" />
     <Compile Include="Containers\ContentInfo.cs" />
     <Compile Include="Containers\DownloadItem.cs" />
