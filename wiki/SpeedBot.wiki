@@ -1,0 +1,17 @@
+#Short info about SpeedBot 2.0
+
+= Introduction =
+
+Add your content here.
+
+
+= Pictures =
+
+[http://flow84.no-ip.org/pictures/speedbot/001.png]
+
+= Details =
+
+Add your content here.  Format your content with:
+  * Text in *bold* or _italic_
+  * Headings, paragraphs, and lists
+  * Automatic links to other wiki pages
