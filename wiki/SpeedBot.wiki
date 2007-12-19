@@ -1,4 +1,4 @@
-#Short info about SpeedBot 2.0
+#Short info about SpeedBot 1.0
 
 = Introduction =
 
