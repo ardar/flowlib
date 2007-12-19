@@ -4,5 +4,5 @@
 
 = Bots =
 
-   * SpeedBot _(2)_
+   * SpeedBot _(1.0)_
    * CleanFlow
