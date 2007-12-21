@@ -48,8 +48,6 @@ namespace FlowLib.Protocols
         protected int protocolStatus = -1;
         protected Supports mySupport = null;
 
-        protected SegmentInfo currentSegmentInfo = new SegmentInfo(-1);
-        long segmentStart=0, segmentLength=-1, segmentPos;
         string directory = string.Empty;
         /// <summary>
         /// Internal identification for Supports
@@ -160,7 +158,7 @@ namespace FlowLib.Protocols
                 // Do we have a working byte array?
                 if (b != null && length != 0)
                 {
-                    BinaryMessage conMsg = new BinaryMessage(trans, b);
+                    BinaryMessage conMsg = new BinaryMessage(trans, b, length);
                     // Plugin handling here
                     FmdcEventArgs e = new FmdcEventArgs(Actions.CommandIncomming, conMsg);
                     MessageReceived(trans, e);
@@ -168,9 +166,9 @@ namespace FlowLib.Protocols
                     {
                         if (this.download)
                         {
-                            if (trans.DownloadItem != null && currentSegmentInfo.Position != -1)
+                            if (trans.DownloadItem != null && trans.CurrentSegment.Index != -1)
                             {
-                                if (currentSegmentInfo.Length < length)
+                                if (trans.CurrentSegment.Length < length)
                                 {
                                     trans.Disconnect("You are sending more then i want.. Why?!");
                                     return;
@@ -179,7 +177,7 @@ namespace FlowLib.Protocols
                                 if (!Utils.FileOperations.PathExists(trans.DownloadItem.ContentInfo.SystemPath))
                                 {
                                     Utils.FileOperations.AllocateFile(trans.DownloadItem.ContentInfo.SystemPath, trans.DownloadItem.ContentInfo.Size);
-                                    segmentPos = 0;
+                                    trans.CurrentSegment.Position = 0;
                                 }
 
                                 // Create the file.
@@ -188,39 +186,38 @@ namespace FlowLib.Protocols
                                     try
                                     {
                                         // Lock this segment of file
-                                        fs.Lock(currentSegmentInfo.Start, currentSegmentInfo.Length);
+                                        fs.Lock(trans.CurrentSegment.Start, trans.CurrentSegment.Length);
                                         // Set position
-                                        fs.Position = currentSegmentInfo.Start + segmentPos;
+                                        fs.Position = trans.CurrentSegment.Start + trans.CurrentSegment.Position;
                                         // Write this byte array to file
                                         fs.Write(b, 0, length);
-                                        segmentPos += length;
+                                        trans.CurrentSegment.Position += length;
                                     }
-                                    catch (System.Exception exp) {
-                                        System.Console.WriteLine("E:"+exp);
+                                    catch (System.Exception exp)
+                                    {
+                                        System.Console.WriteLine("E:" + exp);
+                                        trans.DownloadItem.Cancel(trans.CurrentSegment.Index);
                                     }
                                     finally
                                     {
                                         // Saves and unlocks file
                                         fs.Flush();
-                                        fs.Unlock(currentSegmentInfo.Start, currentSegmentInfo.Length);
+                                        fs.Unlock(trans.CurrentSegment.Start, trans.CurrentSegment.Length);
                                         fs.Dispose();
                                         fs.Close();
-
-                                        if (segmentPos >= currentSegmentInfo.Length)
+                                    }
+                                    if (trans.CurrentSegment.Position >= trans.CurrentSegment.Length)
+                                    {
+                                        trans.DownloadItem.Finished(trans.CurrentSegment.Index);
+                                        //// Searches for a download item and a segment id
+                                        GetDownloadItem();
+                                        // Request new segment from user. IF we have found one. ELSE disconnect.
+                                        if (trans.DownloadItem != null && (trans.CurrentSegment = trans.DownloadItem.GetAvailable()).Index != -1)
                                         {
-                                            trans.DownloadItem.Finished(currentSegmentInfo.Position);
-                                            //// Searches for a download item and a segment id
-                                            GetDownloadItem();
-                                            // Request new segment from user. IF we have found one. ELSE disconnect.
-                                            if (trans.DownloadItem != null && (currentSegmentInfo = trans.DownloadItem.GetAvailable()).Position != -1)
-                                            {
-                                                //segmentLength = currentSegmentInfo.Length;
-                                                OnDownload();
-                                                segmentPos = 0; // currentSegmentInfo.Start;
-                                            }
-                                            else
-                                                trans.Disconnect("All content downloaded");
+                                            OnDownload();
                                         }
+                                        else
+                                            trans.Disconnect("All content downloaded");
                                     }
                                 }
                             }
@@ -335,29 +332,26 @@ namespace FlowLib.Protocols
             return false;
         }
 
-        protected void GetDownloadItem()
+        public void GetDownloadItem()
         {
             // Get content
             trans.DownloadItem = null;
             DownloadItem dwnItem = null;
-            //DownloadItem dwnItem = trans.DownloadItem;
             UserInfo usrInfo = trans.User;
             if (usrInfo != null)
             {
                 FmdcEventArgs eArgs = new FmdcEventArgs(0, dwnItem);
                 ChangeDownloadItem(trans, eArgs);
 
-                //DownloadManager.TryGetDownload(new Source(null, usrInfo.ID), out dwnItem);
-
                 trans.DownloadItem = eArgs.Data as DownloadItem;
-                if (trans.DownloadItem != null && (currentSegmentInfo = trans.DownloadItem.GetAvailable()).Position != -1)
+                if (trans.DownloadItem != null && (trans.CurrentSegment = trans.DownloadItem.GetAvailable()).Index != -1)
                     download = true;
                 else
                     download = false;
             }
         }
 
-        protected void OnDownload()
+        public void OnDownload()
         {
             // We havnt received direction yet.
             if (userDir == null)
@@ -381,7 +375,7 @@ namespace FlowLib.Protocols
                 else
                 {
                     // We won battle. Start download.
-                    if (trans.DownloadItem != null && currentSegmentInfo.Position != -1)
+                    if (trans.DownloadItem != null && trans.CurrentSegment.Index != -1)
                     {
                         // Set right content string
                         trans.Content = new ContentInfo(trans.DownloadItem.ContentInfo.Id, trans.DownloadItem.ContentInfo.IdType);
@@ -408,9 +402,9 @@ namespace FlowLib.Protocols
                         }
 
                         // Set that we are actually downloading stuff
-                        if (currentSegmentInfo.Position >= 0)
+                        if (trans.CurrentSegment.Index >= 0)
                         {
-                            trans.DownloadItem.Start(currentSegmentInfo.Position);
+                            trans.DownloadItem.Start(trans.CurrentSegment.Index);
                         }
                         rawData = false;
                         compressedZLib = false;
@@ -422,7 +416,7 @@ namespace FlowLib.Protocols
                         /// $Get needs nothing
                         if (userSupport != null && userSupport.ADCGet && mySupport.ADCGet)
                         {
-                            trans.Send(new ADCGET(trans, "file", trans.Content.Id, currentSegmentInfo.Start, currentSegmentInfo.Length, compressedZLib));
+                            trans.Send(new ADCGET(trans, "file", trans.Content.Id, trans.CurrentSegment.Start, trans.CurrentSegment.Length, compressedZLib));
                         }
                         else if (
                             (userSupport != null && userSupport.GetZBlock || userSupport.XmlBZList)
@@ -430,22 +424,22 @@ namespace FlowLib.Protocols
                         {
                             if ((userSupport.GetZBlock && userSupport.XmlBZList) && (mySupport.GetZBlock && mySupport.XmlBZList))
                             {
-                                trans.Send(new UGetZBlock(trans, trans.Content.Id, currentSegmentInfo.Start, currentSegmentInfo.Length));
+                                trans.Send(new UGetZBlock(trans, trans.Content.Id, trans.CurrentSegment.Start, trans.CurrentSegment.Length));
                                 compressedZLib = true;
                             }
                             else if (userSupport.XmlBZList && mySupport.XmlBZList)
                             {
-                                trans.Send(new UGetBlock(trans, trans.Content.Id, currentSegmentInfo.Start, currentSegmentInfo.Length));
+                                trans.Send(new UGetBlock(trans, trans.Content.Id, trans.CurrentSegment.Start, trans.CurrentSegment.Length));
                             }
                             else
                             {
-                                trans.Send(new GetZBlock(trans, trans.Content.Id, currentSegmentInfo.Start, currentSegmentInfo.Length));
+                                trans.Send(new GetZBlock(trans, trans.Content.Id, trans.CurrentSegment.Start, trans.CurrentSegment.Length));
                                 compressedZLib = true;
                             }
                         }
                         else
                         {
-                            trans.Send(new Get(trans, trans.Content.Id, currentSegmentInfo.Start));
+                            trans.Send(new Get(trans, trans.Content.Id, trans.CurrentSegment.Start));
                         }
                     }
                 }
@@ -522,11 +516,10 @@ namespace FlowLib.Protocols
                 if (trans.DownloadItem.ContentInfo.Size == -1)
                 {
                     trans.DownloadItem.ContentInfo.Size = sending.Length;
-                    segmentLength = sending.Length;
-                    trans.DownloadItem.SegmentSize = segmentLength;
-                    currentSegmentInfo = trans.DownloadItem.GetAvailable();
+                    trans.DownloadItem.SegmentSize = sending.Length;
+                    trans.CurrentSegment = trans.DownloadItem.GetAvailable();
                 }
-                else if (currentSegmentInfo.Length != sending.Length)
+                else if (trans.CurrentSegment.Length != sending.Length)
                 {
                     trans.Disconnect("Why would i want to get a diffrent length of bytes then i asked for?");
                     return;
@@ -539,11 +532,10 @@ namespace FlowLib.Protocols
                 if (trans.DownloadItem.ContentInfo.Size == -1)
                 {
                     trans.DownloadItem.ContentInfo.Size = fileLength.Length;
-                    segmentLength = fileLength.Length;
-                    trans.DownloadItem.SegmentSize = segmentLength;
-                    currentSegmentInfo = trans.DownloadItem.GetAvailable();
+                    trans.DownloadItem.SegmentSize = fileLength.Length;
+                    trans.CurrentSegment = trans.DownloadItem.GetAvailable();
                 }
-                else if (currentSegmentInfo.Length != fileLength.Length)
+                else if (trans.CurrentSegment.Length != fileLength.Length)
                 {
                     trans.Disconnect("Why would i want to get a diffrent length of bytes then i asked for?");
                     return;
@@ -561,11 +553,10 @@ namespace FlowLib.Protocols
                 if (trans.DownloadItem.ContentInfo.Size == -1)
                 {
                     trans.DownloadItem.ContentInfo.Size = adcsnd.Length;
-                    segmentLength = adcsnd.Length;
-                    trans.DownloadItem.SegmentSize = segmentLength;
-                    currentSegmentInfo = trans.DownloadItem.GetAvailable();
+                    trans.DownloadItem.SegmentSize = adcsnd.Length;
+                    trans.CurrentSegment = trans.DownloadItem.GetAvailable();
                 }
-                else if (currentSegmentInfo.Length != adcsnd.Length)
+                else if (trans.CurrentSegment.Length != adcsnd.Length)
                 {
                     trans.Disconnect("Why would i want to get a diffrent length of bytes then i asked for?");
                     return;
@@ -579,14 +570,13 @@ namespace FlowLib.Protocols
                     trans.Disconnect();
                     return;
                 }
-                segmentPos = bytesToSend.Length;
+                trans.CurrentSegment.Position = bytesToSend.Length;
                 long length = trans.Content.Size;
                 do
                 {
                     trans.Send(new ConMessage(trans, bytesToSend));
-                    segmentPos += bytesToSend.Length;
-                    length -= bytesToSend.Length;
-                } while (connectionStatus != TcpConnection.Disconnected && (bytesToSend = this.GetContent(System.Text.Encoding.ASCII, segmentPos, ref length)) != null);
+                    trans.CurrentSegment.Position += bytesToSend.Length;
+                } while (connectionStatus != TcpConnection.Disconnected && (bytesToSend = this.GetContent(System.Text.Encoding.ASCII, trans.CurrentSegment.Position, trans.CurrentSegment.Length)) != null);
                 trans.Disconnect();
             }
             else if (message is Get)
@@ -600,7 +590,7 @@ namespace FlowLib.Protocols
                 Get get = (Get)message;
 
                 trans.Content = new ContentInfo();
-                segmentStart = get.Start;
+                trans.CurrentSegment = new SegmentInfo(-1, get.Start, -1);
                 if (get.File.Equals("files.xml.bz2"))
                 {
                     trans.Content.VirtualName = System.Text.Encoding.ASCII.WebName + get.File;
@@ -610,13 +600,12 @@ namespace FlowLib.Protocols
                 {
                     trans.Content.VirtualName = get.File;
                 }
-                segmentLength = -1;
-                bytesToSend = this.GetContent(System.Text.Encoding.ASCII, segmentStart, ref segmentLength);
+                bytesToSend = this.GetContent(System.Text.Encoding.ASCII, trans.CurrentSegment.Position, trans.CurrentSegment.Length);
 
                 // Do file exist?
-                if (segmentLength > -1)
+                if (trans.Content.Size > -1)
                 {
-                    trans.Send(new FileLength(trans, segmentLength));
+                    trans.Send(new FileLength(trans, trans.Content.Size));
                 }
                 else
                 {
@@ -643,22 +632,20 @@ namespace FlowLib.Protocols
                     trans.Content.VirtualName = getblocks.FileName;
                 }
 
-                long pos = segmentStart = getblocks.Start;
-                long length = segmentLength = getblocks.Length;
-                if ((bytesToSend = GetContent(System.Text.Encoding.UTF8, pos, ref length)) != null)
+                trans.CurrentSegment = new SegmentInfo(-1, getblocks.Start, getblocks.Length);
+                bool firstTime = true;
+                while (connectionStatus != TcpConnection.Disconnected && (bytesToSend = GetContent(System.Text.Encoding.UTF8, trans.CurrentSegment.Position, trans.CurrentSegment.Length)) != null)
                 {
-                    trans.Send(new Sending(trans));
-                    do
+                    if (firstTime)
                     {
-                        trans.Send(new ConMessage(trans, bytesToSend));
-                        pos += bytesToSend.Length;
-                        length -= bytesToSend.Length;
-                    } while (connectionStatus != TcpConnection.Disconnected && (bytesToSend = GetContent(System.Text.Encoding.UTF8, pos, ref length)) != null);
+                        trans.Send(new Sending(trans));
+                        firstTime = false;
+                    }
+                    trans.Send(new ConMessage(trans, bytesToSend));
+                    trans.CurrentSegment.Position += bytesToSend.Length;
                 }
-                else
-                {
+                if (firstTime)
                     trans.Send(new Failed("File Not Available", trans));
-                }
             }
             else if (message is ADCGET)
             {
@@ -694,40 +681,43 @@ namespace FlowLib.Protocols
                 }
                 try
                 {
-                    long pos = adcget.Start;
-                    long length = adcget.Length;
-                    if ((bytesToSend = GetContent(System.Text.Encoding.UTF8, pos, ref length)) != null)
+                    trans.CurrentSegment = new SegmentInfo(-1, adcget.Start, adcget.Length);
+                    bool firstTime = true;
+                    // TODO : ZLib compression here doesnt work as we want. It takes much memory and much cpu
+                    //Util.Compression.ZLib zlib = null;
+                    //if (adcget.ZL1)
+                    //    zlib = new Fmdc.Util.Compression.ZLib();
+                    while (connectionStatus != TcpConnection.Disconnected && (bytesToSend = GetContent(System.Text.Encoding.UTF8, trans.CurrentSegment.Position, trans.CurrentSegment.Length)) != null)
                     {
-                        ADCSND adcsend = new ADCSND(trans);
-                        adcsend.Type = adcget.Type;
-                        adcsend.Content = adcget.Content;
-                        adcsend.Start = adcget.Start;
-                        adcsend.Length = length;
-                        adcsend.ZL1 = adcget.ZL1;
-                        trans.Send(adcsend);
-                        // TODO : ZLib compression here doesnt work as we want. It takes much memory and much cpu
-                        //Util.Compression.ZLib zlib = null;
-                        //if (adcget.ZL1)
-                        //    zlib = new Fmdc.Util.Compression.ZLib();
-                        do
+                        if (firstTime)
                         {
-                            pos += bytesToSend.Length;
-                            length -= bytesToSend.Length;
-                            // We want to compress content with ZLib
-                            //if (zlib != null)
-                            //{
-                            //    zlib.Compress2(bytesToSend);
-                            //    bytesToSend = zlib.Read();
-                            //}
-                            trans.Send(new ConMessage(trans, bytesToSend));
-                            bytesToSend = null;
-                        } while (connectionStatus != TcpConnection.Disconnected && (bytesToSend = GetContent(System.Text.Encoding.UTF8, pos, ref length)) != null);
-                        // If we compressing data with zlib. We need to send ending bytes too.
-                        //if (zlib != null && connectionStatus != Connection.Disconnected)
-                        //    trans.Send(new ConMessage(trans, zlib.close()));
-                        return;
+                            ADCSND adcsend = new ADCSND(trans);
+                            adcsend.Type = adcget.Type;
+                            adcsend.Content = adcget.Content;
+                            adcsend.Start = adcget.Start;
+                            adcsend.Length = trans.Content.Size;
+                            adcsend.ZL1 = adcget.ZL1;
+                            trans.Send(adcsend);
+
+                            firstTime = false;
+                        }
+
+                        trans.CurrentSegment.Position += bytesToSend.Length;
+                        // We want to compress content with ZLib
+                        //if (zlib != null)
+                        //{
+                        //    zlib.Compress2(bytesToSend);
+                        //    bytesToSend = zlib.Read();
+                        //}
+                        trans.Send(new ConMessage(trans, bytesToSend));
+                        bytesToSend = null;
+
                     }
-                    else
+
+                    // If we compressing data with zlib. We need to send ending bytes too.
+                    //if (zlib != null && connectionStatus != Connection.Disconnected)
+                    //    trans.Send(new ConMessage(trans, zlib.close()));
+                    if (firstTime)
                     {
                         // We should not get here if file is in share.
                         trans.Send(new Error("File Not Available", trans));
@@ -743,7 +733,7 @@ namespace FlowLib.Protocols
             }
         }
 
-        protected byte[] GetContent(System.Text.Encoding encoding, long start, ref long length)
+        protected byte[] GetContent(System.Text.Encoding encoding, long start, long length)
         {
             Share share = trans.Share;
             Containers.ContentInfo info = trans.Content;

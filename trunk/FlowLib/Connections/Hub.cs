@@ -86,7 +86,12 @@ namespace FlowLib.Connections
         public new IProtocolHub Protocol
         {
             get { return (IProtocolHub)protocol; }
-            set { protocol = (IProtocol)value; }
+            set 
+            {
+                base.Protocol = value;
+                protocol = (IProtocol)value;
+
+            }
         }
 
         /// <summary>
@@ -202,6 +207,7 @@ namespace FlowLib.Connections
         {
             fav = infav;    // Sets Favorites.
             me = new User(fav.DisplayName);
+            me.UserInfo.Description = fav.UserDescription;
             me.Tag.Version = "FlowLib";
 
             UpdateRegMode();
@@ -228,7 +234,8 @@ namespace FlowLib.Connections
         /// </summary>
         ~Hub()
         {
-            keepAliveTimer.Dispose();
+            if (keepAliveTimer != null)
+                keepAliveTimer.Dispose();
         }
 
 

@@ -24,27 +24,43 @@ using System;
 namespace FlowLib.Events
 {
     public delegate void FmdcEventHandler(object sender, FmdcEventArgs e);
-    
+
+
+    public class FmdcEventArgs : FmdcEventArgs<int, object>
+    {
+        /// <summary>
+        /// Initializes a new instance of this EventArgs
+        /// </summary>
+        /// <param name="action">Action that has/should be performed</param>
+        public FmdcEventArgs(int action) : base(action, null) { }
+        /// <summary>
+        /// Initializes a new instance of this EventArgs
+        /// </summary>
+        /// <param name="action">Action that has/should be performed</param>
+        /// <param name="data">Object that is used to give more info about the action.</param>
+        public FmdcEventArgs(int action, object data) : base(action, data) { }
+    }
+
     /// <summary>
     /// Provides data for the internal events.
     /// </summary>
-    public class FmdcEventArgs : EventArgs
+    public class FmdcEventArgs<TAction, TData> : EventArgs
     {
-        protected int action = -1;
-        protected object data = null;
+        protected TAction action = default(TAction);
+        protected TData data = default(TData);
         protected bool handled = false;
 
         /// <summary>
         /// Initializes a new instance of this EventArgs
         /// </summary>
         /// <param name="action">Action that has/should be performed</param>
-        public FmdcEventArgs(int action) : this(action,null) { }
+        public FmdcEventArgs(TAction action) : this(action, default(TData)) { }
         /// <summary>
         /// Initializes a new instance of this EventArgs
         /// </summary>
         /// <param name="action">Action that has/should be performed</param>
         /// <param name="data">Object that is used to give more info about the action.</param>
-        public FmdcEventArgs(int action, object data)
+        public FmdcEventArgs(TAction action, TData data)
         {
             this.action = action;
             this.data = data;
@@ -53,14 +69,14 @@ namespace FlowLib.Events
         /// <summary>
         /// Gets Action that has/should be performed.
         /// </summary>
-        public int Action
+        public TAction Action
         {
             get { return action; }
         }
         /// <summary>
         /// Gets/sets object that is used to give more info about action.
         /// </summary>
-        public object Data
+        public TData Data
         {
             get { return data; }
             set { data = value; }

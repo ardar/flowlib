@@ -29,15 +29,23 @@ namespace FlowLib.Containers
     /// </summary>
     public class BinaryMessage : ConMessage
     {
+        protected int length = -1;
+
+        public int Length
+        {
+            get { return length; }
+            set { length = value; }
+        }
+
         /// <summary>
         /// Creating Binary message
         /// </summary>
         /// <param name="con">Connection where message should be sent or was received from</param>
         /// <param name="raw">content of this message</param>
-        public BinaryMessage(IConnection con, byte[] raw)
+        public BinaryMessage(IConnection con, byte[] raw, int length)
             : base(con, raw)
         {
-
+            this.length = length;
         }
     }
 }

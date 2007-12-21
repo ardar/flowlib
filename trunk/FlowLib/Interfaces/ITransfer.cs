@@ -32,10 +32,7 @@ namespace FlowLib.Interfaces
         /// </summary>
         event FmdcEventHandler DownloadItemChanged;
 
-        /// <summary>
-        /// Current Segment Id
-        /// </summary>
-        int SegmentId
+        SegmentInfo CurrentSegment
         {
             get;
             set;

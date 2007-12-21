@@ -196,6 +196,21 @@ namespace FlowLib.Managers
             }
         }
 
+        /// <summary>
+        /// Removes all downloads and sources
+        /// </summary>
+        public void Clear()
+        {
+            foreach (KeyValuePair<DownloadItem, FlowSortedList<Source>> var in downloadItems)
+            {
+                RemoveDownload(var.Key);
+            }
+            foreach (KeyValuePair<Source, FlowSortedList<DownloadItem>> var in sourceItems)
+            {
+                RemoveSource(var.Key);
+            }
+        }
+
         void d_SegmentStarted(object sender, FmdcEventArgs e)
         {
             SegmentStarted(sender, e);
