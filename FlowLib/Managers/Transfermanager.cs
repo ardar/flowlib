@@ -37,21 +37,19 @@ namespace FlowLib.Managers
     /// </summary>
     public class TransferManager
     {
-        public event FmdcEventHandler ShareConnectionStart;
-        public event FmdcEventHandler ShareConnectionEnd;
-
         protected SortedList<string, TransferRequest> requests = new SortedList<string, TransferRequest>();
-        protected SortedList<string, ITransfer> listening = new SortedList<string, ITransfer>();
+        //protected SortedList<string, ITransfer> listening = new SortedList<string, ITransfer>();
         protected SortedList<string, ITransfer> transfers = new SortedList<string, ITransfer>();
+
+        public SortedList<string, ITransfer> Transfers
+        {
+            get { return transfers; }
+        }
 
         public TransferManager()
         {
-            ShareConnectionStart = new FmdcEventHandler(TransferManager_ShareConnectionStart);
-            ShareConnectionEnd = new FmdcEventHandler(TransferManager_ShareConnectionEnd);
         }
 
-        protected void TransferManager_ShareConnectionEnd(object sender, FmdcEventArgs e) { }
-        protected void TransferManager_ShareConnectionStart(object sender, FmdcEventArgs e) { }
         /// <summary>
         /// Add Transfer request
         /// This is used when other users want something from us.
@@ -99,11 +97,8 @@ namespace FlowLib.Managers
         {
             return requests.Remove(key);
         }
-        /// <summary>
-        /// If connection to remote ip and port already exist that connection will be closed and then the new one will be connected
-        /// </summary>
-        /// <param name="trans">Transfer you want to start</param>
-        public void StartTransfer(ITransfer trans)
+
+        public void AddTransfer(ITransfer trans)
         {
             string id = string.Format("{0}{1}", trans.RemoteAddress.Address.ToString(), trans.RemoteAddress.Port);
             ITransfer old = null;
@@ -112,12 +107,55 @@ namespace FlowLib.Managers
                 old.Disconnect("Too many connections.");
                 transfers.Remove(id);
             }
+
+            trans.ConnectionStatusChange += new FmdcEventHandler(trans_ConnectionStatusChange);
             // Add transfer to list.
             transfers.Add(id, trans);
+        }
+
+        /// <summary>
+        /// If connection to remote ip and port already exist that connection will be closed and then the new one will be connected
+        /// </summary>
+        /// <param name="trans">Transfer you want to start</param>
+        public void StartTransfer(ITransfer trans)
+        {
+            AddTransfer(trans);
             // Connect transfer.
             Thread t = new Thread(new ParameterizedThreadStart(ConnectTransfer));
             t.IsBackground = true;
             t.Start(trans);
+        }
+
+        void trans_ConnectionStatusChange(object sender, FmdcEventArgs e)
+        {
+            ITransfer trans = sender as ITransfer;
+            trans.ConnectionStatusChange -= trans_ConnectionStatusChange;
+            if (e.Action == TcpConnection.Disconnected)
+            {
+                string id = string.Format("{0}{1}", trans.RemoteAddress.Address.ToString(), trans.RemoteAddress.Port);
+                transfers.Remove(id);
+            }
+        }
+
+        /// <summary>
+        /// Disconnects and removes all transfers.
+        /// Removes all TransferRequests.
+        /// </summary>
+        public void Clear()
+        {
+            foreach (KeyValuePair<string, ITransfer> var in transfers)
+            {
+                var.Value.Disconnect();
+            }
+            transfers.Clear();
+            requests.Clear();
+        }
+
+        public void EndTransfer(ITransfer trans)
+        {
+            string id = string.Format("{0}{1}", trans.RemoteAddress.Address.ToString(), trans.RemoteAddress.Port);
+            trans.Disconnect();
+            transfers.Remove(id);
         }
 
         private void ConnectTransfer(object obj)

@@ -23,15 +23,22 @@ namespace FlowLib.Containers
 {
     public class SegmentInfo
     {
+        protected int vIndex = -1;
         protected int vPosition = -1;
         protected long vStart = 0;
         protected long vLength = -1;
-        /// <summary>
-        /// Segment position
-        /// </summary>
+
+        public int Index
+        {
+            get { return vIndex; }
+        }
+        ///// <summary>
+        ///// Segment position
+        ///// </summary>
         public int Position
         {
             get { return vPosition; }
+            set { vPosition = value; }
         }
 
         public long Start
@@ -47,32 +54,33 @@ namespace FlowLib.Containers
         }
 
         /// <summary>
-        /// Creating SegmentInfo with pos.
+        /// Creating SegmentInfo with index.
         /// This should only be used for error notification
         /// </summary>
-        /// <param name="pos">Segment position</param>
-        public SegmentInfo(int pos)
+        /// <param name="pos">Segment index</param>
+        public SegmentInfo(int index)
         {
-            vPosition = pos;
+            vIndex = index;
+            vPosition = 0;
         }
         /// <summary>
-        /// Creating SegmentInfo with pos and length info for downloadinfo.
+        /// Creating SegmentInfo with index and length info for downloadinfo.
         /// </summary>
-        /// <param name="pos">Segment position</param>
+        /// <param name="pos">Segment index</param>
         /// <param name="length">Data lenght for this segment</param>
-        public SegmentInfo(int pos, long length)
-            : this(pos)
+        public SegmentInfo(int index, long length)
+            : this(index)
         {
             vLength = length;
         }
         /// <summary>
-        /// Creating SegmentInfo with pos and length info for downloadinfo.
+        /// Creating SegmentInfo with index and length info for downloadinfo.
         /// </summary>
-        /// <param name="pos">Segment position</param>
+        /// <param name="pos">Segment index</param>
         /// <param name="start">Data pos where to start from</param>
         /// <param name="length">Data lenght for this segment</param>
-        public SegmentInfo(int pos, long start, long length)
-            : this(pos, length)
+        public SegmentInfo(int index, long start, long length)
+            : this(index, length)
         {
             vStart = start;
         }

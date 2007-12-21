@@ -19,9 +19,41 @@
  */
 
 using System.IO;
+using System.Collections.Generic;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace FlowLib.Utils
 {
+    public static class FileOperations<T>
+    {
+        public static void SaveObject(string path, T obj)
+        {
+            FileOperations.PathExists(path);
+            XmlSerializer s = new XmlSerializer(obj.GetType(), new XmlRootAttribute());
+            TextWriter w = new StreamWriter(path);
+            s.Serialize(w, obj);
+            w.Close();
+        }
+
+        public static T LoadObject(string path)
+        {
+            XmlSerializer s = new XmlSerializer(typeof(T), new XmlRootAttribute());
+            if (File.Exists(path))
+            {
+                T obj;
+                TextReader r = new StreamReader(path);
+                obj = (T)s.Deserialize(r);
+                r.Close();
+                return obj;
+            }
+            else
+            {
+                return default(T);
+            }
+        }
+    }
+
     public static class FileOperations
     {
         public static bool IsValidFilePath(string path)

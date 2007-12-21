@@ -42,6 +42,7 @@ namespace FlowLib.Connections
         protected DownloadItem downloadItem = null;
         protected int downloadSegmentId = -1;
         protected ContentInfo info = new ContentInfo();
+        protected SegmentInfo currentSegment = new SegmentInfo(-1);
 
         public new IProtocolTransfer Protocol
         {
@@ -49,13 +50,10 @@ namespace FlowLib.Connections
             set { protocol = (IProtocol)value; }
         }
 
-        /// <summary>
-        /// Current Segment Id
-        /// </summary>
-        public int SegmentId
+        public SegmentInfo CurrentSegment
         {
-            get { return downloadSegmentId; }
-            set { downloadSegmentId = value; }
+            get { return currentSegment; }
+            set { currentSegment = value; }
         }
 
         /// <summary>
