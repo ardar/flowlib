@@ -38,7 +38,6 @@ namespace FlowLib.Managers
     public class TransferManager
     {
         protected SortedList<string, TransferRequest> requests = new SortedList<string, TransferRequest>();
-        //protected SortedList<string, ITransfer> listening = new SortedList<string, ITransfer>();
         protected SortedList<string, ITransfer> transfers = new SortedList<string, ITransfer>();
 
         public SortedList<string, ITransfer> Transfers
@@ -143,7 +142,8 @@ namespace FlowLib.Managers
         /// </summary>
         public void Clear()
         {
-            foreach (KeyValuePair<string, ITransfer> var in transfers)
+            SortedList<string, ITransfer> tmpList = new SortedList<string, ITransfer>(transfers);
+            foreach (KeyValuePair<string, ITransfer> var in tmpList)
             {
                 var.Value.Disconnect();
             }

@@ -938,6 +938,13 @@ namespace FlowLib.Protocols.TransferNmdc
             set { filename = value; }
         }
 
+        public GetBlocks(IConnection con, string filename, bool zlibComp, long start, long length)
+            : this(con,filename,zlibComp)
+        {
+            this.start = start;
+            this.length = length;
+        }
+
         public GetBlocks(IConnection con, string filename, bool zlibComp)
             : base(con, null)
         {
@@ -977,7 +984,7 @@ namespace FlowLib.Protocols.TransferNmdc
     public class GetZBlock : GetBlocks
     {
         public GetZBlock(IConnection con, string filename, long start, long length)
-            : base(con, filename, true)
+            : base(con, filename, true, start, length)
         {
             ZLibCompression = true;
             Raw = string.Format("$GetZBlock {0} {1} {2}|", Start, Length, filename);
@@ -992,7 +999,7 @@ namespace FlowLib.Protocols.TransferNmdc
     public class UGetBlock : GetBlocks
     {
         public UGetBlock(IConnection con, string filename, long start, long length)
-            : base(con, filename, false)
+            : base(con, filename, false,start, length)
         {
             Encoding = System.Text.Encoding.UTF8;
             Raw = string.Format("$UGetBlock {0} {1} {2}|", Start, Length, FileName);
@@ -1007,7 +1014,7 @@ namespace FlowLib.Protocols.TransferNmdc
     public class UGetZBlock : GetBlocks
     {
         public UGetZBlock(IConnection con, string filename, long start, long length)
-            : base(con, filename, true)
+            : base(con, filename, true, start, length)
         {
             ZLibCompression = true;
             Encoding = System.Text.Encoding.UTF8;
