@@ -28,6 +28,7 @@ namespace FlowLib.Interfaces
     {
         event FmdcEventHandler ChangeDownloadItem;
         event FmdcEventHandler RequestTransfer;
+        event FmdcEventHandler Error;
 
         void OnDownload();
         void GetDownloadItem();

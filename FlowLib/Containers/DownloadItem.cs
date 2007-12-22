@@ -194,8 +194,11 @@ namespace FlowLib.Containers
 
         public void Cancel(int pos)
         {
-            segmentsInProgress.Set(pos, false);
-            SegmentCanceled(this, new FmdcEventArgs(pos));
+            if (segmentsInProgress != null && segmentsInProgress.Get(pos))
+            {
+                segmentsInProgress.Set(pos, false);
+                SegmentCanceled(this, new FmdcEventArgs(pos));
+            }
         }
 
         public bool Start(int pos)

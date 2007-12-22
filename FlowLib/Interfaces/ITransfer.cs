@@ -38,6 +38,12 @@ namespace FlowLib.Interfaces
             set;
         }
 
+        long LastEventTimeStamp
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// Current ContentInfo for this connection.
         /// </summary>

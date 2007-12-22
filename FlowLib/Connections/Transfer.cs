@@ -43,6 +43,13 @@ namespace FlowLib.Connections
         protected int downloadSegmentId = -1;
         protected ContentInfo info = new ContentInfo();
         protected SegmentInfo currentSegment = new SegmentInfo(-1);
+        protected long lastEventTimeStamp = 0;
+
+        public long LastEventTimeStamp
+        {
+            get { return lastEventTimeStamp; }
+            set { lastEventTimeStamp = value; }
+        }
 
         public new IProtocolTransfer Protocol
         {

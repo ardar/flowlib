@@ -463,12 +463,12 @@ namespace FlowLib.Containers
                 share.Add(contentInfo.Get(ContentInfo.STORAGEPATH), contentInfo);
                 value = true;
             }
-            if (contentInfo.ContainsKey(ContentInfo.VIRTUAL) && !share.ContainsKey(contentInfo.Get(ContentInfo.VIRTUAL)))
+            if (contentInfo.ContainsKey(ContentInfo.VIRTUAL) && !virtualNames.ContainsKey(contentInfo.Get(ContentInfo.VIRTUAL)))
             {
                 virtualNames.Add(contentInfo.Get(ContentInfo.VIRTUAL), contentInfo);
                 value = true;
             }
-            if (contentInfo.ContainsKey(ContentInfo.TTH) && !share.ContainsKey(contentInfo.Get(ContentInfo.TTH)))
+            if (contentInfo.ContainsKey(ContentInfo.TTH) && !tthNames.ContainsKey(contentInfo.Get(ContentInfo.TTH)))
             {
                 tthNames.Add(contentInfo.Get(ContentInfo.TTH), contentInfo);
                 value = true;
