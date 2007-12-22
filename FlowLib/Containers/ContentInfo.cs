@@ -19,6 +19,7 @@
  *
  */
 
+using System.Collections;
 using System.Collections.Generic;
 using System;
 using System.Xml.Serialization;
@@ -30,7 +31,11 @@ namespace FlowLib.Containers
     /// Class representing Share/Download/Upload Item.
     /// Most probably a file on your system.
     /// </summary>
-    public class ContentInfo : PropertyContainer<string, string>
+    public class ContentInfo :
+        PropertyContainer<string, string>,
+        IComparer<ContentInfo>,
+        IComparer,
+        IComparable
     {
         public const string ID = "id";
         public const string TTH = "tth";
@@ -70,15 +75,6 @@ namespace FlowLib.Containers
             set { }
         }
         /// <summary>
-        /// This property is here for xml serialization only.
-        /// </summary>
-        [XmlIgnore()]
-        public bool IdSpecified
-        {
-            get { return false; }
-            set { }
-        }
-        /// <summary>
         /// Indicates if this content is a filelist
         /// </summary>
         [XmlIgnore()]
@@ -94,7 +90,8 @@ namespace FlowLib.Containers
         public bool IsHidden
         {
             get { return ((extend | ContentExtend.Hidden) == extend); }
-            set {
+            set
+            {
                 if (((extend | ContentExtend.Hidden) == extend) != value)
                     extend = ~ContentExtend.Hidden;
             }
@@ -106,7 +103,8 @@ namespace FlowLib.Containers
         public bool IsSystem
         {
             get { return ((extend | ContentExtend.System) == extend); }
-            set {
+            set
+            {
                 if (((extend | ContentExtend.System) == extend) != value)
                     extend = ~ContentExtend.System;
             }
@@ -131,17 +129,6 @@ namespace FlowLib.Containers
             get { return ContainsKey(TTH); }
         }
 
-        //public string SystemPath
-        //{
-        //    get
-        //    {
-        //        return Get(STORAGEPATH);
-        //    }
-        //    set
-        //    {
-        //        Set(STORAGEPATH, value);
-        //    }
-        //}
         /// <summary>
         /// DateTime tick on when file was last changed
         /// </summary>
@@ -149,26 +136,6 @@ namespace FlowLib.Containers
         {
             get { return modified; }
             set { modified = value; }
-        }
-        /// <summary>
-        /// Key name of this contentinfo
-        /// </summary>
-        public string Id
-        {
-            get
-            {
-                if (ContainsKey(ID))
-                {
-                    // We want to override id order.
-                    return ID;
-                }
-                if (ContainsKey(TTH))
-                    return TTH;
-                else if (ContainsKey(VIRTUAL))
-                    return VIRTUAL;
-                else
-                    return NAME;
-            }
         }
         /// <summary>
         /// File size of target
@@ -184,7 +151,6 @@ namespace FlowLib.Containers
         /// </summary>
         public ContentInfo()
         {
-
         }
 
         /// <summary>
@@ -194,7 +160,52 @@ namespace FlowLib.Containers
         /// <param name="value">value that should be added</param>
         public ContentInfo(string key, string value)
         {
-            Add(key, value);
+            Set(key, value);
+        }
+
+        protected int Compare(bool x, bool y)
+        {
+            // are x and y valid?
+            if (x || y)
+            {
+                if (x && y)
+                    return 0;
+                else if (x)
+                    return -1;
+                else
+                    return 1;
+            }
+            return -2;
+        }
+
+        public int Compare(ContentInfo x, ContentInfo y)
+        {
+            // are x and y valid?
+            int i;
+            if ((i = Compare(x == null, y == null)) != -2)
+                return i;
+            if (Compare(x.ContainsKey(ID), y.ContainsKey(ID)) != -2)
+                return string.Compare(x[ID], y[ID]);
+            if (Compare(x.ContainsKey(TTH), y.ContainsKey(TTH)) != -2)
+                return string.Compare(x[TTH], y[TTH]);
+            if (Compare(x.ContainsKey(VIRTUAL), y.ContainsKey(VIRTUAL)) != -2)
+                return string.Compare(x[VIRTUAL], y[VIRTUAL]);
+            if ((i = x.LastModified.CompareTo(y.LastModified)) != 0)
+                return i;
+            if ((i = x.Size.CompareTo(y.Size)) != 0)
+                return i;
+            // We dont know how to compare them anymore so make them equal :)
+            return 0;
+        }
+        public int Compare(object x, object y)
+        {
+            ContentInfo xContent = x as ContentInfo;
+            ContentInfo yContent = y as ContentInfo;
+            return Compare(xContent, yContent);
+        }
+        public int CompareTo(object obj)
+        {
+            return Compare(this, obj);
         }
     }
 }

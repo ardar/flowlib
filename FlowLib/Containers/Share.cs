@@ -462,8 +462,8 @@ namespace FlowLib.Containers
                 share.Add(contentInfo.Get(ContentInfo.STORAGEPATH), contentInfo);
                 virtualNames.Add(contentInfo.Get(ContentInfo.VIRTUAL), contentInfo);
                 if (contentInfo.IsTth)
-                    if (!tthNames.ContainsKey(contentInfo.Id))
-                        tthNames.Add(contentInfo.Id, contentInfo);
+                    if (!tthNames.ContainsKey(contentInfo.Get(ContentInfo.TTH)))
+                        tthNames.Add(contentInfo.Get(ContentInfo.TTH), contentInfo);
                 return true;
             }
             return false;
@@ -472,7 +472,7 @@ namespace FlowLib.Containers
         public virtual bool RemoveFile(ContentInfo contentInfo)
         {
             if (contentInfo.IsTth)
-                tthNames.Remove(contentInfo.Id);
+                tthNames.Remove(contentInfo.Get(ContentInfo.TTH));
             virtualNames.Remove(contentInfo.Get(ContentInfo.VIRTUAL));
             return share.Remove(contentInfo.Get(ContentInfo.STORAGEPATH));
         }
@@ -522,7 +522,7 @@ namespace FlowLib.Containers
                             if (tmpContent.LastModified != contentInfo.LastModified || tmpContent.Size != contentInfo.Size)
                             {
                                 // If this content was hashed, decrease hashed count and size.
-                                if (tmpContent.IsTth && tmpContent.Id.Length != 0) {
+                                if (tmpContent.IsTth) {
                                     vd.HashedCount--;
                                     vd.HashedSize -= tmpContent.Size;
                                 }
@@ -588,7 +588,7 @@ namespace FlowLib.Containers
                             {
                                 virtualNames.Remove(info.Get(ContentInfo.VIRTUAL));
                                 if (info.IsHashed)
-                                    tthNames.Remove(info.Id);
+                                    tthNames.Remove(info.Get(ContentInfo.TTH));
                             }
                             share.Remove(keys[i]);
                             i--;
@@ -663,7 +663,7 @@ namespace FlowLib.Containers
                                 // If file was hashed. Add info
                                 if (item.Value.IsHashed)
                                 {
-                                    tthNames.Add(item.Value.Id, item.Value);
+                                    tthNames.Add(item.Value.Get(ContentInfo.TTH), item.Value);
                                     filesAdded++;
                                     tmp.HashedCount++;
                                     tmp.HashedSize += item.Value.Size;
@@ -789,7 +789,7 @@ namespace FlowLib.Containers
                         {
                             tmp.HashedCount--;
                             tmp.HashedSize -= item.Value.Size;
-                            tthNames.Remove(item.Value.Id);
+                            tthNames.Remove(item.Value.Get(ContentInfo.TTH));
                         }
                         tmp.TotalCount--;
                         tmp.TotalSize -= item.Value.Size;
@@ -882,8 +882,8 @@ namespace FlowLib.Containers
                         // TODO : Add setting so we know if we allow dublicate files with same TTH in share.
                         try
                         {
-                            if (content.IsHashed)
-                                tthNames.Add(content.Id, content);
+                            if (content.IsTth)
+                                tthNames.Add(content.Get(ContentInfo.TTH), content);
                         }
                         catch (ArgumentException) {
                             // We have already added a file with this tth.
@@ -991,9 +991,9 @@ namespace FlowLib.Containers
         public virtual bool ContainsContent(ref ContentInfo info)
         {
             bool found = false;
-            if (info.IsHashed && tthNames.ContainsKey(info.Id))
+            if (info.IsHashed && tthNames.ContainsKey(info.Get(ContentInfo.TTH)))
             {
-                info = tthNames[info.Id];
+                info = tthNames[info.Get(ContentInfo.TTH)];
                 found = true;
             }
             else if (info.ContainsKey(ContentInfo.STORAGEPATH) && share.ContainsKey(info.Get(ContentInfo.STORAGEPATH)))

@@ -382,7 +382,7 @@ namespace FlowLib.Protocols
                         if (trans.DownloadItem.ContentInfo.IsTth)
                         {
                             //trans.Content.Id = "TTH/" + trans.Content.Id;
-                            trans.Content.Set(ContentInfo.REQUEST, "TTH/" + trans.Content.Id);
+                            trans.Content.Set(ContentInfo.REQUEST, "TTH/" + trans.DownloadItem.ContentInfo.Get(ContentInfo.TTH));
                         }
                         else if (trans.DownloadItem.ContentInfo.IsFilelist)
                         {
@@ -410,7 +410,7 @@ namespace FlowLib.Protocols
                         else
                         {
                             // For all other requests :)
-                            trans.Content.Set(ContentInfo.REQUEST, trans.DownloadItem.ContentInfo.Get(trans.DownloadItem.ContentInfo.Id));
+                            trans.Content.Set(ContentInfo.REQUEST, trans.DownloadItem.ContentInfo.Get(ContentInfo.VIRTUAL));
                         }
 
                         // Set that we are actually downloading stuff
@@ -428,7 +428,7 @@ namespace FlowLib.Protocols
                         /// $Get needs nothing
                         if (userSupport != null && userSupport.ADCGet && mySupport.ADCGet)
                         {
-                            trans.Send(new ADCGET(trans, "file", trans.Content.Id, trans.CurrentSegment.Start, trans.CurrentSegment.Length, compressedZLib));
+                            trans.Send(new ADCGET(trans, "file", trans.Content.Get(ContentInfo.REQUEST), trans.CurrentSegment.Start, trans.CurrentSegment.Length, compressedZLib));
                         }
                         else if (
                             (userSupport != null && userSupport.GetZBlock || userSupport.XmlBZList)
@@ -436,22 +436,22 @@ namespace FlowLib.Protocols
                         {
                             if ((userSupport.GetZBlock && userSupport.XmlBZList) && (mySupport.GetZBlock && mySupport.XmlBZList))
                             {
-                                trans.Send(new UGetZBlock(trans, trans.Content.Id, trans.CurrentSegment.Start, trans.CurrentSegment.Length));
+                                trans.Send(new UGetZBlock(trans, trans.Content.Get(ContentInfo.REQUEST), trans.CurrentSegment.Start, trans.CurrentSegment.Length));
                                 compressedZLib = true;
                             }
                             else if (userSupport.XmlBZList && mySupport.XmlBZList)
                             {
-                                trans.Send(new UGetBlock(trans, trans.Content.Id, trans.CurrentSegment.Start, trans.CurrentSegment.Length));
+                                trans.Send(new UGetBlock(trans, trans.Content.Get(ContentInfo.REQUEST), trans.CurrentSegment.Start, trans.CurrentSegment.Length));
                             }
                             else
                             {
-                                trans.Send(new GetZBlock(trans, trans.Content.Id, trans.CurrentSegment.Start, trans.CurrentSegment.Length));
+                                trans.Send(new GetZBlock(trans, trans.Content.Get(ContentInfo.REQUEST), trans.CurrentSegment.Start, trans.CurrentSegment.Length));
                                 compressedZLib = true;
                             }
                         }
                         else
                         {
-                            trans.Send(new Get(trans, trans.Content.Id, trans.CurrentSegment.Start));
+                            trans.Send(new Get(trans, trans.Content.Get(ContentInfo.REQUEST), trans.CurrentSegment.Start));
                         }
                     }
                 }
@@ -557,7 +557,7 @@ namespace FlowLib.Protocols
             else if (message is ADCSND)
             {
                 ADCSND adcsnd = (ADCSND)message;
-                if (!trans.Content.Id.Equals(adcsnd.Content))
+                if (!trans.Content.Get(ContentInfo.REQUEST).Equals(adcsnd.Content))
                 {
                     trans.Disconnect("I want my bytes..");
                     return;
@@ -588,7 +588,7 @@ namespace FlowLib.Protocols
                 {
                     trans.Send(new ConMessage(trans, bytesToSend));
                     trans.CurrentSegment.Position += bytesToSend.Length;
-                } while (connectionStatus != TcpConnection.Disconnected && (bytesToSend = this.GetContent(System.Text.Encoding.ASCII, trans.CurrentSegment.Position, trans.CurrentSegment.Length)) != null);
+                } while (connectionStatus != TcpConnection.Disconnected && (bytesToSend = this.GetContent(System.Text.Encoding.ASCII, trans.CurrentSegment.Position, trans.CurrentSegment.Length - trans.CurrentSegment.Position)) != null);
                 trans.Disconnect();
             }
             else if (message is Get)
@@ -615,7 +615,7 @@ namespace FlowLib.Protocols
                     //trans.Content.VirtualName = get.File;
                     trans.Content.Set(ContentInfo.VIRTUAL, get.File);
                 }
-                bytesToSend = this.GetContent(System.Text.Encoding.ASCII, trans.CurrentSegment.Position, trans.CurrentSegment.Length);
+                bytesToSend = this.GetContent(System.Text.Encoding.ASCII, trans.CurrentSegment.Position, trans.CurrentSegment.Length - -trans.CurrentSegment.Position);
 
                 // Do file exist?
                 if (trans.Content.Size > -1)
@@ -651,7 +651,7 @@ namespace FlowLib.Protocols
 
                 trans.CurrentSegment = new SegmentInfo(-1, getblocks.Start, getblocks.Length);
                 bool firstTime = true;
-                while (connectionStatus != TcpConnection.Disconnected && (bytesToSend = GetContent(System.Text.Encoding.UTF8, trans.CurrentSegment.Position, trans.CurrentSegment.Length)) != null)
+                while (connectionStatus != TcpConnection.Disconnected && (bytesToSend = GetContent(System.Text.Encoding.UTF8, trans.CurrentSegment.Position, trans.CurrentSegment.Length - trans.CurrentSegment.Position)) != null)
                 {
                     if (firstTime)
                     {
@@ -707,7 +707,7 @@ namespace FlowLib.Protocols
                     //Util.Compression.ZLib zlib = null;
                     //if (adcget.ZL1)
                     //    zlib = new Fmdc.Util.Compression.ZLib();
-                    while (connectionStatus != TcpConnection.Disconnected && (bytesToSend = GetContent(System.Text.Encoding.UTF8, trans.CurrentSegment.Position, trans.CurrentSegment.Length)) != null)
+                    while (connectionStatus != TcpConnection.Disconnected && (bytesToSend = GetContent(System.Text.Encoding.UTF8, trans.CurrentSegment.Position, trans.CurrentSegment.Length - -trans.CurrentSegment.Position)) != null)
                     {
                         if (firstTime)
                         {

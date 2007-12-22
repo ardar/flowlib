@@ -226,25 +226,17 @@ namespace FlowLib.Containers
         #region Comparing
         public int Compare(DownloadItem x, DownloadItem y)
         {
-            if (x.ContentInfo.Id == null || y.ContentInfo.Id == null)
+            // are x and y valid?
+            if (x == null || y == null)
             {
-                if (x.ContentInfo.Id == null && y.ContentInfo.Id == null)
-                {
+                if (x == null && y == null)
                     return 0;
-                }
-                else if (x.ContentInfo.Id == null)
-                {
+                else if (x == null)
                     return -1;
-                }
                 else
-                {
                     return 1;
-                }
             }
-            else
-            {
-                return x.ContentInfo.Id.CompareTo(y.ContentInfo.Id);
-            }
+            return x.ContentInfo.Compare(x.ContentInfo, y.ContentInfo);
         }
         public int Compare(object x, object y)
         {
