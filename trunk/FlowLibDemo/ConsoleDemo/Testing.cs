@@ -75,8 +75,8 @@ namespace ConsoleDemo
                     if (!userInfo.IsOperator && !userInfo.ID.Equals(hub.Me.ID))
                     {
                         transferManager.AddTransferReq(userInfo.ID, hub, userInfo);
-                        ContentInfo content = new ContentInfo(userInfo.ID, FlowLib.Enums.ContentIdTypes.Filelist);
-                        content.SystemPath =  System.AppDomain.CurrentDomain.BaseDirectory + @"\FileLists\" + userInfo.ID + ".filelist";
+                        ContentInfo content = new ContentInfo(ContentInfo.FILELIST, BaseFilelist.UNKNOWN);
+                        content.Set(ContentInfo.STORAGEPATH, System.AppDomain.CurrentDomain.BaseDirectory + @"\FileLists\" + userInfo.ID + ".filelist");
                         downloadManager.AddDownload(new DownloadItem(content), new Source(null, userInfo.ID));
                         hub.Send(new FlowLib.Protocols.HubNmdc.ConnectToMe(userInfo.ID, hub.Share.Port, hub));
                     }
