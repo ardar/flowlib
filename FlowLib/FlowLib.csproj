@@ -61,6 +61,7 @@
     <Compile Include="Containers\HubStatus.cs" />
     <Compile Include="Containers\MainMessage.cs" />
     <Compile Include="Containers\PrivateMessage.cs" />
+    <Compile Include="Containers\PropertyContainer.cs" />
     <Compile Include="Containers\SegmentInfo.cs" />
     <Compile Include="Containers\SettingItem.cs" />
     <Compile Include="Containers\SettingsGroup.cs" />

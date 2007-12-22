@@ -53,9 +53,11 @@ namespace FlowLib.Utils.FileLists
         {
             get
             {
-                Containers.ContentInfo content = new ContentInfo("MyList" + extention, ContentIdTypes.Filelist);
-                content.VirtualName = "MyList" + extention;
-                content.SystemPath = systemPath + share.Name + ".DcLst" + extention;
+                ContentInfo content = new ContentInfo();
+                content.Set(ContentInfo.VIRTUAL, "MyList" + extention);
+                content.Set(ContentInfo.STORAGEPATH, systemPath + share.Name + ".DcLst" + extention);
+                content.Set(ContentInfo.FILELIST, BZ);
+
                 content.Size = size;
                 content.LastModified = System.DateTime.Now.Ticks;
                 return content;
@@ -118,8 +120,8 @@ namespace FlowLib.Utils.FileLists
         {
             try
             {
-                Utils.FileOperations.PathExists(systemPath);
-                baseStream = new System.IO.FileStream(ContentInfo.SystemPath, System.IO.FileMode.Create);
+                Utils.FileOperations.PathExists(ContentInfo.Get(ContentInfo.STORAGEPATH));
+                baseStream = new System.IO.FileStream(ContentInfo.Get(ContentInfo.STORAGEPATH), System.IO.FileMode.Create);
                 byte[] data = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
                 #region Bz2
                 if (bz2)
@@ -186,7 +188,7 @@ namespace FlowLib.Utils.FileLists
                 {
                     sb.Append("\t");
                 }
-                sb.Append(System.IO.Path.GetFileName(content.VirtualName));
+                sb.Append(System.IO.Path.GetFileName(content.Get(ContentInfo.VIRTUAL)));
                 sb.Append("|");
                 sb.Append(content.Size.ToString());
                 sb.AppendLine();
@@ -218,9 +220,8 @@ namespace FlowLib.Utils.FileLists
                     long size;
                     long.TryParse(name.Substring(sep + 1), out size);
                     name = name.Substring(0, sep).Trim('\t');
-                    Containers.ContentInfo ci = new ContentInfo(name, ContentIdTypes.Filename);
+                    ContentInfo ci = new ContentInfo(ContentInfo.NAME, name);
                     ci.Size = size;
-
 
                     #region Adding virtual dir
                     string virtualDir = @"";
@@ -230,8 +231,8 @@ namespace FlowLib.Utils.FileLists
                     {
                         virtualDir += tmpDirs[vpos] + @"\";
                     }
-                    ci.VirtualName = virtualDir + name;
-                    ci.SystemPath = name;
+                    ci.Set(ContentInfo.VIRTUAL, virtualDir + name);
+                    ci.Set(ContentInfo.NAME, name);
                     #endregion
                     AddFile(ci);
                 }
