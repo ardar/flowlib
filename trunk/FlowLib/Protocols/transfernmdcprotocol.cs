@@ -174,14 +174,13 @@ namespace FlowLib.Protocols
                                     return;
                                 }
 
-                                if (!Utils.FileOperations.PathExists(trans.DownloadItem.ContentInfo.SystemPath))
+                                if (trans.CurrentSegment.Position == 0 && !Utils.FileOperations.PathExists(trans.DownloadItem.ContentInfo.Get(ContentInfo.STORAGEPATH)))
                                 {
-                                    Utils.FileOperations.AllocateFile(trans.DownloadItem.ContentInfo.SystemPath, trans.DownloadItem.ContentInfo.Size);
-                                    trans.CurrentSegment.Position = 0;
+                                    Utils.FileOperations.AllocateFile(trans.DownloadItem.ContentInfo.Get(ContentInfo.STORAGEPATH), trans.DownloadItem.ContentInfo.Size);
                                 }
 
                                 // Create the file.
-                                using (System.IO.FileStream fs = System.IO.File.OpenWrite(trans.DownloadItem.ContentInfo.SystemPath))
+                                using (System.IO.FileStream fs = System.IO.File.OpenWrite(trans.DownloadItem.ContentInfo.Get(ContentInfo.STORAGEPATH)))
                                 {
                                     try
                                     {
@@ -378,27 +377,40 @@ namespace FlowLib.Protocols
                     if (trans.DownloadItem != null && trans.CurrentSegment.Index != -1)
                     {
                         // Set right content string
-                        trans.Content = new ContentInfo(trans.DownloadItem.ContentInfo.Id, trans.DownloadItem.ContentInfo.IdType);
-                        if ((trans.DownloadItem.ContentInfo.IdType | ContentIdTypes.TTH) == trans.DownloadItem.ContentInfo.IdType)
+                        //trans.Content = new ContentInfo(trans.DownloadItem.ContentInfo.Id, trans.DownloadItem.ContentInfo.IdType);
+                        trans.Content = new ContentInfo();
+                        if (trans.DownloadItem.ContentInfo.IsTth)
                         {
-                            trans.Content.Id = "TTH/" + trans.Content.Id;
+                            //trans.Content.Id = "TTH/" + trans.Content.Id;
+                            trans.Content.Set(ContentInfo.REQUEST, "TTH/" + trans.Content.Id);
                         }
                         else if (trans.DownloadItem.ContentInfo.IsFilelist)
                         {
                             if (userSupport != null && userSupport.XmlBZList && mySupport.XmlBZList)
                             {
-                                trans.Content.Id = "files.xml.bz2";
-                                trans.DownloadItem.ContentInfo.IdType = ContentIdTypes.FilelistXmlBz;
+                                //trans.Content.Id = "files.xml.bz2";
+                                //trans.DownloadItem.ContentInfo.IdType = ContentIdTypes.FilelistXmlBz;
+                                trans.Content.Set(ContentInfo.REQUEST, "files.xml.bz2");
+                                trans.Content.Set(ContentInfo.FILELIST, Utils.FileLists.BaseFilelist.XMLBZ);
                             }
                             else if (userSupport != null && userSupport.BZList && mySupport.BZList)
                             {
-                                trans.Content.Id = "MyList.bz2";
-                                trans.DownloadItem.ContentInfo.IdType = ContentIdTypes.FilelistBz;
+                                //trans.Content.Id = "MyList.bz2";
+                                //trans.DownloadItem.ContentInfo.IdType = ContentIdTypes.FilelistBz;
+                                trans.Content.Set(ContentInfo.REQUEST, "MyList.bz2");
+                                trans.Content.Set(ContentInfo.FILELIST, Utils.FileLists.BaseFilelist.BZ);
                             }
                             else
                             {
-                                trans.Content.Id = "MyList.DcLst";
+                                //trans.Content.Id = "MyList.DcLst";
+                                trans.Content.Set(ContentInfo.REQUEST, "MyList.DcLst");
+                                trans.Content.Set(ContentInfo.FILELIST, Utils.FileLists.BaseFilelist.HUFFMAN);
                             }
+                        }
+                        else
+                        {
+                            // For all other requests :)
+                            trans.Content.Set(ContentInfo.REQUEST, trans.DownloadItem.ContentInfo.Get(trans.DownloadItem.ContentInfo.Id));
                         }
 
                         // Set that we are actually downloading stuff
@@ -589,16 +601,19 @@ namespace FlowLib.Protocols
                 }
                 Get get = (Get)message;
 
-                trans.Content = new ContentInfo();
+                trans.Content = new ContentInfo(ContentInfo.REQUEST, get.File);
                 trans.CurrentSegment = new SegmentInfo(-1, get.Start, -1);
                 if (get.File.Equals("files.xml.bz2"))
                 {
-                    trans.Content.VirtualName = System.Text.Encoding.ASCII.WebName + get.File;
-                    trans.Content.IdType = ContentIdTypes.Filelist;
+                    //trans.Content.VirtualName = System.Text.Encoding.ASCII.WebName + get.File;
+                    //trans.Content.IdType = ContentIdTypes.Filelist;
+                    trans.Content.Set(ContentInfo.FILELIST, Utils.FileLists.BaseFilelist.XMLBZ);
+                    trans.Content.Set(ContentInfo.VIRTUAL, System.Text.Encoding.ASCII.WebName + get.File);
                 }
                 else
                 {
-                    trans.Content.VirtualName = get.File;
+                    //trans.Content.VirtualName = get.File;
+                    trans.Content.Set(ContentInfo.VIRTUAL, get.File);
                 }
                 bytesToSend = this.GetContent(System.Text.Encoding.ASCII, trans.CurrentSegment.Position, trans.CurrentSegment.Length);
 
@@ -621,15 +636,17 @@ namespace FlowLib.Protocols
                     return;
                 }
                 GetBlocks getblocks = (GetBlocks)message;
-                trans.Content = new Containers.ContentInfo();
+                trans.Content = new Containers.ContentInfo(ContentInfo.REQUEST, getblocks.FileName);
                 if (getblocks.FileName.Equals("files.xml.bz2"))
                 {
-                    trans.Content.VirtualName = System.Text.Encoding.UTF8.WebName + getblocks.FileName;
-                    trans.Content.IdType = ContentIdTypes.Filelist;
+                    //trans.Content.VirtualName = System.Text.Encoding.UTF8.WebName + getblocks.FileName;
+                    //trans.Content.IdType = ContentIdTypes.Filelist;
+                    trans.Content.Set(ContentInfo.VIRTUAL, System.Text.Encoding.UTF8.WebName + getblocks.FileName);
+                    trans.Content.Set(ContentInfo.FILELIST, Utils.FileLists.BaseFilelist.XMLBZ);
                 }
                 else
                 {
-                    trans.Content.VirtualName = getblocks.FileName;
+                    trans.Content.Set(ContentInfo.VIRTUAL, getblocks.FileName);
                 }
 
                 trans.CurrentSegment = new SegmentInfo(-1, getblocks.Start, getblocks.Length);
@@ -656,25 +673,28 @@ namespace FlowLib.Protocols
                     return;
                 }
                 ADCGET adcget = (ADCGET)message;
-                trans.Content = new ContentInfo();
+                trans.Content = new ContentInfo(ContentInfo.REQUEST, adcget.Content);
                 switch (adcget.Type.ToLower())
                 {
                     case "file":
                         if (adcget.Content.StartsWith("TTH/"))
                         {
-                            trans.Content.Id = adcget.Content.Substring(4);
-                            trans.Content.IdType = ContentIdTypes.TTH | ContentIdTypes.Hash;
+                            //trans.Content.Id = adcget.Content.Substring(4);
+                            //trans.Content.IdType = ContentIdTypes.TTH | ContentIdTypes.Hash;
+                            trans.Content.Set(ContentInfo.TTH, adcget.Content.Substring(4));
                         }
                         else
                         {
                             if (adcget.Content.Equals("files.xml.bz2"))
                             {
-                                trans.Content.VirtualName = System.Text.Encoding.UTF8.WebName + adcget.Content;
-                                trans.Content.IdType = ContentIdTypes.Filelist;
+                                //trans.Content.VirtualName = System.Text.Encoding.UTF8.WebName + adcget.Content;
+                                //trans.Content.IdType = ContentIdTypes.Filelist;
+                                trans.Content.Set(ContentInfo.VIRTUAL, System.Text.Encoding.UTF8.WebName + adcget.Content);
+                                trans.Content.Set(ContentInfo.FILELIST, Utils.FileLists.BaseFilelist.XMLBZ);
                             }
                             else
                             {
-                                trans.Content.VirtualName = adcget.Content;
+                                trans.Content.Set(ContentInfo.VIRTUAL, adcget.Content);
                             }
                         }
                         break;

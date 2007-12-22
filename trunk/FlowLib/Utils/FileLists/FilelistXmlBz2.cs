@@ -50,9 +50,10 @@ namespace FlowLib.Utils.FileLists
         {
             get
             {
-                Containers.ContentInfo content = new ContentInfo(virtualFileName + encoding.WebName + "files" + extention, ContentIdTypes.Filelist);
-                content.VirtualName = virtualFileName + encoding.WebName + "files" + extention;
-                content.SystemPath = systemPath + FileName;
+                ContentInfo content = new ContentInfo();
+                content.Set(ContentInfo.VIRTUAL, virtualFileName + encoding.WebName + "files" + extention);
+                content.Set(ContentInfo.FILELIST, XMLBZ);
+                content.Set(ContentInfo.STORAGEPATH, systemPath + FileName);
                 content.Size = size;
                 content.LastModified = System.DateTime.Now.Ticks;
                 return content;
@@ -180,11 +181,11 @@ namespace FlowLib.Utils.FileLists
                                     Containers.ContentInfo ci = null;
                                     if (string.IsNullOrEmpty(tth))
                                     {
-                                        ci = new ContentInfo(name, ContentIdTypes.Filename);
+                                        ci = new ContentInfo(ContentInfo.NAME, name);
                                     }
                                     else
                                     {
-                                        ci = new ContentInfo(tth, ContentIdTypes.TTH);
+                                        ci = new ContentInfo(ContentInfo.TTH,tth);
                                     }
                                     ci.Size = size;
 
@@ -199,8 +200,8 @@ namespace FlowLib.Utils.FileLists
                                             virtualDir += tmpDirs[i] + @"\";
                                         }
                                     }
-                                    ci.VirtualName = virtualDir + name;
-                                    ci.SystemPath = name;
+                                    ci.Set(ContentInfo.VIRTUAL, virtualDir + name);
+                                    ci.Set(ContentInfo.NAME, name);
                                     #endregion
 
                                     AddFile(ci);
@@ -351,10 +352,10 @@ namespace FlowLib.Utils.FileLists
             if (!fromXml)
             {
                 // Make XML filelist
-                string tmpName = content.VirtualName;
+                string tmpName = content.Get(ContentInfo.VIRTUAL);
                 int pos;
                 if ((pos = tmpName.LastIndexOf(seperator)) != -1)
-                    tmpName = content.VirtualName.Substring(++pos);
+                    tmpName = content.Get(ContentInfo.VIRTUAL).Substring(++pos);
 
                 writer.WriteStartElement("File");
                 writer.WriteStartAttribute("Name");
@@ -363,10 +364,10 @@ namespace FlowLib.Utils.FileLists
                 writer.WriteStartAttribute("Size");
                 writer.WriteValue(content.Size);
                 writer.WriteEndAttribute();
-                if (content.IsHashed)
+                if (content.IsTth)
                 {
-                    writer.WriteStartAttribute(content.IdType.ToString());
-                    writer.WriteValue(content.Id);
+                    writer.WriteStartAttribute("Tth");
+                    writer.WriteValue(content.Get(Containers.ContentInfo.TTH));
                 }
                 writer.WriteEndAttribute();
                 writer.WriteEndElement();

@@ -27,6 +27,11 @@ namespace FlowLib.Utils.FileLists
 {
     public abstract class BaseFilelist
     {
+        public const string UNKNOWN = "UNKNOWN";
+        public const string XMLBZ = "XMLBZ";
+        public const string BZ = "BZ";
+        public const string HUFFMAN = "HUFFMAN";
+
         protected char seperator = '\\';
         protected Share share = null;
         protected bool hasWritenFilelist = false;
@@ -68,7 +73,7 @@ namespace FlowLib.Utils.FileLists
             foreach (KeyValuePair<string, ContentInfo> item in share)
             {
                 if (item.Value != null)
-                    vlist.Add(item.Value.VirtualName, item.Value);
+                    vlist.Add(item.Value.Get(ContentInfo.VIRTUAL), item.Value);
             }
             #endregion
             #region Add Content
@@ -77,9 +82,9 @@ namespace FlowLib.Utils.FileLists
             {
                 string[] currentDirs = null;
                 int pos;
-                if (item.Value != null && (pos = item.Value.VirtualName.LastIndexOf(seperator)) != -1)
+                if (item.Value != null && (pos = item.Value.Get(ContentInfo.VIRTUAL).LastIndexOf(seperator)) != -1)
                 {
-                    string tmpPath = item.Value.VirtualName.Substring(0, pos);
+                    string tmpPath = item.Value.Get(ContentInfo.VIRTUAL).Substring(0, pos);
                     currentDirs = tmpPath.Split(seperator);
                     #region remove directories
                     int differFrom = 0;

@@ -457,10 +457,10 @@ namespace FlowLib.Containers
         #region For Transfer Protocol that makes Filelists.
         public virtual bool AddFile(ContentInfo contentInfo)
         {
-            if (!share.ContainsKey(contentInfo.SystemPath))
+            if (!share.ContainsKey(contentInfo.Get(ContentInfo.STORAGEPATH)))
             {
-                share.Add(contentInfo.SystemPath, contentInfo);
-                virtualNames.Add(contentInfo.VirtualName, contentInfo);
+                share.Add(contentInfo.Get(ContentInfo.STORAGEPATH), contentInfo);
+                virtualNames.Add(contentInfo.Get(ContentInfo.VIRTUAL), contentInfo);
                 if (contentInfo.IsTth)
                     if (!tthNames.ContainsKey(contentInfo.Id))
                         tthNames.Add(contentInfo.Id, contentInfo);
@@ -473,15 +473,15 @@ namespace FlowLib.Containers
         {
             if (contentInfo.IsTth)
                 tthNames.Remove(contentInfo.Id);
-            virtualNames.Remove(contentInfo.VirtualName);
-            return share.Remove(contentInfo.SystemPath);
+            virtualNames.Remove(contentInfo.Get(ContentInfo.VIRTUAL));
+            return share.Remove(contentInfo.Get(ContentInfo.STORAGEPATH));
         }
         #endregion
         protected virtual void AddContent(ContentInfo contentInfo)
         {
             foreach (KeyValuePair<string, VirtualDir> item in virtualDirs)
             {
-                if (contentInfo.SystemPath.StartsWith(item.Key))
+                if (contentInfo.Get(ContentInfo.STORAGEPATH).StartsWith(item.Key))
                 {
                     AddContent(contentInfo, item.Value);
                     return;
@@ -495,7 +495,7 @@ namespace FlowLib.Containers
             // Adding to lists
             try{
                 ContentInfo virtualValue;
-                if (virtualNames.TryGetValue(contentInfo.VirtualName, out virtualValue) && !virtualValue.SystemPath.Equals(contentInfo.SystemPath))
+                if (virtualNames.TryGetValue(contentInfo.Get(ContentInfo.VIRTUAL), out virtualValue) && !virtualValue.Get(ContentInfo.STORAGEPATH).Equals(contentInfo.Get(ContentInfo.STORAGEPATH)))
                 {
                     // TODO : Making it optional what should happen if we get a Virtual name conflict.
                     // Duplicate of virtual name.
@@ -506,8 +506,8 @@ namespace FlowLib.Containers
                 {
                     if (virtualValue == null)
                     {
-                        virtualNames.Add(contentInfo.VirtualName, contentInfo);
-                        share.Add(contentInfo.SystemPath, contentInfo); 
+                        virtualNames.Add(contentInfo.Get(ContentInfo.VIRTUAL), contentInfo);
+                        share.Add(contentInfo.Get(ContentInfo.STORAGEPATH), contentInfo); 
                         // Adding status stuff
                         vd.TotalSize += contentInfo.Size;
                         vd.TotalCount++;
@@ -517,7 +517,7 @@ namespace FlowLib.Containers
                         // We are trying to add a contentInfo with same name,
                         // See if content has changed. If so we will replace info.
                         ContentInfo tmpContent;
-                        if (share.TryGetValue(virtualValue.SystemPath, out tmpContent))
+                        if (share.TryGetValue(virtualValue.Get(ContentInfo.STORAGEPATH), out tmpContent))
                         {
                             if (tmpContent.LastModified != contentInfo.LastModified || tmpContent.Size != contentInfo.Size)
                             {
@@ -528,8 +528,8 @@ namespace FlowLib.Containers
                                 }
                                 // Decrease size, not count as we will add content again.
                                 vd.TotalSize -= tmpContent.Size;
-                                share.Remove(virtualValue.SystemPath);
-                                share.Add(contentInfo.SystemPath, contentInfo);
+                                share.Remove(virtualValue.Get(ContentInfo.STORAGEPATH));
+                                share.Add(contentInfo.Get(ContentInfo.STORAGEPATH), contentInfo);
                                 // Adding status stuff
                                 vd.TotalSize += contentInfo.Size;
                             }
@@ -555,12 +555,12 @@ namespace FlowLib.Containers
         {
             // Copy interesting info
             ContentInfo info = new ContentInfo();
-            info.SystemPath = fileInfo.FullName;
 
             info.LastModified = fileInfo.LastWriteTimeUtc.Ticks;
             info.Size = fileInfo.Length;
             // TODO : Check fileInfo.Name so it will make a valid virtual name
-            info.VirtualName = virtualname + fileInfo.Name;
+            info.Set(ContentInfo.VIRTUAL, virtualname + fileInfo.Name);
+            info.Set(ContentInfo.STORAGEPATH, fileInfo.FullName);
             info.IsHidden = ((fileInfo.Attributes & System.IO.FileAttributes.Hidden) == System.IO.FileAttributes.Hidden);
             info.IsSystem = ((fileInfo.Attributes & System.IO.FileAttributes.System) == System.IO.FileAttributes.System);
             AddContent(info, vd);
@@ -586,7 +586,7 @@ namespace FlowLib.Containers
                             ContentInfo info = null;
                             if (share.TryGetValue(keys[i], out info) && info != null)
                             {
-                                virtualNames.Remove(info.VirtualName);
+                                virtualNames.Remove(info.Get(ContentInfo.VIRTUAL));
                                 if (info.IsHashed)
                                     tthNames.Remove(info.Id);
                             }
@@ -640,8 +640,8 @@ namespace FlowLib.Containers
                         try
                         {
                             // Get virtual dir
-                            if (tmp == null || !item.Value.SystemPath.StartsWith(tmp.SystemPath))
-                                tmp = GetMatchingVirtualDir(item.Value.SystemPath);
+                            if (tmp == null || !item.Value.Get(ContentInfo.STORAGEPATH).StartsWith(tmp.SystemPath))
+                                tmp = GetMatchingVirtualDir(item.Value.Get(ContentInfo.STORAGEPATH));
                             // It should not be possible for this to be null.
                             if (tmp != null)
                             {
@@ -654,14 +654,11 @@ namespace FlowLib.Containers
                                 if (!e.Handled)
                                 {
 
-                                    TthThreaded tth = new TthThreaded(item.Value.SystemPath);
+                                    TthThreaded tth = new TthThreaded(item.Value.Get(ContentInfo.STORAGEPATH));
                                     tth.ThreadPriority = this.hashPriority;
                                     tth.ThreadCount = this.hashThreadCount;
                                     byte[] bytes = tth.GetTTH_Value();
-                                    item.Value.Id = Base32.Encode(bytes);
-                                    item.Value.IdType = ContentIdTypes.TTH | ContentIdTypes.Hash;
-                                    //share[item.Key].Id = Base32.Encode(bytes);
-                                    //share[item.Key].IdType = ContentIdTypes.TTH | ContentIdTypes.Hash;
+                                    item.Value.Set(ContentInfo.TTH, Base32.Encode(bytes));
                                 }
                                 // If file was hashed. Add info
                                 if (item.Value.IsHashed)
@@ -690,7 +687,7 @@ namespace FlowLib.Containers
                             if (!hashAllowDuplicate)
                             {
                                 share.Remove(item.Key);
-                                virtualNames.Remove(item.Value.VirtualName);
+                                virtualNames.Remove(item.Value.Get(ContentInfo.VIRTUAL));
                                 if (tmp != null)
                                 {
                                     tmp.TotalCount--;
@@ -783,7 +780,7 @@ namespace FlowLib.Containers
                     // have we virtual dir temporary stored?
                     if (tmp == null || !tmp.SystemPath.StartsWith(tmp.SystemPath))
                     {
-                        tmp = GetMatchingVirtualDir(item.Value.SystemPath);
+                        tmp = GetMatchingVirtualDir(item.Value.Get(ContentInfo.STORAGEPATH));
                     }
                     if (tmp != null)
                     {
@@ -796,7 +793,7 @@ namespace FlowLib.Containers
                         }
                         tmp.TotalCount--;
                         tmp.TotalSize -= item.Value.Size;
-                        virtualNames.Remove(item.Value.VirtualName);
+                        virtualNames.Remove(item.Value.Get(ContentInfo.VIRTUAL));
                         share.Remove(item.Key);
                     }
                 }
@@ -880,8 +877,8 @@ namespace FlowLib.Containers
                     ContentInfo content = (ContentInfo)setting.GetObject(i);
                     if (content != null)
                     {
-                        share.Add(content.SystemPath, content);
-                        virtualNames.Add(content.VirtualName, content);
+                        share.Add(content.Get(ContentInfo.STORAGEPATH), content);
+                        virtualNames.Add(content.Get(ContentInfo.VIRTUAL), content);
                         // TODO : Add setting so we know if we allow dublicate files with same TTH in share.
                         try
                         {
@@ -894,11 +891,11 @@ namespace FlowLib.Containers
                             if (!hashAllowDuplicate)
                             {
                                 VirtualDir vd;
-                                if ((vd = this.GetMatchingVirtualDir(content.SystemPath)) != null)
+                                if ((vd = this.GetMatchingVirtualDir(content.Get(ContentInfo.STORAGEPATH))) != null)
                                 {
                                     // Remove file if we dont allow duplicates.
-                                    virtualNames.Remove(content.VirtualName);
-                                    share.Remove(content.SystemPath);
+                                    virtualNames.Remove(content.Get(ContentInfo.VIRTUAL));
+                                    share.Remove(content.Get(ContentInfo.STORAGEPATH));
                                     vd.TotalCount--;
                                     vd.TotalSize -= content.Size;
                                 }
@@ -999,14 +996,14 @@ namespace FlowLib.Containers
                 info = tthNames[info.Id];
                 found = true;
             }
-            else if (info.SystemPath.Length > 0 && share.ContainsKey(info.SystemPath))
+            else if (info.ContainsKey(ContentInfo.STORAGEPATH) && share.ContainsKey(info.Get(ContentInfo.STORAGEPATH)))
             {
-                info = share[info.SystemPath];
+                info = share[info.Get(ContentInfo.STORAGEPATH)];
                 found = true;
             }
-            else if (info.VirtualName.Length > 0 && virtualNames.ContainsKey(info.VirtualName))
+            else if (info.ContainsKey(ContentInfo.VIRTUAL) && virtualNames.ContainsKey(info.Get(ContentInfo.VIRTUAL)))
             {
-                info = virtualNames[info.VirtualName];
+                info = virtualNames[info.Get(ContentInfo.VIRTUAL)];
                 found = true;
             }
             // TODO : Add Filtering matchning here.
@@ -1035,7 +1032,7 @@ namespace FlowLib.Containers
                     // Read requested bytes
                     //using (BinaryReader reader = new BinaryReader(new StreamReader(info.SystemPath).BaseStream))
                     //{
-                        StreamReader sr = new StreamReader(info.SystemPath);
+                    StreamReader sr = new StreamReader(info.Get(ContentInfo.STORAGEPATH));
                         BinaryReader reader = new BinaryReader(sr.BaseStream);
                         //BinaryReader reader = new BinaryReader(new StreamReader(info.SystemPath).BaseStream);
                         byte[] buffer = new byte[length];

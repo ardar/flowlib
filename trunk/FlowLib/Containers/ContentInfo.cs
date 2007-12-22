@@ -19,6 +19,7 @@
  *
  */
 
+using System.Collections.Generic;
 using System;
 using System.Xml.Serialization;
 using FlowLib.Enums;
@@ -29,15 +30,25 @@ namespace FlowLib.Containers
     /// Class representing Share/Download/Upload Item.
     /// Most probably a file on your system.
     /// </summary>
-    public class ContentInfo
+    public class ContentInfo : PropertyContainer<string, string>
     {
-        protected string systemPath = string.Empty;
-        protected string virtualName = string.Empty;
+        public const string ID = "id";
+        public const string TTH = "tth";
+        /// <summary>
+        /// Virtual path in your/others share
+        /// </summary>
+        public const string VIRTUAL = "virtual";
+        public const string NAME = "name";
+        /// <summary>
+        /// Storage path for this content
+        /// </summary>
+        public const string STORAGEPATH = "storage";
+        public const string FILELIST = "filelist";
+        public const string REQUEST = "request";   // This should only be set when we want / send content
+
         protected long modified = 0;
-        protected string id = string.Empty;
         protected long size = -1;
 
-        protected ContentIdTypes type = ContentIdTypes.None;
         protected ContentExtend extend = ContentExtend.None;
         #region For content made of files.
         /// <summary>
@@ -64,16 +75,7 @@ namespace FlowLib.Containers
         [XmlIgnore()]
         public bool IdSpecified
         {
-            get { return ((type | ContentIdTypes.None) == type); }
-            set { }
-        }
-        /// <summary>
-        /// This property is here for xml serialization only.
-        /// </summary>
-        [XmlIgnore()]
-        public bool IdTypeSpecified
-        {
-            get { return ((type | ContentIdTypes.None) == type); }
+            get { return false; }
             set { }
         }
         /// <summary>
@@ -82,7 +84,7 @@ namespace FlowLib.Containers
         [XmlIgnore()]
         public bool IsFilelist
         {
-            get { return ((type | ContentIdTypes.Filelist) == type); }
+            get { return ContainsKey(FILELIST); }
         }
 
         /// <summary>
@@ -117,7 +119,8 @@ namespace FlowLib.Containers
         [XmlIgnore()]
         public bool IsHashed
         {
-            get { return ((type | ContentIdTypes.Hash) == type); }
+            get
+            { return ContainsKey(TTH); }
         }
         /// <summary>
         /// Indicates that the id of this contentinfo is a TTH (Tiger Tree Hash)
@@ -125,32 +128,20 @@ namespace FlowLib.Containers
         [XmlIgnore()]
         public bool IsTth
         {
-            get { return ((type | ContentIdTypes.TTH) == type); }
+            get { return ContainsKey(TTH); }
         }
-        /// <summary>
-        /// Id type of this contentinfo
-        /// </summary>
-        public ContentIdTypes IdType
-        {
-            get { return type; }
-            set { type = value; }
-        }
-        /// <summary>
-        /// Virtual path in your/others share
-        /// </summary>
-        public string VirtualName
-        {
-            get { return virtualName; }
-            set { virtualName = value; }
-        }
-        /// <summary>
-        /// System path for this file
-        /// </summary>
-        public string SystemPath
-        {
-            get { return systemPath; }
-            set { systemPath = value; }
-        }
+
+        //public string SystemPath
+        //{
+        //    get
+        //    {
+        //        return Get(STORAGEPATH);
+        //    }
+        //    set
+        //    {
+        //        Set(STORAGEPATH, value);
+        //    }
+        //}
         /// <summary>
         /// DateTime tick on when file was last changed
         /// </summary>
@@ -160,12 +151,24 @@ namespace FlowLib.Containers
             set { modified = value; }
         }
         /// <summary>
-        /// Id of this contentinfo
+        /// Key name of this contentinfo
         /// </summary>
         public string Id
         {
-            get { return id; }
-            set { id = value; }
+            get
+            {
+                if (ContainsKey(ID))
+                {
+                    // We want to override id order.
+                    return ID;
+                }
+                if (ContainsKey(TTH))
+                    return TTH;
+                else if (ContainsKey(VIRTUAL))
+                    return VIRTUAL;
+                else
+                    return NAME;
+            }
         }
         /// <summary>
         /// File size of target
@@ -185,14 +188,13 @@ namespace FlowLib.Containers
         }
 
         /// <summary>
-        /// Creating ContentInfo with a id and the id type
+        /// Creating ContentInfo with key and its value
         /// </summary>
-        /// <param name="id">Id for this ContentInfo</param>
-        /// <param name="type">Type of id</param>
-        public ContentInfo(string id, ContentIdTypes type)
+        /// <param name="key">Key to add value for</param>
+        /// <param name="value">value that should be added</param>
+        public ContentInfo(string key, string value)
         {
-            this.id = id;
-            this.type = type;
+            Add(key, value);
         }
     }
 }
