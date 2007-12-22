@@ -379,7 +379,7 @@ namespace FlowLib.Protocols
                         // Set right content string
                         //trans.Content = new ContentInfo(trans.DownloadItem.ContentInfo.Id, trans.DownloadItem.ContentInfo.IdType);
                         trans.Content = new ContentInfo();
-                        if (trans.DownloadItem.ContentInfo.IsTth)
+                        if (trans.DownloadItem.ContentInfo.IsTth && userSupport != null && userSupport.TTHF && mySupport.TTHF)
                         {
                             //trans.Content.Id = "TTH/" + trans.Content.Id;
                             trans.Content.Set(ContentInfo.REQUEST, "TTH/" + trans.DownloadItem.ContentInfo.Get(ContentInfo.TTH));
@@ -391,20 +391,20 @@ namespace FlowLib.Protocols
                                 //trans.Content.Id = "files.xml.bz2";
                                 //trans.DownloadItem.ContentInfo.IdType = ContentIdTypes.FilelistXmlBz;
                                 trans.Content.Set(ContentInfo.REQUEST, "files.xml.bz2");
-                                trans.Content.Set(ContentInfo.FILELIST, Utils.FileLists.BaseFilelist.XMLBZ);
+                                trans.DownloadItem.ContentInfo.Set(ContentInfo.FILELIST, Utils.FileLists.BaseFilelist.XMLBZ);
                             }
                             else if (userSupport != null && userSupport.BZList && mySupport.BZList)
                             {
                                 //trans.Content.Id = "MyList.bz2";
                                 //trans.DownloadItem.ContentInfo.IdType = ContentIdTypes.FilelistBz;
                                 trans.Content.Set(ContentInfo.REQUEST, "MyList.bz2");
-                                trans.Content.Set(ContentInfo.FILELIST, Utils.FileLists.BaseFilelist.BZ);
+                                trans.DownloadItem.ContentInfo.Set(ContentInfo.FILELIST, Utils.FileLists.BaseFilelist.BZ);
                             }
                             else
                             {
                                 //trans.Content.Id = "MyList.DcLst";
                                 trans.Content.Set(ContentInfo.REQUEST, "MyList.DcLst");
-                                trans.Content.Set(ContentInfo.FILELIST, Utils.FileLists.BaseFilelist.HUFFMAN);
+                                trans.DownloadItem.ContentInfo.Set(ContentInfo.FILELIST, Utils.FileLists.BaseFilelist.HUFFMAN);
                             }
                         }
                         else
