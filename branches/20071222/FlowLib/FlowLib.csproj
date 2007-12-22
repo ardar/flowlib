@@ -1,0 +1,163 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{4C9A3F81-7660-4170-8D6B-62C239922C89}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>FlowLib</RootNamespace>
+    <AssemblyName>FlowLib</AssemblyName>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>
+    </DocumentationFile>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <CodeAnalysisRules>
+    </CodeAnalysisRules>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <CodeAnalysisRules>
+    </CodeAnalysisRules>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Connections\TcpConnection.cs" />
+    <Compile Include="Connections\Hub.cs" />
+    <Compile Include="Connections\TcpConnectionListener.cs" />
+    <Compile Include="Connections\Transfer.cs" />
+    <Compile Include="Connections\UdpConnection.cs" />
+    <Compile Include="Containers\BinaryMessage.cs" />
+    <Compile Include="Containers\ConMessage.cs" />
+    <Compile Include="Containers\ContentInfo.cs" />
+    <Compile Include="Containers\DownloadItem.cs" />
+    <Compile Include="Containers\FlowSortedList.cs" />
+    <Compile Include="Containers\HubMessage.cs" />
+    <Compile Include="Containers\HubName.cs" />
+    <Compile Include="Containers\HubSetting.cs" />
+    <Compile Include="Containers\HubStatus.cs" />
+    <Compile Include="Containers\MainMessage.cs" />
+    <Compile Include="Containers\PrivateMessage.cs" />
+    <Compile Include="Containers\PropertyContainer.cs" />
+    <Compile Include="Containers\SegmentInfo.cs" />
+    <Compile Include="Containers\SettingItem.cs" />
+    <Compile Include="Containers\SettingsGroup.cs" />
+    <Compile Include="Containers\Share.cs" />
+    <Compile Include="Containers\Source.cs" />
+    <Compile Include="Containers\TagInfo.cs" />
+    <Compile Include="Containers\TransferMessage.cs" />
+    <Compile Include="Containers\TransferRequest.cs" />
+    <Compile Include="Containers\User.cs" />
+    <Compile Include="Containers\UserInfo.cs" />
+    <Compile Include="Containers\VirtualDir.cs" />
+    <Compile Include="Enums\Enums.cs" />
+    <Compile Include="Events\Actions.cs" />
+    <Compile Include="Events\FmdcEventArg.cs" />
+    <Compile Include="Interfaces\IConMessage.cs" />
+    <Compile Include="Interfaces\IConnection.cs" />
+    <Compile Include="Interfaces\IErrorReporting.cs" />
+    <Compile Include="Interfaces\IBaseUpdater.cs" />
+    <Compile Include="Interfaces\IGuiHub.cs" />
+    <Compile Include="Interfaces\IGuiMain.cs" />
+    <Compile Include="Interfaces\IHash.cs" />
+    <Compile Include="Interfaces\IHubMessage.cs" />
+    <Compile Include="Interfaces\IProtocol.cs" />
+    <Compile Include="Interfaces\IProtocolHub.cs" />
+    <Compile Include="Interfaces\IProtocolTransfer.cs" />
+    <Compile Include="Interfaces\ITransfer.cs" />
+    <Compile Include="Managers\DownloadManager.cs" />
+    <Compile Include="Managers\EventManager.cs" />
+    <Compile Include="Managers\ShareManager.cs" />
+    <Compile Include="Managers\TransferManager.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Protocols\Adc\adcbasemessage.cs" />
+    <Compile Include="Protocols\Adc\adcmessages.cs" />
+    <Compile Include="Protocols\hubadcprotocol.cs" />
+    <Compile Include="Protocols\hubnmdcprotocol.cs" />
+    <Compile Include="Protocols\Nmdc\hubnmdcmessages.cs" />
+    <Compile Include="Protocols\Nmdc\transfernmdcmessages.cs" />
+    <Compile Include="Protocols\transferadcprotocol.cs" />
+    <Compile Include="Protocols\transfernmdcprotocol.cs" />
+    <Compile Include="Utils\Compression\Bz2.cs" />
+    <Compile Include="Utils\Compression\Bz2SubMethods\BZip2Constants.cs" />
+    <Compile Include="Utils\Compression\Bz2SubMethods\BZip2Exception.cs" />
+    <Compile Include="Utils\Compression\Bz2SubMethods\BZip2InputStream.cs" />
+    <Compile Include="Utils\Compression\Bz2SubMethods\BZip2OutputStream.cs" />
+    <Compile Include="Utils\Compression\Core\Adler32.cs" />
+    <Compile Include="Utils\Compression\Core\CRC32.cs" />
+    <Compile Include="Utils\Compression\Core\FileSystemScanner.cs" />
+    <Compile Include="Utils\Compression\Core\IChecksum.cs" />
+    <Compile Include="Utils\Compression\Core\INameTransform.cs" />
+    <Compile Include="Utils\Compression\Core\NameFilter.cs" />
+    <Compile Include="Utils\Compression\Core\PathFilter.cs" />
+    <Compile Include="Utils\Compression\Core\PkzipClassic.cs" />
+    <Compile Include="Utils\Compression\Core\SharpZipBaseException.cs" />
+    <Compile Include="Utils\Compression\Core\StrangeCRC.cs" />
+    <Compile Include="Utils\Compression\ZLib.cs" />
+    <Compile Include="Utils\Compression\ZLibSubMethods\Deflater.cs" />
+    <Compile Include="Utils\Compression\ZLibSubMethods\DeflaterConstants.cs" />
+    <Compile Include="Utils\Compression\ZLibSubMethods\DeflaterEngine.cs" />
+    <Compile Include="Utils\Compression\ZLibSubMethods\DeflaterHuffman.cs" />
+    <Compile Include="Utils\Compression\ZLibSubMethods\DeflaterOutputStream.cs" />
+    <Compile Include="Utils\Compression\ZLibSubMethods\DeflaterPending.cs" />
+    <Compile Include="Utils\Compression\ZLibSubMethods\FastZip.cs" />
+    <Compile Include="Utils\Compression\ZLibSubMethods\Inflater.cs" />
+    <Compile Include="Utils\Compression\ZLibSubMethods\InflaterDynHeader.cs" />
+    <Compile Include="Utils\Compression\ZLibSubMethods\InflaterHuffmanTree.cs" />
+    <Compile Include="Utils\Compression\ZLibSubMethods\InflaterInputStream.cs" />
+    <Compile Include="Utils\Compression\ZLibSubMethods\OutputWindow.cs" />
+    <Compile Include="Utils\Compression\ZLibSubMethods\PendingBuffer.cs" />
+    <Compile Include="Utils\Compression\ZLibSubMethods\StreamManipulator.cs" />
+    <Compile Include="Utils\Compression\ZLibSubMethods\ZipConstants.cs" />
+    <Compile Include="Utils\Compression\ZLibSubMethods\ZipEntry.cs" />
+    <Compile Include="Utils\Compression\ZLibSubMethods\ZipException.cs" />
+    <Compile Include="Utils\Compression\ZLibSubMethods\ZipInputStream.cs" />
+    <Compile Include="Utils\Compression\ZLibSubMethods\ZipNameTransform.cs" />
+    <Compile Include="Utils\Compression\ZLibSubMethods\ZipOutputStream.cs" />
+    <Compile Include="Utils\Convert\Base32.cs" />
+    <Compile Include="Utils\Convert\Environment.cs" />
+    <Compile Include="Utils\Convert\General.cs" />
+    <Compile Include="Utils\ErrorHandling\ErrorReporting.cs" />
+    <Compile Include="Utils\FileLists\BaseFilelist.cs" />
+    <Compile Include="Utils\FileLists\FilelistMyList.cs" />
+    <Compile Include="Utils\FileLists\FilelistXmlBz2.cs" />
+    <Compile Include="Utils\FileLists\General.cs" />
+    <Compile Include="Utils\FileOperations.cs" />
+    <Compile Include="Utils\FmdcException.cs" />
+    <Compile Include="Utils\Hash\Tiger.cs" />
+    <Compile Include="Utils\Hash\Tth.cs" />
+    <Compile Include="Utils\Hash\TthOptimized.cs" />
+    <Compile Include="Utils\Hash\TthThreaded.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
