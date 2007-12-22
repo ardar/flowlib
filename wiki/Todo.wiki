@@ -10,7 +10,7 @@ _Note that just because it is on this list it is not a promise that it will be d
   * Verify downloaded content
   * Adc Support (to latest draft)
 
-= Release C =
+= Release A =
   * UPnP Support
 
 = Release ? =
