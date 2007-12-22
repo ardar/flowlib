@@ -1,3 +1,4 @@
+using FlowLib.Utils.FileLists;
 using FlowLib.Interfaces;
 using FlowLib.Events;
 using FlowLib.Containers;
@@ -65,8 +66,8 @@ namespace ConsoleDemo
                         //User user = hub.GetUserById("DCDM++0.0495");
                         if (user != null && hub.Share != null)
                         {
-                            ContentInfo ci = new ContentInfo(user.ID + ".xml.bz2", FlowLib.Enums.ContentIdTypes.Filelist);
-                            ci.SystemPath = @"C:\Private\FMDC\PiP\FlowLibDemo\ConsoleDemo\bin\Debug\FileLists\" + user.ID + ".xml.bz2";
+                            ContentInfo ci = new ContentInfo(ContentInfo.FILELIST, FlowLib.Utils.FileLists.BaseFilelist.UNKNOWN);
+                            ci.Set(ContentInfo.STORAGEPATH, @"C:\Private\FMDC\PiP\FlowLibDemo\ConsoleDemo\bin\Debug\FileLists\" + user.ID + ".xml.bz2");
                             DownloadItem di = new DownloadItem(ci);
                             downloadManager.AddDownload(di, new Source(null, user.ID));
                             downloadManager.DownloadCompleted += new FmdcEventHandler(DownloadManager_DownloadCompleted);
@@ -140,22 +141,33 @@ namespace ConsoleDemo
                 return;
             if (di.ContentInfo.IsFilelist)
             {
-                byte[] data = System.IO.File.ReadAllBytes(di.ContentInfo.SystemPath);
-                bool isBzXmlList = ((di.ContentInfo.IdType | FlowLib.Enums.ContentIdTypes.FilelistXmlBz) == di.ContentInfo.IdType);
-
-                FlowLib.Utils.FileLists.FilelistXmlBz2 filelist = new FlowLib.Utils.FileLists.FilelistXmlBz2(data, isBzXmlList);
-                filelist.CreateShare();
-                Share userShare = filelist.Share;
-
-                if (user != null)
+                byte[] data = System.IO.File.ReadAllBytes(di.ContentInfo.Get(ContentInfo.STORAGEPATH));
+                BaseFilelist filelist = null;
+                switch (di.ContentInfo.Get(ContentInfo.FILELIST))
                 {
-                    foreach (System.Collections.Generic.KeyValuePair<string, ContentInfo> var in userShare)
+                    case BaseFilelist.XMLBZ:
+                        filelist = new FilelistXmlBz2(data, true);
+                        break;
+                    case BaseFilelist.BZ:
+                        filelist = new FilelistMyList(data, true);
+                        break;
+                }
+
+                if (filelist != null)
+                {
+                    filelist.CreateShare();
+                    Share userShare = filelist.Share;
+
+                    if (user != null)
                     {
-                        var.Value.SystemPath = @"C:\Private\FMDC\PiP\FlowLibDemo\ConsoleDemo\bin\Debug\Download\" + var.Value.SystemPath;
-                        DownloadItem di2 = new DownloadItem(var.Value);
-                        // Uncomment below if you want to disable segment downloading.
-                        //di2.SegmentSize = di2.ContentInfo.Size;
-                        downloadManager.AddDownload(di2, new Source(null, user.ID));
+                        foreach (System.Collections.Generic.KeyValuePair<string, ContentInfo> var in userShare)
+                        {
+                            var.Value.Set(ContentInfo.STORAGEPATH, @"C:\Private\FMDC\PiP\FlowLibDemo\ConsoleDemo\bin\Debug\Download\" + var.Value.Get(ContentInfo.NAME));
+                            DownloadItem di2 = new DownloadItem(var.Value);
+                            // Uncomment below if you want to disable segment downloading.
+                            //di2.SegmentSize = di2.ContentInfo.Size;
+                            downloadManager.AddDownload(di2, new Source(null, user.ID));
+                        }
                     }
                 }
             }
