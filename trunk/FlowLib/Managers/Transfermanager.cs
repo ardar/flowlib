@@ -128,9 +128,9 @@ namespace FlowLib.Managers
         void trans_ConnectionStatusChange(object sender, FmdcEventArgs e)
         {
             ITransfer trans = sender as ITransfer;
-            trans.ConnectionStatusChange -= trans_ConnectionStatusChange;
             if (e.Action == TcpConnection.Disconnected)
             {
+                trans.ConnectionStatusChange -= trans_ConnectionStatusChange;
                 string id = string.Format("{0}{1}", trans.RemoteAddress.Address.ToString(), trans.RemoteAddress.Port);
                 transfers.Remove(id);
             }

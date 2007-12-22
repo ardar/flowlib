@@ -19,6 +19,8 @@
  *
  */
 
+using System.Threading;
+
 using FlowLib.Events;
 using FlowLib.Interfaces;
 using FlowLib.Protocols.TransferNmdc;
@@ -47,6 +49,7 @@ namespace FlowLib.Protocols
         protected int connectionStatus = -1;
         protected int protocolStatus = -1;
         protected Supports mySupport = null;
+        protected Timer timer = null;
 
         string directory = string.Empty;
         /// <summary>
@@ -63,6 +66,7 @@ namespace FlowLib.Protocols
         public event FmdcEventHandler MessageToSend;
         public event FmdcEventHandler ChangeDownloadItem;
         public event FmdcEventHandler RequestTransfer;
+        public event FmdcEventHandler Error;
         #endregion
 
         #region Properties
@@ -108,12 +112,32 @@ namespace FlowLib.Protocols
             MessageToSend = new FmdcEventHandler(OnMessageToSend);
             ChangeDownloadItem = new FmdcEventHandler(OnChangeDownloadItem);
             RequestTransfer = new FmdcEventHandler(OnRequestTransfer);
+            Error = new FmdcEventHandler(OnError);
+
+            TimerCallback timerDelegate = new TimerCallback(OnTimer);
+            long interval = 10 * 1000; // 10 seconds
+            timer = new System.Threading.Timer(timerDelegate, trans, interval, interval);
+
 
             trans.ConnectionStatusChange += new FmdcEventHandler(trans_ConnectionStatusChange);
         }
 
+        void OnError(object sender, FmdcEventArgs e) { }
         void OnRequestTransfer(object sender, FmdcEventArgs e) { }
         void OnChangeDownloadItem(object sender, FmdcEventArgs e) { }
+
+        void OnTimer(object stateInfo)
+        {
+            long interval = 30 * 1000;  // 30 seconds
+            // We are checking against socket != null. This is if we havnt connect.
+            if (connectionStatus != TcpConnection.Disconnected && System.DateTime.Now.Ticks > interval)
+            {
+                FmdcEventArgs e = new FmdcEventArgs((int)TransferErrors.INACTIVITY);
+                Error(this, e);
+                if (!e.Handled)
+                    trans.Disconnect("Inactivity");
+            }
+        }
 
         void trans_ConnectionStatusChange(object sender, FmdcEventArgs e)
         {
@@ -124,6 +148,12 @@ namespace FlowLib.Protocols
                 case TcpConnection.Connected: break;
                 case TcpConnection.Connecting: break;
                 case TcpConnection.Disconnected:
+                    if (trans.DownloadItem != null && trans.CurrentSegment !=null)
+                    {
+                        // Clean up here please :)
+                        trans.DownloadItem.Cancel(trans.CurrentSegment.Position);
+                    }
+
                     if (e.Data is Utils.FmdcException)
                     {
                         // TODO : Send out error message here.
@@ -377,40 +407,24 @@ namespace FlowLib.Protocols
                     if (trans.DownloadItem != null && trans.CurrentSegment.Index != -1)
                     {
                         // Set right content string
-                        //trans.Content = new ContentInfo(trans.DownloadItem.ContentInfo.Id, trans.DownloadItem.ContentInfo.IdType);
-                        trans.Content = new ContentInfo();
-                        if (trans.DownloadItem.ContentInfo.IsTth && userSupport != null && userSupport.TTHF && mySupport.TTHF)
-                        {
-                            //trans.Content.Id = "TTH/" + trans.Content.Id;
-                            trans.Content.Set(ContentInfo.REQUEST, "TTH/" + trans.DownloadItem.ContentInfo.Get(ContentInfo.TTH));
-                        }
-                        else if (trans.DownloadItem.ContentInfo.IsFilelist)
+                        trans.Content = new ContentInfo(ContentInfo.REQUEST, trans.DownloadItem.ContentInfo.Get(ContentInfo.VIRTUAL));
+                        if (trans.DownloadItem.ContentInfo.IsFilelist)
                         {
                             if (userSupport != null && userSupport.XmlBZList && mySupport.XmlBZList)
                             {
-                                //trans.Content.Id = "files.xml.bz2";
-                                //trans.DownloadItem.ContentInfo.IdType = ContentIdTypes.FilelistXmlBz;
                                 trans.Content.Set(ContentInfo.REQUEST, "files.xml.bz2");
                                 trans.DownloadItem.ContentInfo.Set(ContentInfo.FILELIST, Utils.FileLists.BaseFilelist.XMLBZ);
                             }
                             else if (userSupport != null && userSupport.BZList && mySupport.BZList)
                             {
-                                //trans.Content.Id = "MyList.bz2";
-                                //trans.DownloadItem.ContentInfo.IdType = ContentIdTypes.FilelistBz;
                                 trans.Content.Set(ContentInfo.REQUEST, "MyList.bz2");
                                 trans.DownloadItem.ContentInfo.Set(ContentInfo.FILELIST, Utils.FileLists.BaseFilelist.BZ);
                             }
                             else
                             {
-                                //trans.Content.Id = "MyList.DcLst";
                                 trans.Content.Set(ContentInfo.REQUEST, "MyList.DcLst");
                                 trans.DownloadItem.ContentInfo.Set(ContentInfo.FILELIST, Utils.FileLists.BaseFilelist.HUFFMAN);
                             }
-                        }
-                        else
-                        {
-                            // For all other requests :)
-                            trans.Content.Set(ContentInfo.REQUEST, trans.DownloadItem.ContentInfo.Get(ContentInfo.VIRTUAL));
                         }
 
                         // Set that we are actually downloading stuff
@@ -428,6 +442,9 @@ namespace FlowLib.Protocols
                         /// $Get needs nothing
                         if (userSupport != null && userSupport.ADCGet && mySupport.ADCGet)
                         {
+                            if (userSupport.TTHF && mySupport.TTHF && trans.DownloadItem.ContentInfo.ContainsKey(ContentInfo.TTH))
+                                trans.Content.Set(ContentInfo.REQUEST, "TTH/" + trans.DownloadItem.ContentInfo.Get(ContentInfo.TTH));
+
                             trans.Send(new ADCGET(trans, "file", trans.Content.Get(ContentInfo.REQUEST), trans.CurrentSegment.Start, trans.CurrentSegment.Length, compressedZLib));
                         }
                         else if (
@@ -748,8 +765,46 @@ namespace FlowLib.Protocols
             }
             else if (message is MaxedOut)
             {
-                // TODO : Send out a notice to user.
-                trans.Disconnect();
+                FmdcEventArgs e = new FmdcEventArgs((int)TransferErrors.NO_FREE_SLOTS);
+                Error(this, e);
+                if (!e.Handled)
+                    trans.Disconnect();
+            }
+            else if (message is Error)
+            {
+                TransferNmdc.Error error = (TransferNmdc.Error)message;
+                FmdcEventArgs e = null;
+                // TODO : Add more error messages here.
+                switch (error.Message)
+                {
+                    case "File Not Available":
+                        e = new FmdcEventArgs((int)TransferErrors.FILE_NOT_AVAILABLE);
+                        break;
+                    default:
+                        e = new FmdcEventArgs((int)TransferErrors.UNKNOWN, error.Message);
+                        break;
+                }
+                Error(this, e);
+                if (!e.Handled)
+                    trans.Disconnect();
+            }
+            else if (message is Failed)
+            {
+                Failed failed = (Failed)message;
+                FmdcEventArgs e = null;
+                // TODO : Add more error messages here.
+                switch (failed.Message)
+                {
+                    case "File Not Available":
+                        e = new FmdcEventArgs((int)TransferErrors.FILE_NOT_AVAILABLE);
+                        break;
+                    default:
+                        e = new FmdcEventArgs((int)TransferErrors.UNKNOWN, failed.Message);
+                        break;
+                }
+                Error(this, e);
+                if (!e.Handled)
+                    trans.Disconnect();
             }
         }
 
@@ -774,9 +829,11 @@ namespace FlowLib.Protocols
         #region Event(s)
         protected void OnMessageReceived(object sender, FmdcEventArgs e)
         {
+            trans.LastEventTimeStamp = System.DateTime.Now.Ticks;
         }
         protected void OnMessageToSend(object sender, FmdcEventArgs e)
         {
+            trans.LastEventTimeStamp = System.DateTime.Now.Ticks;
             if (e.Data is TransferMessage)
             {
                 TransferMessage msg = (TransferMessage)e.Data;

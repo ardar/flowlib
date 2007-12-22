@@ -92,4 +92,12 @@ namespace FlowLib.Enums
         /* Id is a hash, tiger tree hash to be exact */
         TTH = Hash | 1
     }
+
+    public enum TransferErrors
+    {
+        UNKNOWN = 0,
+        INACTIVITY = 1,
+        NO_FREE_SLOTS = 2,
+        FILE_NOT_AVAILABLE = 4,
+    }
 }
