@@ -457,16 +457,23 @@ namespace FlowLib.Containers
         #region For Transfer Protocol that makes Filelists.
         public virtual bool AddFile(ContentInfo contentInfo)
         {
-            if (!share.ContainsKey(contentInfo.Get(ContentInfo.STORAGEPATH)))
+            bool value = false;
+            if (contentInfo.ContainsKey(ContentInfo.STORAGEPATH) && !share.ContainsKey(contentInfo.Get(ContentInfo.STORAGEPATH)))
             {
                 share.Add(contentInfo.Get(ContentInfo.STORAGEPATH), contentInfo);
-                virtualNames.Add(contentInfo.Get(ContentInfo.VIRTUAL), contentInfo);
-                if (contentInfo.IsTth)
-                    if (!tthNames.ContainsKey(contentInfo.Get(ContentInfo.TTH)))
-                        tthNames.Add(contentInfo.Get(ContentInfo.TTH), contentInfo);
-                return true;
+                value = true;
             }
-            return false;
+            if (contentInfo.ContainsKey(ContentInfo.VIRTUAL) && !share.ContainsKey(contentInfo.Get(ContentInfo.VIRTUAL)))
+            {
+                virtualNames.Add(contentInfo.Get(ContentInfo.VIRTUAL), contentInfo);
+                value = true;
+            }
+            if (contentInfo.ContainsKey(ContentInfo.TTH) && !share.ContainsKey(contentInfo.Get(ContentInfo.TTH)))
+            {
+                tthNames.Add(contentInfo.Get(ContentInfo.TTH), contentInfo);
+                value = true;
+            }
+            return value;
         }
 
         public virtual bool RemoveFile(ContentInfo contentInfo)
@@ -1069,7 +1076,12 @@ namespace FlowLib.Containers
 
         public IEnumerator GetEnumerator()
         {
-            return share.GetEnumerator();
+            if (share.Count != 0)
+                return share.GetEnumerator();
+            else if (tthNames.Count != 0)
+                return tthNames.GetEnumerator();
+            else
+                return virtualNames.GetEnumerator();
         }
 
         #endregion
