@@ -1,3 +1,4 @@
+#labels Featured
 #Shows what are planned to be done until a release and what has been done so far
 
 _Note that just because it is on this list it is not a promise that it will be done._
