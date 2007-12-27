@@ -1,6 +1,0 @@
-#summary Questions and Discussion.
-#labels Featured
-
-= Introduction =
-
-Here you should write if you have some question or want to discuss something.
