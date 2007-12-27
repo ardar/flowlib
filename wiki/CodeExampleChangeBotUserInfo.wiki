@@ -1,4 +1,4 @@
-#Code Example - Change Bot UserInfo
+#summary Code Example - Change Bot UserInfo
 
 = Description =
 
