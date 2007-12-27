@@ -11,3 +11,4 @@ Every example will have a description to tell little about what problem it solve
 || [CodeExamplesConnectToHub Connect to hub] ||
 || [CodeExampleChangeBotUserInfo Change bot info (MyInfo)] ||
 || [CodeExamplesPassvieEmptySharing Enable passive sharing (Empty)] ||
+|| [CodeExampleDebugRawCommands Show/Handle raw commands] ||
