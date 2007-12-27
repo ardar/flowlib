@@ -1,4 +1,4 @@
-#Code Example - Empty sharing in passive mode
+#summary Code Example - Empty sharing in passive mode
 
 = Description =
 
