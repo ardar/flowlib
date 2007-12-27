@@ -1,5 +1,5 @@
 #summary Questions and Discussion.
-#labels Question,Discussion
+#labels Featured
 
 = Introduction =
 
