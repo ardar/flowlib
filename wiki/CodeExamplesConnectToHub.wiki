@@ -1,4 +1,4 @@
-#Code Example - Connect to hub
+#summary Code Example - Connect to hub
 
 = Description =
 
