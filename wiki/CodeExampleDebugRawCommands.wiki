@@ -3,8 +3,9 @@
 = Description =
 
 _[CodeExamplesConnectToHub To learn on how to connect to hub click here.]_
-1) Start listening on MessageReceived and MessageToSend event.
-2) e.Data will contain a inherit class of HubMessage.
+
+  # Start listening on MessageReceived and MessageToSend event.
+  # e.Data will contain a inherit class of HubMessage.
 
 
 = Code =
