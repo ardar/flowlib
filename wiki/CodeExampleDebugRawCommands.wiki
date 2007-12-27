@@ -7,7 +7,7 @@ _[CodeExamplesConnectToHub To learn on how to connect to hub click here.]_
   # Start listening on MessageReceived and MessageToSend event.
   # e.Data will contain a inherit class of HubMessage.
 
-_Note_
+= Note =
 
   # This is before protocol handling (*NO* action has been triggered)
   # This is before message has actualy been sent. (If connection is not alive, message will not be sent)
