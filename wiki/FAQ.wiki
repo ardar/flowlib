@@ -1,0 +1,11 @@
+#summary Frequently Asked Questions
+
+= Introduction =
+
+What should you do if you have a question?
+  # Read all Questions and responses below.
+  # If you want to know how you should do something. Please Look [CodeExamplesIndex here] first
+  # Add comment below and your question will be answered (Or removed)
+= Questions =
+
+_No questions added yet_
