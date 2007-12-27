@@ -1,5 +1,5 @@
+#summary Code Examples
 #labels Featured
-#Code Examples
 
 = Introduction =
 
