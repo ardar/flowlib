@@ -37,9 +37,17 @@ namespace ConsoleDemo.Examples
             // Wait 10 seconds and hope we are connected.
             System.Threading.Thread.Sleep(10 * 1000);
 
+            // Create mainchat message.
             MainMessage msg = new MainMessage(hubConnection.Me.ID, "Testing");
-
+            // message will here be converted to right format and then be sent.
             UpdateBase(this, new FlowLib.Events.FmdcEventArgs(FlowLib.Events.Actions.MainMessage, msg));
+
+            // Create private message.
+            PrivateMessage privMsg = new PrivateMessage("DCDM++0.0495", hubConnection.Me.ID, "Testing");
+
+            // message will here be converted to right format and then be sent.
+            UpdateBase(this, new FlowLib.Events.FmdcEventArgs(FlowLib.Events.Actions.PrivateMessage, privMsg));
+
         }
 
         void SendMainChatOrPMToHub_UpdateBase(object sender, FlowLib.Events.FmdcEventArgs e) {}
