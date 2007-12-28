@@ -1,0 +1,49 @@
+#summary One-sentence summary of this page.
+
+= Introduction =
+
+Add your content here.
+
+
+= Code = 
+
+{{{
+using FlowLib.Connections;
+using FlowLib.Containers;
+using FlowLib.Interfaces;
+
+namespace ConsoleDemo.Examples
+{
+    public class SendMainChatOrPMToHub : IBaseUpdater
+    {
+        #region IBaseUpdater Members
+        public event FlowLib.Events.FmdcEventHandler UpdateBase;
+        #endregion
+
+        public SendMainChatOrPMToHub()
+        {
+            UpdateBase = new FlowLib.Events.FmdcEventHandler(SendMainChatOrPMToHub_UpdateBase);
+
+            HubSetting settings = new HubSetting();
+            settings.Address = "127.0.0.1";
+            settings.Port = 411;
+            settings.DisplayName = "FlowLibNick";
+
+            Hub hubConnection = new Hub(settings, this);
+            hubConnection.Protocol = new FlowLib.Protocols.HubNmdcProtocol(hubConnection);
+            hubConnection.Connect();
+            // YOU should really listen for regmode change here.
+            // Im not doing it here to make example more easy to understand.
+            // Wait 10 seconds and hope we are connected.
+            System.Threading.Thread.Sleep(10 * 1000);
+
+            MainMessage msg = new MainMessage(hubConnection.Me.ID, "Testing");
+
+            UpdateBase(this, new FlowLib.Events.FmdcEventArgs(FlowLib.Events.Actions.MainMessage, msg));
+        }
+
+        void SendMainChatOrPMToHub_UpdateBase(object sender, FlowLib.Events.FmdcEventArgs e) {}
+    }
+}
+
+}}}
