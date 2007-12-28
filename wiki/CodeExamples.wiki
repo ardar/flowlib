@@ -12,3 +12,4 @@ Every example will have a description to tell little about what problem it solve
 || [CodeExampleChangeBotUserInfo Change bot info (MyInfo)] ||
 || [CodeExamplesPassvieEmptySharing Enable passive sharing (Empty)] ||
 || [CodeExampleDebugRawCommands Show/Handle raw commands] ||
+|| [CodeExampleSendMainChatOrPM Send MainChat / PM] ||
