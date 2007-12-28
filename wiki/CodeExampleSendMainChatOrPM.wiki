@@ -4,8 +4,7 @@
 
 _[CodeExamplesConnectToHub To learn on how to connect to hub click here.]_
 
-  # We need to create a class implementing interface _FlowLib.Interfaces.IBaseUpdater
-_.
+  # We need to create a class implementing interface _IBaseUpdater_.
   # Add a reference to this class in Hub constructor. This is so hub knows it should listen for messages from this class.
   # Create a generic MainMessage. This is so we dont need to care what protocol hub use.
   # Now we will tell hub that it we want to send a Mainchat Message. We use UpdateBase for this.
