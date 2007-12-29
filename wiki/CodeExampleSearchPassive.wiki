@@ -58,15 +58,6 @@ namespace ConsoleDemo.Examples
                     if (e.Data is SearchResultInfo)
                     {
                         SearchResultInfo srInfo = (SearchResultInfo)e.Data;
-                        // This is if we want to enable auto adding of sources to a downloaditem.
-                        //FlowLib.Managers.DownloadManager dm = new FlowLib.Managers.DownloadManager();
-                        //DownloadItem tmpDownloadItem = new DownloadItem(srInfo.Info);
-                        //// Do downloadItem exist?
-                        //if (dm.ContainsDownload(tmpDownloadItem))
-                        //{
-                        //    // Add Source to the existing downloaditem. Note that we first check if it exist.
-                        //    dm.AddDownload(tmpDownloadItem, srInfo.Source);
-                        //}
                     }
                     break;
             }
