@@ -1,0 +1,77 @@
+#summary Passive Searching
+
+= Description =
+
+_[CodeExamplesConnectToHub To learn on how to connect to hub click here.]_
+
+
+
+= Code = 
+
+{{
+using FlowLib.Containers;
+using FlowLib.Connections;
+using FlowLib.Interfaces;
+using FlowLib.Events;
+using Nmdc = FlowLib.Protocols.HubNmdc;
+using System.Net;
+
+namespace ConsoleDemo.Examples
+{
+    public class PassiveSearch : IBaseUpdater
+    {
+        #region IBaseUpdater Members
+        public event FlowLib.Events.FmdcEventHandler UpdateBase;
+        #endregion
+
+        public PassiveSearch()
+        {
+            UpdateBase = new FlowLib.Events.FmdcEventHandler(PassiveSearch_UpdateBase);
+
+            HubSetting settings = new HubSetting();
+            settings.Address = "127.0.0.1";
+            settings.Port = 411;
+            settings.DisplayName = "FlowLibNick";
+            settings.Protocol = "Nmdc";
+
+            Hub hubConnection = new Hub(settings,this);
+            hubConnection.Update += new FlowLib.Events.FmdcEventHandler(hubConnection_Update);
+            hubConnection.Connect();
+
+            // Wait 5 seconds
+            System.Threading.Thread.Sleep(5 * 1000);
+
+            // Send Search
+            SearchInfo searchInfo = new SearchInfo();
+            searchInfo.Set(SearchInfo.SEARCH, "Ecma-334");
+
+            UpdateBase(this, new FlowLib.Events.FmdcEventArgs(Actions.Search, searchInfo));
+        }
+
+        void PassiveSearch_UpdateBase(object sender, FlowLib.Events.FmdcEventArgs e) { }
+
+        void hubConnection_Update(object sender, FlowLib.Events.FmdcEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case Actions.SearchResult:
+                    if (e.Data is SearchResultInfo)
+                    {
+                        SearchResultInfo srInfo = (SearchResultInfo)e.Data;
+                        // This is if we want to enable auto adding of sources to a downloaditem.
+                        //FlowLib.Managers.DownloadManager dm = new FlowLib.Managers.DownloadManager();
+                        //DownloadItem tmpDownloadItem = new DownloadItem(srInfo.Info);
+                        //// Do downloadItem exist?
+                        //if (dm.ContainsDownload(tmpDownloadItem))
+                        //{
+                        //    // Add Source to the existing downloaditem. Note that we first check if it exist.
+                        //    dm.AddDownload(tmpDownloadItem, srInfo.Source);
+                        //}
+                    }
+                    break;
+            }
+
+        }
+    }
+}
+}}}
