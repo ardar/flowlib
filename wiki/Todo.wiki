@@ -6,10 +6,11 @@ _Note that just because it is on this list it is not a promise that it will be d
 ~~text~~ = Means it has been done
 
 = Next release =
-  * Search for content (Nmdc)
-  * Receive search result (Nmdc)
+  ~~* Search for content (Nmdc)~~
+  ~~* Receive search result (Nmdc)~~
   * Verify downloaded content
   * Adc Support (to latest draft)
+  * Add Valid flag to transfer messages and search messages.
 
 = Release A =
   * UPnP Support
