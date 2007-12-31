@@ -6,6 +6,9 @@ _Note that just because it is on this list it is not a promise that it will be d
 ~~text~~ = Means it has been done
 
 = Next release =
+  
+  _[Changelog See changelog to see fixes and changes not listed here]_
+
   * ~~Search for content (Nmdc)~~
   * ~~Receive search result (Nmdc)~~
   * Verify downloaded content
