@@ -3,6 +3,8 @@
 
 = Next release =
 
+  _[Todo See Todo for changes still remaining before release]_
+
   * ADD		- Acitve and passive searching (Send/Receive)
   * FIX		- User Tag parsing. Hub count was always -1. (Thanks GhOstFaCE for reporting)
   * FIX		- Active Transfers, NullReference Exception (Thanks Sneaky for reporting)
