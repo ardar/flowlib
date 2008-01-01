@@ -42,7 +42,8 @@ namespace FlowLib.Protocols
         protected Hub hub = null;              // Current hub where this protocol is used
         protected string recieved = "";
 
-        protected static string yoursupports = "ADBAS0";
+        
+        protected static string yoursupports = "ADBASE ADTIGR BZIP";
 
         public event FmdcEventHandler MessageReceived;
         public event FmdcEventHandler MessageToSend;
