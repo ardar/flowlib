@@ -320,7 +320,7 @@ namespace FlowLib.Protocols
                     // Should this be sent?
                     if (send)
                     {
-                        SR sr = new SR(hub, ret[i], (search.Info.ContainsKey(SearchInfo.EXTENTION) ? search.Info.Get(SearchInfo.EXTENTION).Equals("$0") : false));
+                        SR sr = new SR(hub, ret[i], (search.Info.ContainsKey(SearchInfo.EXTENTION) ? search.Info.Get(SearchInfo.EXTENTION).Equals("$0") : false), search.From);
                         if (active)
                         {
                             // Send with UDP

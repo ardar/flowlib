@@ -682,7 +682,7 @@ namespace FlowLib.Protocols.HubNmdc
             }
         }
 
-        public SR(Hub hub, ContentInfo info, bool directoryOnly)
+        public SR(Hub hub, ContentInfo info, bool directoryOnly, string from)
             : base(hub, null)
         {
             this.info = info;
@@ -701,8 +701,10 @@ namespace FlowLib.Protocols.HubNmdc
             string hubname = string.Empty;
             if (info.ContainsKey(ContentInfo.TTH) && !directoryOnly)
                 hubname = "TTH:" + info.Get(ContentInfo.TTH);
-
-            Raw = string.Format("$SR {0} {1} {2}\x005{3} ({4}:{5})|",hub.Me.ID, content, slots, hubname, hub.RemoteAddress.Address.ToString(), hub.RemoteAddress.Port);
+            string passive = string.Empty;
+            if (!string.IsNullOrEmpty(from))
+                passive = "\x005" + from;
+            Raw = string.Format("$SR {0} {1} {2}\x005{3} ({4}:{5}){6}|", hub.Me.ID, content, slots, hubname, hub.RemoteAddress.Address.ToString(), hub.RemoteAddress.Port, passive);
         }
     }
 
