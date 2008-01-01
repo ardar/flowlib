@@ -86,13 +86,16 @@ namespace FlowLib.Protocols.HubNmdc
                     return;
                 from = tmp.Substring(0, pos);
                 content = tmp.Substring(pos + 2);
-                if (!string.IsNullOrEmpty(from))
-                    valid = true;
+                // This is a real Main chat msg as we have from.
+                // But as none follows standard we will allow msg even if it not a valid mainchat msg starting with <
+                //if (!string.IsNullOrEmpty(from))
+                //    valid = true;
             }
             else
             {
                 content = raw;
             }
+            valid = true;
         }
         // for sending
         public MainChat(Hub hub, string from, string content)
