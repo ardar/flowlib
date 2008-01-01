@@ -14,7 +14,7 @@
   * ADD		- Added a RemoveTransfer in TransferManager
   * FIX		- When DownloadItem is changed in Transfer. DownloadItemChanged event is triggered.
   * FIX		- ContentInfo wasnt saved correctly when saving Share
-
+  * FIX		- We will now handle all messages not starting with $ as Mainchat Msg, NMDC. (Thanks Carraya for reporting)
 = 20071222 =
 
   * NOTE - First release. Because all started from a project called FMDC we dont have any changelog for this version.
