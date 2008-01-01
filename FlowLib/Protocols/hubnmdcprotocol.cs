@@ -387,7 +387,9 @@ namespace FlowLib.Protocols
             else if (message is Quit)
             {
                 Quit quit = (Quit)message;
-                hub.FireUpdate(Actions.UserOffline, quit.From);
+                User usr = null;
+                if ((usr = hub.GetUserById(quit.From)) != null)
+                    hub.FireUpdate(Actions.UserOffline, usr.UserInfo);
             }
             else if (message is LogedIn)
                 hub.RegMode = 2;
