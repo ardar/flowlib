@@ -17,6 +17,8 @@
   * FIX		- We will now handle all messages not starting with $ as Mainchat Msg, NMDC. (Thanks Carraya for reporting)
   * CHANGE	- Removed Actions.UsersOnline. We now use Actions.UserOnline instead.  Releated to [http://code.google.com/p/flowlib/issues/detail?id=2 Issue 2]
   * CHANGE	- Removed Actions.OpUsers. We now use Actions.UserOnline or Actions.UserInfoChanged. Releated to [http://code.google.com/p/flowlib/issues/detail?id=2 Issue 2]
+  * FIX		- Parsing of NickList and OpList made list containing empty usernames.
+
 
 = 20071222 =
 
