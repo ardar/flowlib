@@ -464,7 +464,10 @@ namespace FlowLib.Connections
                     userlist.Add(ui.ID, u);
                     break;
                 case Actions.UserOffline:
-                    userlist.Remove((string)e.Data);
+                    UserInfo userInfo = (UserInfo)e.Data;
+                    if (userInfo == null)
+                        return;
+                    userlist.Remove(userInfo.ID);
                     break;
             }
         }
