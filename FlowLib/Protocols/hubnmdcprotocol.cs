@@ -288,7 +288,12 @@ namespace FlowLib.Protocols
                                     foundEnough = true;
                                     break;
                                 default:
-                                    if (var.Value.ContainsKey(ContentInfo.VIRTUAL) && (var.Value.Get(ContentInfo.VIRTUAL).IndexOf(sch, System.StringComparison.OrdinalIgnoreCase) != -1))
+                                    string infoExt = System.IO.Path.GetExtension(var.Value.Get(ContentInfo.VIRTUAL)).TrimStart('.');
+                                    if (
+                                            var.Value.ContainsKey(ContentInfo.VIRTUAL)
+                                            && (var.Value.Get(ContentInfo.VIRTUAL).IndexOf(sch, System.StringComparison.OrdinalIgnoreCase) != -1)
+                                            && (ext.Length == 0 || ext.Contains(infoExt))
+                                        )
                                         ret.Add(var.Value);
                                     break;
                             }
