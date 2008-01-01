@@ -41,6 +41,7 @@ namespace FlowLib.Events
         /// </summary>
         public const int UserOnline = 3;
         /// <summary>
+        /// [Depricated]
         /// One or Many Users has come online.
         /// object is of type string[] where entry is a User Id.
         /// </summary>
@@ -56,6 +57,7 @@ namespace FlowLib.Events
         /// </summary>
         public const int UserInfoChange = 6;
         /// <summary>
+        /// [Depricated]
         /// List containing one or more Operators.
         /// object is of type string[] where entry is a User Id
         /// </summary>

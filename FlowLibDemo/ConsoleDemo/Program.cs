@@ -8,9 +8,9 @@ namespace ConsoleDemo
     {
         static void Main(string[] args)
         {
-            new AdcSpecV1();
+            //new AdcSpecV1();
             //new ActiveSearchTest();
-            //new Testing();
+            new Testing();
             Console.Read();
         }
 

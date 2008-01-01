@@ -843,7 +843,7 @@ namespace FlowLib.Protocols.HubNmdc
             {
                 string tmp = raw.Substring(pos1);
                 char[] test = { '$', '$' };
-                nicks = tmp.Split(test);
+                nicks = tmp.Split(test, System.StringSplitOptions.RemoveEmptyEntries);
                 if (nicks.Length > 0)
                     IsValid = true;
             }
@@ -883,7 +883,7 @@ namespace FlowLib.Protocols.HubNmdc
             {
                 string tmp = raw.Substring(++pos1);
                 char[] test = { '$', '$' };
-                ops = tmp.Split(test); // command.Split("$$", StringSplitOptions.RemoveEmptyEntries);
+                ops = tmp.Split(test, System.StringSplitOptions.RemoveEmptyEntries); // command.Split("$$", StringSplitOptions.RemoveEmptyEntries);
             }
             IsValid = true;
         }
