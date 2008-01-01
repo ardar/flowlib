@@ -59,9 +59,13 @@
     <Compile Include="Containers\HubName.cs" />
     <Compile Include="Containers\HubSetting.cs" />
     <Compile Include="Containers\HubStatus.cs" />
+    <Compile Include="Containers\FlowKeyValuePair.cs" />
     <Compile Include="Containers\MainMessage.cs" />
     <Compile Include="Containers\PrivateMessage.cs" />
     <Compile Include="Containers\PropertyContainer.cs" />
+    <Compile Include="Containers\SearchInfo.cs" />
+    <Compile Include="Containers\SearchResultInfo.cs" />
+    <Compile Include="Containers\UdpMessage.cs" />
     <Compile Include="Containers\SegmentInfo.cs" />
     <Compile Include="Containers\SettingItem.cs" />
     <Compile Include="Containers\SettingsGroup.cs" />
@@ -87,6 +91,7 @@
     <Compile Include="Interfaces\IProtocol.cs" />
     <Compile Include="Interfaces\IProtocolHub.cs" />
     <Compile Include="Interfaces\IProtocolTransfer.cs" />
+    <Compile Include="Interfaces\IProtocolUdp.cs" />
     <Compile Include="Interfaces\ITransfer.cs" />
     <Compile Include="Managers\DownloadManager.cs" />
     <Compile Include="Managers\EventManager.cs" />
@@ -101,6 +106,7 @@
     <Compile Include="Protocols\Nmdc\transfernmdcmessages.cs" />
     <Compile Include="Protocols\transferadcprotocol.cs" />
     <Compile Include="Protocols\transfernmdcprotocol.cs" />
+    <Compile Include="Protocols\UdpNmdcProtocol.cs" />
     <Compile Include="Utils\Compression\Bz2.cs" />
     <Compile Include="Utils\Compression\Bz2SubMethods\BZip2Constants.cs" />
     <Compile Include="Utils\Compression\Bz2SubMethods\BZip2Exception.cs" />
@@ -141,6 +147,7 @@
     <Compile Include="Utils\Convert\Environment.cs" />
     <Compile Include="Utils\Convert\General.cs" />
     <Compile Include="Utils\ErrorHandling\ErrorReporting.cs" />
+    <Compile Include="Utils\ErrorHandling\IssueReportingGoogleCode.cs" />
     <Compile Include="Utils\FileLists\BaseFilelist.cs" />
     <Compile Include="Utils\FileLists\FilelistMyList.cs" />
     <Compile Include="Utils\FileLists\FilelistXmlBz2.cs" />
@@ -151,6 +158,8 @@
     <Compile Include="Utils\Hash\Tth.cs" />
     <Compile Include="Utils\Hash\TthOptimized.cs" />
     <Compile Include="Utils\Hash\TthThreaded.cs" />
+    <Compile Include="Utils\StringOperations.cs" />
+    <Compile Include="Utils\WebOperations.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

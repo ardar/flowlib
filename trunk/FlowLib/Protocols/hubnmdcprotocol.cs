@@ -196,6 +196,10 @@ namespace FlowLib.Protocols
                                 msg = new ConnectToMe(hub, raw); break;
                             case "$revconnecttome":
                                 msg = new RevConnectToMe(hub, raw); break;
+                            case "$search":
+                                msg = new Search(hub, raw); break;
+                            case "$sr":
+                                msg = new SR(hub, raw); break;
                         }
                         break;
                     default:
@@ -233,6 +237,102 @@ namespace FlowLib.Protocols
                 To to = (To)message;
                 PrivateMessage pm = new PrivateMessage(to.To, to.From, to.Content);
                 hub.FireUpdate(Actions.PrivateMessage, pm);
+            }
+            else if (message is SR)
+            {
+                SR searchResult = (SR)message;
+                SearchResultInfo srinfo = new SearchResultInfo(searchResult.Info, searchResult.From);
+                hub.FireUpdate(Actions.SearchResult, srinfo);
+            }
+            else if (message is Search)
+            {
+                Search search = (Search)message;
+                if (hub.Share == null)
+                    return;
+                int maxReturns = 5;
+                bool active = false;
+                if (search.Address != null)
+                {
+                    maxReturns = 10;
+                    active = true;
+                }
+                System.Collections.Generic.List<ContentInfo> ret = new System.Collections.Generic.List<ContentInfo>(maxReturns);
+                // TODO : This lookup can be done nicer
+                lock (hub.Share)
+                {
+
+                    foreach (System.Collections.Generic.KeyValuePair<string, Containers.ContentInfo> var in hub.Share)
+                    {
+                        if (var.Value == null)
+                            continue;
+                        bool foundEnough = false;
+                        string ext = search.Info.Get(SearchInfo.EXTENTION);
+                        string sch = search.Info.Get(SearchInfo.SEARCH);
+                        if (ext != null && sch != null)
+                        {
+                            ContentInfo contentInfo = new ContentInfo();
+                            switch (search.Info.Get(SearchInfo.EXTENTION))
+                            {
+                                case "$0":
+                                    if (var.Value.ContainsKey(ContentInfo.VIRTUAL) && (System.IO.Path.GetDirectoryName(var.Value.Get(ContentInfo.VIRTUAL)).IndexOf(sch, System.StringComparison.OrdinalIgnoreCase) != -1))
+                                        ret.Add(var.Value);
+                                    break;
+                                case "$1":
+                                    contentInfo.Set(ContentInfo.TTH, search.Info.Get(SearchInfo.SEARCH));
+                                    if (hub.Share.ContainsContent(ref contentInfo))
+                                    {
+                                        ret.Add(contentInfo);
+                                    }
+                                    // We are looking through whole share here.
+                                    // If no TTH matching. Ignore.
+                                    foundEnough = true;
+                                    break;
+                                default:
+                                    if (var.Value.ContainsKey(ContentInfo.VIRTUAL) && (var.Value.Get(ContentInfo.VIRTUAL).IndexOf(sch, System.StringComparison.OrdinalIgnoreCase) != -1))
+                                        ret.Add(var.Value);
+                                    break;
+                            }
+                        }
+                        if (foundEnough || ret.Count >= maxReturns)
+                            break;
+                    }
+                }
+                // Test against size restrictions
+                for (int i = 0; i < ret.Count; i++)
+                {
+                    bool send = true;
+                    long size = -1;
+                    if (search.Info.ContainsKey(SearchInfo.SIZETYPE) && long.TryParse(search.Info.Get(SearchInfo.SIZE), out size))
+                    {
+                        switch (search.Info.Get(SearchInfo.SIZETYPE))
+                        {
+                            case "1":       // Min Size
+                                send = (size <= ret[i].Size);
+                                break;
+                            case "2":       // Max Size
+                                send = (size >= ret[i].Size);
+                                break;
+                            case "3":       // Equal Size
+                                send = (size == ret[i].Size);
+                                break;
+                        }
+                    }
+                    // Should this be sent?
+                    if (send)
+                    {
+                        SR sr = new SR(hub, ret[i], (search.Info.ContainsKey(SearchInfo.EXTENTION) ? search.Info.Get(SearchInfo.EXTENTION).Equals("$0") : false));
+                        if (active)
+                        {
+                            // Send with UDP
+                            UdpConnection.Send(sr, search.Address);
+                        }
+                        else
+                        {
+                            // Send through hub
+                            hub.Send(sr);
+                        }
+                    }
+                }
             }
             else if (message is Lock)
             {
@@ -352,6 +452,10 @@ namespace FlowLib.Protocols
             else if (e.Action.Equals(Actions.Password))
             {
                 hub.Send(new MyPass(hub, (string)e.Data));
+            }
+            else if (e.Action.Equals(Actions.Search))
+            {
+                hub.Send(new Search(hub, (SearchInfo)e.Data));
             }
         }
         #endregion

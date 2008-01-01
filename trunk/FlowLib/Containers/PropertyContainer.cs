@@ -24,9 +24,6 @@ using System.Collections.Generic;
 
 namespace FlowLib.Containers
 {
-    //public class PropertyContainer<TKey, TObj> : SortedList<TKey, TObj>
-    //public class PropertyContainer<TKey, TObj> : Dictionary<TKey, TObj>
-    //public class PropertyContainer<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>, IEnumerable
     public class PropertyContainer<TKey, TValue>
     {
         protected SortedList<TKey, TValue> list = null;
@@ -35,6 +32,10 @@ namespace FlowLib.Containers
         public PropertyContainer()
         {
             list = new SortedList<TKey, TValue>(); ;
+        }
+        public PropertyContainer(PropertyContainer<TKey, TValue> pList)
+        {
+            list = new SortedList<TKey, TValue>(pList.list);
         }
         public PropertyContainer(IComparer<TKey> comparer)
         {
@@ -95,14 +96,21 @@ namespace FlowLib.Containers
         //
         // Returns:
         //     A System.Collections.Generic.IList<T> containing the keys in the System.Collections.Generic.SortedList<TKey,TValue>.
-        public IList<TKey> Keys { get { return list.Keys; } }
+        public IList<TKey> Keys
+        {
+            get { return list.Keys; }
+        }
         //
         // Summary:
         //     Gets a collection containing the values in the System.Collections.Generic.SortedList<TKey,TValue>.
         //
         // Returns:
         //     A System.Collections.Generic.IList<T> containing the keys in the System.Collections.Generic.SortedList<TKey,TValue>.
-        public IList<TValue> Values { get { return list.Values; } }
+        public IList<TValue> Values
+        {
+            get { return list.Values; }
+        }
+
         // Summary:
         //     Gets or sets the value associated with the specified key.
         //
@@ -122,7 +130,8 @@ namespace FlowLib.Containers
         //
         //   System.Collections.Generic.KeyNotFoundException:
         //     The property is retrieved and key does not exist in the collection.
-        public TValue this[TKey key] {
+        public TValue this[TKey key]
+        {
             get { return list[key]; }
             set { list[key] = value; }
         }
@@ -159,5 +168,108 @@ namespace FlowLib.Containers
             return obj;
         }
         #endregion
+
+        public PropertyContainerItems Items
+        {
+            get { return new PropertyContainerItems(ref list); }
+            set
+            {
+                if (value != null)
+                {
+                    list = value.list;
+                }
+            }
+        }
+
+        public class PropertyContainerItems :IEnumerable<FlowKeyValuePair<TKey, TValue>>, IEnumerable
+        {
+            public SortedList<TKey, TValue> list = null;
+
+            public PropertyContainerItems(ref SortedList<TKey, TValue> list)
+            {
+                this.list = list;
+            }
+
+            #region IEnumerable<FlowKeyValuePair<TKey,TValue>> Members
+            public void Add(System.Object obj)
+            {
+                FlowKeyValuePair<TKey, TValue> flow = obj as FlowKeyValuePair<TKey, TValue>;
+                if (flow == null)
+                    return;
+                list.Add(flow.Key, flow.Value);
+            }
+
+            public IEnumerator<FlowKeyValuePair<TKey, TValue>> GetEnumerator()
+            {
+                return new FlowEnumerator(list.GetEnumerator());
+            }
+
+            #endregion
+
+            #region IEnumerable Members
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
+
+            #endregion
+
+        }
+
+        class FlowEnumerator : IEnumerator<FlowKeyValuePair<TKey, TValue>>
+        {
+            IEnumerator<KeyValuePair<TKey, TValue>> enumerator = null;
+
+            public FlowEnumerator()
+            {
+
+            }
+
+            public FlowEnumerator(IEnumerator<KeyValuePair<TKey, TValue>> enumerator)
+            {
+                this.enumerator = enumerator;
+            }
+
+            #region IEnumerator<FlowKeyValuePair<TKey,TValue>> Members
+            public FlowKeyValuePair<TKey, TValue> Current
+            {
+                get
+                {
+                    KeyValuePair<TKey, TValue> value = enumerator.Current;
+                    return new FlowKeyValuePair<TKey, TValue>(value.Key, value.Value);
+                }
+            }
+            #endregion
+
+            #region IDisposable Members
+            public void Dispose()
+            {
+                if (enumerator != null)
+                    enumerator.Dispose();
+            }
+            #endregion
+
+            #region IEnumerator Members
+            object IEnumerator.Current
+            {
+                get { return Current; }
+            }
+
+            public bool MoveNext()
+            {
+                if (enumerator != null)
+                    return enumerator.MoveNext();
+                else
+                    return false;
+            }
+
+            public void Reset()
+            {
+                if (enumerator != null)
+                    enumerator.Reset();
+            }
+            #endregion
+        }
     }
 }

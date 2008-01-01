@@ -21,13 +21,22 @@
 
 using System.Net.Sockets;
 using FlowLib.Interfaces;
+using FlowLib.Events;
 
 namespace FlowLib.Connections
 {
     public class UdpConnection
     {
-        UdpClient connection = new UdpClient();
+        protected IProtocolUdp protocol;
+        UdpClient connection = null;
         bool listen = false;
+
+
+        public IProtocolUdp Protocol
+        {
+            get { return protocol; }
+            set { protocol = value; }
+        }
 
         public bool IsListening
         {
@@ -35,21 +44,26 @@ namespace FlowLib.Connections
             set { listen = value; }
         }
 
-        public UdpConnection()
+        public UdpConnection(System.Net.IPEndPoint ip)
         {
+            connection = new UdpClient(ip);
             connection.DontFragment = true;
+            StartListen();
         }
 
-        private void OnListen()
+        void UdpConnection_Update(object sender, FmdcEventArgs e) { }
+
+        protected void OnListen()
         {
             while (listen)
             {
                 System.Net.IPEndPoint sender = new System.Net.IPEndPoint(0,0);
                 byte[] data = connection.Receive(ref sender);
+                Protocol.ParseRaw(data, data.Length, sender);
             }
         }
 
-        public void StartListen(System.Net.IPEndPoint ip)
+        protected void StartListen()
         {
             listen = true;
             System.Threading.Thread t =  new System.Threading.Thread(new System.Threading.ThreadStart(OnListen));

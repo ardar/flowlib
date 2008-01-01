@@ -170,26 +170,9 @@ namespace FlowLib.Protocols.HubNmdc
                         if ((pos = sections[0].LastIndexOf('<')) != -1)
                         {
                             info.Description = sections[0].Substring(0, pos);
-                            info.TagInfo.Tag = sections[0].Substring(pos);
                             // <Z++ V:2.00,M:P,H:4/4/25,S:2>
+                            info.TagInfo.Tag = sections[0].Substring(pos);
                             // Parsing of tag
-                            string[] tagsections = info.TagInfo.Tag.Split(',');
-                            if (tagsections.Length >= 4)
-                            {
-                                switch (tagsections[1])
-                                {
-                                    case "M:A":
-                                        info.Mode = Enums.ConnectionTypes.Direct;
-                                        break;
-                                    case "M:P":
-                                        info.Mode = Enums.ConnectionTypes.Passive;
-                                        break;
-                                    case "M:5":
-                                        info.Mode = Enums.ConnectionTypes.Socket5;
-                                        break;
-                                }
-                            }
-
                         }
                         else
                         {
@@ -322,6 +305,407 @@ namespace FlowLib.Protocols.HubNmdc
             IsValid = true;
         }
     }
+
+    public class Search : HubMessage
+    {
+        protected SearchInfo info = null;
+        protected System.Net.IPEndPoint address = null;
+
+        public System.Net.IPEndPoint Address
+        {
+            get { return address; }
+            set { address = value; }
+        }
+
+        public SearchInfo Info
+        {
+            get
+            {
+                return info;
+            }
+            set
+            {
+                info = value;
+            }
+        }
+
+        public Search(Hub hub, string raw)
+            : base(hub, raw)
+        {
+            int searchPos = 0;
+            #region Get From
+            int pos1 =0, pos2 = 0;
+            if (Utils.StringOperations.Find(raw, "Hub:", " ", ref pos1, ref pos2))
+            {
+                searchPos = pos2;
+                pos1 += 4;
+                pos2 -= 1;
+                from = raw.Substring(pos1, pos2 - pos1);
+            }
+            else if (((pos1=0) == 0) && Utils.StringOperations.Find(raw, "$Search ", " ", ref pos1, ref pos2))
+            {
+                searchPos = pos2;
+                pos1 += 8;
+                pos2 -= 1;
+                string[] tmp = raw.Substring(pos1, pos2 - pos1).Split(':');
+                if (tmp.Length == 2)
+                {
+                    System.Net.IPAddress ip = null;
+                    int port = -1;
+                    if (System.Net.IPAddress.TryParse(tmp[0], out ip) && int.TryParse(tmp[1], out port))
+                    {
+                        address = new System.Net.IPEndPoint(ip, port);
+                    }
+                }
+            }
+            #endregion
+            #region Search Info
+            if (searchPos != 0)
+            {
+                info = new SearchInfo();
+                string[] sections = raw.Substring(searchPos).Split('?');
+                if (sections.Length == 5)
+                {
+                    #region Size Info
+                    info.Set(SearchInfo.SIZETYPE, "0");
+                    if (sections[0] == "T")
+                    {
+                        info.Set(SearchInfo.SIZETYPE, (sections[1] == "F" ? "1" : "2"));
+                    }
+                    long size = 0;
+                    if (!long.TryParse(sections[2], out size))
+                        size = 0;
+                    info.Set(SearchInfo.SIZE, size.ToString());
+                    #endregion
+                    #region Extention
+                    string ext = string.Empty;
+                    System.Text.StringBuilder sb = new System.Text.StringBuilder(7);
+                    switch (sections[3])
+                    {
+                        case "2":       // Audio
+                            sb.Append("mp3 ");
+                            sb.Append("mp2 ");
+                            sb.Append("wav ");
+                            sb.Append("au ");
+                            sb.Append("rm ");
+                            sb.Append("mid ");
+                            sb.Append("sm");
+                            break;
+                        case "3":       // Compressed
+                            sb.Append("zip ");
+                            sb.Append("arj ");
+                            sb.Append("rar ");
+                            sb.Append("lzh ");
+                            sb.Append("gz ");
+                            sb.Append("z ");
+                            sb.Append("arc ");
+                            sb.Append("pak");
+                            break;
+                        case "4":       // Documents
+                            sb.Append("doc ");
+                            sb.Append("txt ");
+                            sb.Append("wri ");
+                            sb.Append("pdf ");
+                            sb.Append("ps ");
+                            sb.Append("tex");
+                            break;
+                        case "5":       // Executables
+                            sb.Append("exe ");
+                            sb.Append("pm ");
+                            sb.Append("bat ");
+                            sb.Append("com");
+                            break;
+                        case "6":       // Pictures
+                            sb.Append("gif ");
+                            sb.Append("jpg ");
+                            sb.Append("jpeg ");
+                            sb.Append("bmp ");
+                            sb.Append("pcx ");
+                            sb.Append("png ");
+                            sb.Append("wmf ");
+                            sb.Append("psd");
+                            break;
+                        case "7":       // Videos
+                            sb.Append("mpg ");
+                            sb.Append("mpeg ");
+                            sb.Append("avi ");
+                            sb.Append("asf ");
+                            sb.Append("mov");
+                            break;
+                        case "8":       // Folders
+                            sb.Append("$0");
+                            break;
+                        case "9":       // TTH Search
+                            sb.Append("$1");
+                            break;
+                    }
+                    info.Set(SearchInfo.EXTENTION, sb.ToString());
+                    #endregion
+                    #region Search String
+                    if (sections[4].StartsWith("TTH:"))
+                        info.Set(SearchInfo.SEARCH, sections[4].Substring(4));
+                    else
+                        info.Set(SearchInfo.SEARCH, sections[4]);
+                    #endregion
+                    valid = true;
+                }
+            }
+            #endregion
+        }
+
+        public Search(Hub hub, SearchInfo info)
+            : base(hub,null)
+        {
+            this.info = info;
+
+            #region Id
+            string id = null;
+            switch (hub.Me.Mode)
+            {
+                case FlowLib.Enums.ConnectionTypes.Direct:
+                case FlowLib.Enums.ConnectionTypes.UPnP:
+                case FlowLib.Enums.ConnectionTypes.Forward:
+                    id = string.Format("{0}:{1}", hub.LocalAddress.Address, hub.Share.Port);
+                    break;
+                default:
+                    id = string.Format("Hub:{0}", hub.Me.ID);
+                    break;
+            }
+            #endregion
+            string search = string.Empty;
+            #region Size
+            string size = "F?F?0";
+            if (info.ContainsKey(SearchInfo.SIZETYPE))
+            {
+                switch (info.Get(SearchInfo.SIZETYPE))
+                {
+                    case "1":     // Min Size
+                        size = "T?F" + info.Get(SearchInfo.SIZE);
+                        break;
+                    case "2":     // Max Size
+                        size = "T:T" + info.Get(SearchInfo.SIZE);
+                        break;
+                }
+            }
+            #endregion
+            #region Extention
+            string type = "?1";
+            switch (info.Get(SearchInfo.EXTENTION))
+            {
+                case "mp3":
+                case "mp2":
+                case "wav":
+                case "au":
+                case "rm":
+                case "mid":
+                case "sm":
+                    type = "?2";
+                    break;
+                case "zip":
+                case "arj":
+                case "rar":
+                case "lzh":
+                case "gz":
+                case "z":
+                case "arc":
+                case "pak":
+                    type = "?3";
+                    break;
+                case "doc":
+                case "txt":
+                case "wri":
+                case "pdf":
+                case "ps":
+                case "tex":
+                    type = "?4";
+                    break;
+                case "pm":
+                case "exe":
+                case "bat":
+                case "com":
+                    type = "?5";
+                    break;
+                case "gif":
+                case "jpg":
+                case "jpeg":
+                case "bmp":
+                case "pcx":
+                case "png":
+                case "wmf":
+                case "psd":
+                    type = "?6";
+                    break;
+                case "mpg":
+                case "mpeg":
+                case "avi":
+                case "asf":
+                case "mov":
+                    type = "?7";
+                    break;
+                case "$0":
+                    type = "?8";
+                    break;
+                case "$1":
+                    type = "?9";
+                    break;
+            }
+            #endregion
+
+            string schStr = info.Get(SearchInfo.SEARCH);
+            schStr = schStr.Replace(" ", "$");
+            search = string.Format("{0}{1}?{2}", size, type, schStr);
+            Raw = string.Format("$Search {0} {1}|", id, search);
+        }
+    }
+
+    public static class Dummy
+    {
+        public static string ConvertToNmdc(string str)
+        {
+            str = str.Replace("&", "&amp;");
+            str = str.Replace("&#124;", "&#36;");
+            str = str.Replace("$", "&#124;");
+            return str;
+        }
+
+        public static string ConvertFromNmdc(string str)
+        {
+            str = str.Replace("&#124;", "$");
+            str = str.Replace("&#36;", "&#124;");
+            str = str.Replace("&amp;", "&");
+            return str;
+        }
+    }
+
+    public class SR : HubMessage
+    {
+        protected ContentInfo info = null;
+        protected string address = null;
+        protected string content = null;
+
+        public string Content
+        {
+            get { return content; }
+            set { content = value; }
+        }
+
+        public string Address
+        {
+            get { return address; }
+            set { address = value; }
+        }
+
+        public ContentInfo Info
+        {
+            get
+            {
+                return info;
+            }
+            set
+            {
+                info = value;
+            }
+        }
+
+        public SR(Hub hub, string raw)
+            : base(hub, raw)
+        {
+            Parse();
+        }
+
+        protected void Parse()
+        {
+            // Directory
+            // $SR DC++0.699 Books 1/1TTH:AYAAMAAGAADAABQAAYAAEKCAAAAG633LOMAAAAA (127.0.0.1:411)
+            // File
+            // $SR DC++0.699 BIGFILE\pgm2-kebabtestarna.wmv5898936 1/1TTH:QIFN7FMMSHXLRZDZUGTRZO5RWUY4IONS6JRVQSA (127.0.0.1:411)
+            int pos1 = 0, pos2 = 0;
+            string[] sections = raw.Split('\x005');
+
+            if (sections.Length >= 2)
+            {
+                info = new ContentInfo();
+
+                // $SR DC++0.699 BIGFILE\pgm2-kebabtestarna.wmv
+                #region User Id
+                if (Utils.StringOperations.Find(sections[0], "$SR ", " ", ref pos1, ref pos2))
+                {
+                    pos1 += 4;
+                    pos2 -= 1;
+                    from = sections[0].Substring(pos1, pos2 - pos1);
+                    pos2++;
+                }
+                #endregion
+
+                int index = 0;
+                // If file, we will have 3
+                if (sections.Length == 3)
+                {
+                    info.Set(ContentInfo.VIRTUAL, sections[0].Substring(pos2));
+                    index = 1;
+                }
+                else if (sections.Length == 2)
+                {
+                    index = 0;
+                }
+                int tmp;
+
+                // Get directory name or file size
+                if ((tmp = sections[index].LastIndexOf(" ")) != -1)
+                {
+                    if (index == 0)
+                    {
+                        info.Set(ContentInfo.VIRTUAL, sections[0].Substring(pos2, tmp - pos2));
+                    }
+                    long size;
+                    if (long.TryParse(sections[index].Substring(0, tmp), out size))
+                    {
+                        info.Size = size;
+                    }
+                }
+                index++;
+                pos1 = 0;
+                pos2 = 0;
+                // Content & Address
+                if (Utils.StringOperations.Find(sections[index], "(", ")", ref pos1, ref pos2))
+                {
+                    content = sections[index].Substring(0, pos1).Trim();
+                    if (content.StartsWith("TTH:"))
+                    {
+                        info.Set(ContentInfo.TTH, content.Substring(4));
+                    }
+                    pos1++;
+                    pos2--;
+                    address = sections[index].Substring(pos1, pos2 - pos1);
+                    valid = true;
+                }
+            }
+        }
+
+        public SR(Hub hub, ContentInfo info, bool directoryOnly)
+            : base(hub, null)
+        {
+            this.info = info;
+            // Directory
+            // $SR DC++0.699 Books 1/1TTH:AYAAMAAGAADAABQAAYAAEKCAAAAG633LOMAAAAA (127.0.0.1:411)
+            // File
+            // $SR DC++0.699 BIGFILE\pgm2-kebabtestarna.wmv5898936 1/1TTH:QIFN7FMMSHXLRZDZUGTRZO5RWUY4IONS6JRVQSA (127.0.0.1:411)
+            string content = null;
+            if (directoryOnly)
+                content = System.IO.Path.GetDirectoryName(info.Get(ContentInfo.VIRTUAL));
+            else
+                content = info.Get(ContentInfo.VIRTUAL) + "\x005" + info.Size.ToString();
+            // TODO : We are not supporting slot system right now so we will respond that we have all slots open.
+            string slots = string.Format("{0}/{0}", hub.Me.TagInfo.Slots); 
+            // TODO : We are not saving hub name as it is now so we cant use it.
+            string hubname = string.Empty;
+            if (info.ContainsKey(ContentInfo.TTH) && !directoryOnly)
+                hubname = "TTH:" + info.Get(ContentInfo.TTH);
+
+            Raw = string.Format("$SR {0} {1} {2}\x005{3} ({4}:{5})|",hub.Me.ID, content, slots, hubname, hub.RemoteAddress.Address.ToString(), hub.RemoteAddress.Port);
+        }
+    }
+
     public class ConnectToMe : HubMessage
     {
         #region Variables

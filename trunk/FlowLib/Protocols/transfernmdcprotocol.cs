@@ -128,7 +128,8 @@ namespace FlowLib.Protocols
 
         void OnTimer(object stateInfo)
         {
-            long interval = 30 * 1000;  // 30 seconds
+            //long interval = 30 * 1000 + trans.LastEventTimeStamp;  // 30 seconds
+            long interval = 30 * 1000 * 10000 + trans.LastEventTimeStamp;  // 30 seconds
             // We are checking against socket != null. This is if we havnt connect.
             if (connectionStatus != TcpConnection.Disconnected && System.DateTime.Now.Ticks > interval)
             {
@@ -151,7 +152,7 @@ namespace FlowLib.Protocols
                     if (trans.DownloadItem != null && trans.CurrentSegment !=null)
                     {
                         // Clean up here please :)
-                        trans.DownloadItem.Cancel(trans.CurrentSegment.Position);
+                        trans.DownloadItem.Cancel(trans.CurrentSegment.Index);
                     }
 
                     if (e.Data is Utils.FmdcException)

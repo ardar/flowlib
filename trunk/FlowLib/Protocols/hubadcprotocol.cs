@@ -279,7 +279,6 @@ namespace FlowLib.Protocols
         #endregion
 
         #region IProtocolHub Members
-
         public bool OnStartTransfer(User usr)
         {
             throw new System.Exception("The method or operation is not implemented.");

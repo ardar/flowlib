@@ -25,22 +25,35 @@ using FlowLib.Interfaces;
 
 namespace ConsoleDemo.Examples
 {
-    public class ConnectToHub
+    public class DisplayRawMessages
     {
-        public ConnectToHub()
+        public DisplayRawMessages()
         {
             HubSetting settings = new HubSetting();
             settings.Address = "127.0.0.1";
             settings.Port = 411;
             settings.DisplayName = "FlowLibNick";
-            // The below is one way to say what protocol we should use when connecting to hub.
-            //settings.Protocol = "Nmdc";
 
             Hub hubConnection = new Hub(settings);
-            // This is a other way to say what protocol we should use when connecting
             hubConnection.Protocol = new FlowLib.Protocols.HubNmdcProtocol(hubConnection);
+            hubConnection.Protocol.MessageReceived += new FlowLib.Events.FmdcEventHandler(Protocol_MessageReceived);
+            hubConnection.Protocol.MessageToSend += new FlowLib.Events.FmdcEventHandler(Protocol_MessageToSend);
 
             hubConnection.Connect();
+        }
+
+        void Protocol_MessageToSend(object sender, FlowLib.Events.FmdcEventArgs e)
+        {
+            HubMessage msg = e.Data as HubMessage;
+            if (msg != null)
+                System.Console.WriteLine(string.Format("OUT: {0}", msg.Raw));
+        }
+
+        void Protocol_MessageReceived(object sender, FlowLib.Events.FmdcEventArgs e)
+        {
+            HubMessage msg = e.Data as HubMessage;
+            if (msg != null)
+               System.Console.WriteLine(string.Format("IN: {0}", msg.Raw));
         }
     }
 }

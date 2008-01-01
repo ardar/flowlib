@@ -104,6 +104,16 @@ namespace FlowLib.Events
         /// TransferRequest. This is used when others should connect to us.
         /// </summary>
         public const int TransferRequest = 16;
+        /// <summary>
+        /// Search should be started.
+        /// object is SearchInfo
+        /// </summary>
+        public const int Search = 17;
+        /// <summary>
+        /// Search Result received.
+        /// object is a SourceResultInfo
+        /// </summary>
+        public const int SearchResult = 18;
     }
 
     /*public enum Actions

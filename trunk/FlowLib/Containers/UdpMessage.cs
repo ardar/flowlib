@@ -19,28 +19,38 @@
  *
  */
 
-using FlowLib.Connections;
-using FlowLib.Containers;
-using FlowLib.Interfaces;
+using System.Net;
 
-namespace ConsoleDemo.Examples
+namespace FlowLib.Containers
 {
-    public class ConnectToHub
+    public class UdpMessage : ConMessage
     {
-        public ConnectToHub()
+        protected IPEndPoint point = null;
+        protected string raw = null;
+
+        /// <summary>
+        /// raw message
+        /// </summary>
+        public string Raw
         {
-            HubSetting settings = new HubSetting();
-            settings.Address = "127.0.0.1";
-            settings.Port = 411;
-            settings.DisplayName = "FlowLibNick";
-            // The below is one way to say what protocol we should use when connecting to hub.
-            //settings.Protocol = "Nmdc";
+            get { return raw; }
+            set
+            {
+                raw = value;
+            }
+        }
 
-            Hub hubConnection = new Hub(settings);
-            // This is a other way to say what protocol we should use when connecting
-            hubConnection.Protocol = new FlowLib.Protocols.HubNmdcProtocol(hubConnection);
+        public IPEndPoint RemoteAddress
+        {
+            get { return point; }
+            set { point = value; }
+        }
 
-            hubConnection.Connect();
+        public UdpMessage(string data, IPEndPoint point)
+            : base(null,null)
+        {
+            this.point = point;
+            this.raw = data;
         }
     }
 }

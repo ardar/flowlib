@@ -87,7 +87,11 @@ namespace FlowLib.Connections
         public DownloadItem DownloadItem
         {
             get { return downloadItem; }
-            set { downloadItem = value; }
+            set
+            {
+                downloadItem = value;
+                DownloadItemChanged(this, new FmdcEventArgs(0, downloadItem));
+            }
         }
 
         /// <summary>
@@ -116,6 +120,11 @@ namespace FlowLib.Connections
             : base(s)
         {
             DownloadItemChanged = new FmdcEventHandler(OnDownloadItemChanged);
+            if (socket.Connected)
+            {
+                localAddress = (System.Net.IPEndPoint)socket.LocalEndPoint;
+                remoteAddress = (System.Net.IPEndPoint)socket.RemoteEndPoint;
+            }
         }
 
         /// <summary>

@@ -36,7 +36,7 @@ namespace FlowLib.Connections
     /// <summary>
     /// Class representing hub in the p2p network Direct Connect
     /// </summary>
-    public class Hub : TcpConnection//, Hub
+    public class Hub : TcpConnection
     {
         #region Events
         /// <summary>

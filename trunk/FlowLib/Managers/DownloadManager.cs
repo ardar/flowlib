@@ -174,7 +174,12 @@ namespace FlowLib.Managers
             }
             else
             {
-                tmpDwn = downloadItems[d];
+                lock (downloadItems)
+                {
+                    // This is if we have a fake downloaditem (that we probably have)
+                    d = downloadItems.Keys[downloadItems.IndexOfKey(d)];
+                    tmpDwn = downloadItems[d];
+                }
             }
             if (s != null)
             {
@@ -196,6 +201,16 @@ namespace FlowLib.Managers
             }
         }
 
+        /// <summary>
+        /// Adds Source related to downloaditem
+        /// Same as AddDownload. If Download exist source will just be added to downloaditem.
+        /// </summary>
+        /// <param name="s">Source to be related to downloaditem</param>
+        /// <param name="d">DownloadItem to relate to source</param>
+        public void AddSource(Source s, DownloadItem d)
+        {
+            AddDownload(d, s);
+        }
         /// <summary>
         /// Removes all downloads and sources
         /// </summary>
