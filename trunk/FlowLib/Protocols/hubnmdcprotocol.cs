@@ -358,12 +358,28 @@ namespace FlowLib.Protocols
             else if (message is NickList)
             {
                 NickList nicks = (NickList)message;
-                hub.FireUpdate(Actions.UsersOnline, nicks.List);
+                foreach (string userid in nicks.List)
+                {
+                    UserInfo userInfo = new UserInfo();
+                    userInfo.DisplayName = userid;
+                    if (hub.GetUserById(userid) == null)
+                        hub.FireUpdate(Actions.UserOnline, userInfo);
+                }
             }
             else if (message is OpList)
             {
                 OpList ops = (OpList)message;
-                hub.FireUpdate(Actions.OpUsers, ops.List);
+                foreach (string userid in ops.List)
+                {
+                    UserInfo userInfo = new UserInfo();
+                    userInfo.DisplayName = userid;
+                    userInfo.IsOperator = true;
+
+                    if (hub.GetUserById(userid) == null)
+                        hub.FireUpdate(Actions.UserOnline, userInfo);
+                    else
+                        hub.FireUpdate(Actions.UserInfoChange, userInfo);
+                }
             }
             else if (message is Quit)
             {

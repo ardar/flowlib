@@ -463,13 +463,6 @@ namespace FlowLib.Connections
                     u.UserInfo = ui;
                     userlist.Add(ui.ID, u);
                     break;
-                case Actions.UsersOnline:
-                    string[] list = (string[])e.Data;
-                    for (int i = 0; i < list.Length; i++)
-                    {
-                        userlist.Add(list[i], new User(list[i]));
-                    }
-                    break;
                 case Actions.UserOffline:
                     userlist.Remove((string)e.Data);
                     break;
