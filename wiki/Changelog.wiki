@@ -19,7 +19,7 @@
   * CHANGE	- Removed Actions.OpUsers. We now use Actions.UserOnline or Actions.UserInfoChange. Releated to [http://code.google.com/p/flowlib/issues/detail?id=2 Issue 2]
   * FIX		- Parsing of NickList and OpList made list containing empty usernames.
   * CHANGE	- Actions.UserInfoChange now contains the updated UserInfo. Not only the changes as before.
-
+  * CHANGE	- Actions.UserOffline now contains UserInfo related to User. This is so developers can disconnect transfers and so on.
 
 
 = 20071222 =
