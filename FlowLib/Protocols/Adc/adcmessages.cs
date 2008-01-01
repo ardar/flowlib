@@ -145,6 +145,11 @@ namespace FlowLib.Protocols.Adc
         public UserInfo UserInfo
         {
             get { return info; }
+            set
+            {
+                info = value;
+                CreateRaw();
+            }
         }
         // Receiving
         public INF(Hub hub, string raw)
@@ -284,7 +289,7 @@ namespace FlowLib.Protocols.Adc
                 return;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
             sb.Append("BINF " + info.SID);
-            sb.Append(" ID" + info.ID);
+            sb.Append(" ID" + info.CID);
             sb.Append(" PD" + info.PID);
             sb.Append(" DE" + HubAdcProtocol.ConvertOutgoing(info.Description));
 
@@ -296,10 +301,9 @@ namespace FlowLib.Protocols.Adc
             sb.Append(" I40.0.0.0");
             sb.Append(" NI" + HubAdcProtocol.ConvertOutgoing(info.DisplayName));
             sb.Append(" SL" + info.TagInfo.Slots); // Upload Slots Open
-            sb.Append(" SF" + 0/*ShareManager.Default.FileCount.ToString()*/);  // TODO : Add Shared Files
-            sb.Append(" SS" + 0/*ShareManager.Default.FileSize.ToString()*/);    // TODO : Add Share Size in bytes
+            sb.Append(" SF" + (Hub.Share != null ? Hub.Share.HashedCount : 0));  // Shared Files
+            sb.Append(" SS" + (Hub.Share != null ? Hub.Share.HashedSize : 0));    // Share Size in bytes
             //sb.Append(" SU" + "ADC0,TCP4,UDP4 U4-6536");  // TODO : Add Support
-            // TODO : Add Version Setting
             sb.Append(" VE" + HubAdcProtocol.ConvertOutgoing(Hub.Me.TagInfo.Version));
             sb.Append("\n");
             Raw = sb.ToString();
@@ -445,6 +449,7 @@ namespace FlowLib.Protocols.Adc
         }
         protected string severity = null;
         protected string code = null;
+        protected string content = null;
         public string Severity
         {
             get { return severity; }
@@ -452,6 +457,10 @@ namespace FlowLib.Protocols.Adc
         public string Code
         {
             get { return code; }
+        }
+        public string Content
+        {
+            get { return content; }
         }
 
         public STA(Hub hub, string raw)

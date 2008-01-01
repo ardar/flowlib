@@ -46,13 +46,14 @@ namespace ConsoleDemo.Examples
             settings.Address = "vidfamne.myftp.org";
             settings.Port = 12345;
             settings.DisplayName = "FlowLibNick";
+            settings.UserDescription = "FlowLib";
             // TODO : Do this work
             //settings.Protocol = "Nmdc";
 
             Tiger tiger = new Tiger();
             byte[] data = tiger.ComputeHash(System.Text.Encoding.UTF8.GetBytes("FlowLib"));
             string pid = Base32.Encode(data);
-            data = tiger.ComputeHash(System.Text.Encoding.UTF8.GetBytes(pid));
+            data = tiger.ComputeHash(Base32.Decode(pid));
             string cid = Base32.Encode(data);
 
             Hub hubConnection = new Hub(settings);
@@ -61,8 +62,8 @@ namespace ConsoleDemo.Examples
             hubConnection.Me.CID = cid;
             hubConnection.Share = share;
 
-            // This is a other way to say what protocol we should use when connecting
-            //hubConnection.Protocol = new FlowLib.Protocols.HubNmdcProtocol(hubConnection);
+            hubConnection.Update += new FlowLib.Events.FmdcEventHandler(hubConnection_Update);
+
             hubConnection.Protocol = new FlowLib.Protocols.HubAdcProtocol(hubConnection);
             hubConnection.Protocol.MessageReceived += new FlowLib.Events.FmdcEventHandler(Protocol_MessageReceived);
             hubConnection.Protocol.MessageToSend += new FlowLib.Events.FmdcEventHandler(Protocol_MessageToSend);
@@ -70,18 +71,51 @@ namespace ConsoleDemo.Examples
             hubConnection.Connect();
         }
 
+        void hubConnection_Update(object sender, FlowLib.Events.FmdcEventArgs e)
+        {
+            //switch (e.Action)
+            //{
+            //    case FlowLib.Events.Actions.MainMessage:
+            //        MainMessage msg = e.Data as MainMessage;
+            //        if (msg == null)
+            //            return;
+            //        System.Console.WriteLine(string.Format("<{0}> {1}", msg.From, msg.Content));
+            //        break;
+            //    default:
+            //        break;
+            //}
+        }
+
         void Protocol_MessageToSend(object sender, FlowLib.Events.FmdcEventArgs e)
         {
             HubMessage msg = e.Data as HubMessage;
             if (msg != null)
-                System.Console.WriteLine("OUT: " + msg.Raw);
+            {
+                switch (msg.Raw.Substring(0, 4))
+                {
+                    default:
+                        System.Console.WriteLine("OUT: " + msg.Raw);
+                        break;
+                }
+            }
         }
 
         void Protocol_MessageReceived(object sender, FlowLib.Events.FmdcEventArgs e)
         {
             HubMessage msg = e.Data as HubMessage;
             if (msg != null)
-                System.Console.WriteLine("IN: " + msg.Raw);
+            {
+                switch (msg.Raw.Substring(0, 4))
+                {
+                    case "BINF":
+                    case "BSCH":
+                    case "IMSG":
+                        break;
+                    default:
+                        System.Console.WriteLine("IN: " + msg.Raw);
+                        break;
+                }
+            }
         }
 
         void share_HashingCompleted(object sender, System.EventArgs e)

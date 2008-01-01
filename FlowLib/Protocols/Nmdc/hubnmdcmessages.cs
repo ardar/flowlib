@@ -83,9 +83,14 @@ namespace FlowLib.Protocols.HubNmdc
                 int pos = 0;
                 // If first is on a pos more then max allowed nick size(35), ignore it.
                 if ((pos = tmp.IndexOf("> ")) > 35 || pos < 1)
-                    return;
-                from = tmp.Substring(0, pos);
-                content = tmp.Substring(pos + 2);
+                {
+                    content = raw;
+                }
+                else
+                {
+                    from = tmp.Substring(0, pos);
+                    content = tmp.Substring(pos + 2);
+                }
                 // This is a real Main chat msg as we have from.
                 // But as none follows standard we will allow msg even if it not a valid mainchat msg starting with <
                 //if (!string.IsNullOrEmpty(from))
