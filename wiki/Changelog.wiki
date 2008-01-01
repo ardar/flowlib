@@ -5,7 +5,7 @@
 
   _[Todo See Todo for changes still remaining before release]_
 
-  * ADD		- Acitve and passive searching (Send/Receive)
+  * ADD		- Acitve and passive searching (Send/Receive). FlowLib will not respond with a directory if user is not just searching for directories.
   * FIX		- User Tag parsing. Hub count was always -1. (Thanks GhOstFaCE for reporting)
   * FIX		- Active Transfers, NullReference Exception (Thanks Sneaky for reporting)
   * CHANGE	- You now need to set transfer in Listening state on Actions.TransferStarted and set Event as Handled.
