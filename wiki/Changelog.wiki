@@ -15,6 +15,9 @@
   * FIX		- When DownloadItem is changed in Transfer. DownloadItemChanged event is triggered.
   * FIX		- ContentInfo wasnt saved correctly when saving Share
   * FIX		- We will now handle all messages not starting with $ as Mainchat Msg, NMDC. (Thanks Carraya for reporting)
+  * CHANGE	- Removed Actions.UsersOnline. We now use Actions.UserOnline instead.  Releated to [http://code.google.com/p/flowlib/issues/detail?id=2 Issue 2]
+  * CHANGE	- Removed Actions.OpUsers. We now use Actions.UserOnline or Actions.UserInfoChanged. Releated to [http://code.google.com/p/flowlib/issues/detail?id=2 Issue 2]
+
 = 20071222 =
 
   * NOTE - First release. Because all started from a project called FMDC we dont have any changelog for this version.
