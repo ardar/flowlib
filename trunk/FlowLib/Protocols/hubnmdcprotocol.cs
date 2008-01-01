@@ -374,11 +374,14 @@ namespace FlowLib.Protocols
                     UserInfo userInfo = new UserInfo();
                     userInfo.DisplayName = userid;
                     userInfo.IsOperator = true;
-
-                    if (hub.GetUserById(userid) == null)
+                    User usr = null;
+                    if ((usr = hub.GetUserById(userid)) == null)
                         hub.FireUpdate(Actions.UserOnline, userInfo);
                     else
-                        hub.FireUpdate(Actions.UserInfoChange, userInfo);
+                    {
+                        usr.UserInfo = userInfo;
+                        hub.FireUpdate(Actions.UserInfoChange, usr.UserInfo);
+                    }
                 }
             }
             else if (message is Quit)
@@ -401,10 +404,14 @@ namespace FlowLib.Protocols
             else if (message is MyINFO)
             {
                 MyINFO myinfo = (MyINFO)message;
-                if (hub.GetUserById(message.From) == null)
+                User usr = null;
+                if ((usr = hub.GetUserById(message.From)) == null)
                     hub.FireUpdate(Actions.UserOnline, myinfo.UserInfo);
                 else
-                    hub.FireUpdate(Actions.UserInfoChange, myinfo.UserInfo);
+                {
+                    usr.UserInfo = myinfo.UserInfo;
+                    hub.FireUpdate(Actions.UserInfoChange, usr.UserInfo);
+                }
             }
             else if (message is Hello)
             {

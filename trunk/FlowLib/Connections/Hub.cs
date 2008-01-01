@@ -466,12 +466,6 @@ namespace FlowLib.Connections
                 case Actions.UserOffline:
                     userlist.Remove((string)e.Data);
                     break;
-                case Actions.UserInfoChange:
-                    UserInfo uic = (UserInfo)e.Data;
-                    User uc = GetUserById(uic.ID);
-                    if (uc != null)
-                        uc.UserInfo = uic;
-                    break;
             }
         }
         #endregion
