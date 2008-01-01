@@ -500,7 +500,8 @@ namespace FlowLib.Containers
         protected virtual void AddContent(ContentInfo contentInfo, VirtualDir vd)
         {
             // Adding to lists
-            try{
+            try
+            {
                 ContentInfo virtualValue;
                 if (virtualNames.TryGetValue(contentInfo.Get(ContentInfo.VIRTUAL), out virtualValue) && !virtualValue.Get(ContentInfo.STORAGEPATH).Equals(contentInfo.Get(ContentInfo.STORAGEPATH)))
                 {
@@ -514,7 +515,7 @@ namespace FlowLib.Containers
                     if (virtualValue == null)
                     {
                         virtualNames.Add(contentInfo.Get(ContentInfo.VIRTUAL), contentInfo);
-                        share.Add(contentInfo.Get(ContentInfo.STORAGEPATH), contentInfo); 
+                        share.Add(contentInfo.Get(ContentInfo.STORAGEPATH), contentInfo);
                         // Adding status stuff
                         vd.TotalSize += contentInfo.Size;
                         vd.TotalCount++;
@@ -529,7 +530,8 @@ namespace FlowLib.Containers
                             if (tmpContent.LastModified != contentInfo.LastModified || tmpContent.Size != contentInfo.Size)
                             {
                                 // If this content was hashed, decrease hashed count and size.
-                                if (tmpContent.IsTth) {
+                                if (tmpContent.IsTth)
+                                {
                                     vd.HashedCount--;
                                     vd.HashedSize -= tmpContent.Size;
                                 }
@@ -543,8 +545,8 @@ namespace FlowLib.Containers
                         }
                     }
                 }
-            }catch(ArgumentException) {
             }
+            catch (ArgumentException) { }
         }
         protected virtual void AddContent(System.IO.FileInfo fileInfo, string virtualname)
         {

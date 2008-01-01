@@ -113,7 +113,43 @@ namespace FlowLib.Containers
         public string Tag
         {
             get { return tag; }
-            set { tag = value; }
+            set {
+                // <++ V:0.699,M:A,H:2/0/0,S:1>
+                tag = value;
+                string[] tagsections = tag.Split(',');
+                if (tagsections.Length >= 4)
+                {
+                    #region Hub Count
+                    if (tagsections[2].StartsWith("H:"))
+                    {
+                        string[] sections;
+                        if ((sections = tagsections[2].Split('/')).Length == 3)
+                        {
+                            int.TryParse(sections[0], out hubs_normal);
+                            int.TryParse(sections[1], out hubs_regged);
+                            int.TryParse(sections[1], out hubs_op);
+                        }
+                    }
+                    #endregion
+                    #region Mode
+                    switch (tagsections[1])
+                    {
+                        case "M:A":
+                            Mode = ConnectionTypes.Direct;
+                            break;
+                        case "M:P":
+                            Mode = ConnectionTypes.Passive;
+                            break;
+                        case "M:5":
+                            Mode = ConnectionTypes.Socket5;
+                            break;
+                        default:
+                            Mode = ConnectionTypes.Unknown;
+                            break;
+                    }
+                    #endregion
+                }
+            }
         }
 
         public void CreateTag()

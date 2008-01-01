@@ -100,16 +100,28 @@ namespace FlowLib.Managers
         public void AddTransfer(ITransfer trans)
         {
             string id = string.Format("{0}{1}", trans.RemoteAddress.Address.ToString(), trans.RemoteAddress.Port);
-            ITransfer old = null;
-            if (transfers.TryGetValue(id, out old))
-            {
-                old.Disconnect("Too many connections.");
-                transfers.Remove(id);
-            }
-
+            RemoveTransfer(id);
             trans.ConnectionStatusChange += new FmdcEventHandler(trans_ConnectionStatusChange);
             // Add transfer to list.
             transfers.Add(id, trans);
+        }
+
+        public ITransfer GetTransfer(string key)
+        {
+            ITransfer old = null;
+            transfers.TryGetValue(key, out old);
+            return old;
+        }
+
+        public bool RemoveTransfer(string key)
+        {
+            ITransfer old = null;
+            if (transfers.TryGetValue(key, out old))
+            {
+                old.Disconnect("Too many connections.");
+                return transfers.Remove(key);
+            }
+            return false;
         }
 
         /// <summary>

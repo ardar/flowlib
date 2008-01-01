@@ -119,11 +119,11 @@ namespace FlowLib.Utils.Hash
                 }
             }
             // FLOW84 : Start
-            //catch (Exception e)
-            //{
-            //    Console.WriteLine("error while trying to get TTH: " + e.Message);
+            catch (Exception e)
+            {
+                Console.WriteLine("error while trying to get TTH: " + e.Message);
             //    StopThreads();
-            //}
+            }
             finally
             {
                 StopThreads();

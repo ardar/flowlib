@@ -19,28 +19,26 @@
  *
  */
 
-using FlowLib.Connections;
-using FlowLib.Containers;
-using FlowLib.Interfaces;
+using FlowLib.Enums;
 
-namespace ConsoleDemo.Examples
+namespace FlowLib.Containers
 {
-    public class ConnectToHub
+    public class SearchInfo : PropertyContainer<string, string>
     {
-        public ConnectToHub()
-        {
-            HubSetting settings = new HubSetting();
-            settings.Address = "127.0.0.1";
-            settings.Port = 411;
-            settings.DisplayName = "FlowLibNick";
-            // The below is one way to say what protocol we should use when connecting to hub.
-            //settings.Protocol = "Nmdc";
+        public const string SEARCH = "schstr";
+        public const string NOSEARCH = "noschstr";
+        public const string SIZE = "size";
+        /// <summary>
+        /// Size type.
+        /// 0 = No Size restriction
+        /// 1 = Min Size
+        /// 2 = Max Size
+        /// 3 = Equal Size
+        /// </summary>
+        public const string SIZETYPE = "sizetype";
+        public const string EXTENTION = "ext";
+        public const string SENDER = "sender";
 
-            Hub hubConnection = new Hub(settings);
-            // This is a other way to say what protocol we should use when connecting
-            hubConnection.Protocol = new FlowLib.Protocols.HubNmdcProtocol(hubConnection);
 
-            hubConnection.Connect();
-        }
     }
 }

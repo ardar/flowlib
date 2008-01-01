@@ -78,8 +78,10 @@ namespace FlowLib.Connections
         {
             Socket s = (Socket)ar.AsyncState;
             Transfer t = new Transfer(s.EndAccept(ar));
-            t.Listen();
-            Update(this, new FmdcEventArgs(Actions.TransferStarted, t));
+            FmdcEventArgs e = new FmdcEventArgs(Actions.TransferStarted, t);
+            Update(this, e);
+            if (!e.Handled)
+                t.Disconnect();
             SetupConnection(s);
         }
     }

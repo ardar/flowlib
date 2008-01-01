@@ -237,23 +237,15 @@ namespace FlowLib.Containers
         /// <param name="root">Xml Root name</param>
         public static void Load(string path, out SettingsGroup group, string root)
         {
-            try
+            XmlSerializer s = new XmlSerializer(typeof(SettingsGroup), new XmlRootAttribute(root));
+            if (File.Exists(path))
             {
-                XmlSerializer s = new XmlSerializer(typeof(SettingsGroup), new XmlRootAttribute(root));
-                if (File.Exists(path))
-                {
-                    TextReader r = new StreamReader(path);
-                    group = (SettingsGroup)s.Deserialize(r);
-                    r.Close();
-                }
-                else
-                {
-                    group = new SettingsGroup();
-                }
+                TextReader r = new StreamReader(path);
+                group = (SettingsGroup)s.Deserialize(r);
+                r.Close();
             }
-            catch (Exception exp)
+            else
             {
-                Console.WriteLine(exp.Message);
                 group = new SettingsGroup();
             }
         }

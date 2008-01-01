@@ -19,28 +19,31 @@
  *
  */
 
-using FlowLib.Connections;
-using FlowLib.Containers;
-using FlowLib.Interfaces;
+using System.Net;
 
-namespace ConsoleDemo.Examples
+namespace FlowLib.Containers
 {
-    public class ConnectToHub
+    public class SearchResultInfo
     {
-        public ConnectToHub()
+        protected ContentInfo info = null;
+        protected string userid = null;
+
+        public ContentInfo Info
         {
-            HubSetting settings = new HubSetting();
-            settings.Address = "127.0.0.1";
-            settings.Port = 411;
-            settings.DisplayName = "FlowLibNick";
-            // The below is one way to say what protocol we should use when connecting to hub.
-            //settings.Protocol = "Nmdc";
+            get { return info; }
+            set { info = value; }
+        }
 
-            Hub hubConnection = new Hub(settings);
-            // This is a other way to say what protocol we should use when connecting
-            hubConnection.Protocol = new FlowLib.Protocols.HubNmdcProtocol(hubConnection);
+        public string UserId
+        {
+            get { return userid; }
+            set { userid = value; }
+        }
 
-            hubConnection.Connect();
+        public SearchResultInfo(ContentInfo info, string userid)
+        {
+            this.info = info;
+            this.userid = userid;
         }
     }
 }

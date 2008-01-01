@@ -19,28 +19,14 @@
  *
  */
 
-using FlowLib.Connections;
+using FlowLib.Events;
 using FlowLib.Containers;
-using FlowLib.Interfaces;
+using System.Net;
 
-namespace ConsoleDemo.Examples
+namespace FlowLib.Interfaces
 {
-    public class ConnectToHub
+    public interface IProtocolUdp : IProtocol
     {
-        public ConnectToHub()
-        {
-            HubSetting settings = new HubSetting();
-            settings.Address = "127.0.0.1";
-            settings.Port = 411;
-            settings.DisplayName = "FlowLibNick";
-            // The below is one way to say what protocol we should use when connecting to hub.
-            //settings.Protocol = "Nmdc";
-
-            Hub hubConnection = new Hub(settings);
-            // This is a other way to say what protocol we should use when connecting
-            hubConnection.Protocol = new FlowLib.Protocols.HubNmdcProtocol(hubConnection);
-
-            hubConnection.Connect();
-        }
+        void ParseRaw(byte[] b, int length, IPEndPoint point);
     }
 }

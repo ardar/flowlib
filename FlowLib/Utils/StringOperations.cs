@@ -1,4 +1,3 @@
-
 /*
  *
  * Copyright (C) 2007 Mattias Blomqvist, patr-blo at dsv dot su dot se
@@ -19,28 +18,23 @@
  *
  */
 
-using FlowLib.Connections;
-using FlowLib.Containers;
-using FlowLib.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace ConsoleDemo.Examples
+namespace FlowLib.Utils
 {
-    public class ConnectToHub
+    public static class StringOperations
     {
-        public ConnectToHub()
+        public static bool Find(string content, string start, string end, ref int pos1, ref int pos2)
         {
-            HubSetting settings = new HubSetting();
-            settings.Address = "127.0.0.1";
-            settings.Port = 411;
-            settings.DisplayName = "FlowLibNick";
-            // The below is one way to say what protocol we should use when connecting to hub.
-            //settings.Protocol = "Nmdc";
-
-            Hub hubConnection = new Hub(settings);
-            // This is a other way to say what protocol we should use when connecting
-            hubConnection.Protocol = new FlowLib.Protocols.HubNmdcProtocol(hubConnection);
-
-            hubConnection.Connect();
+            bool value = ((pos1 = content.IndexOf(start, pos1)) != -1
+                && (pos2 = content.IndexOf(end, pos1 + start.Length)) != -1);
+            if (value)
+                pos2 += end.Length;
+            return value;
         }
+
+
     }
 }
