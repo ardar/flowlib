@@ -27,6 +27,12 @@ namespace FlowLib.Containers
     {
         public const string SEARCH = "schstr";
         public const string NOSEARCH = "noschstr";
+        /// <summary>
+        /// 0 = File
+        /// 1 = Directory
+        /// 2 = Tth
+        /// </summary>
+        public const string TYPE = "schtype";
         public const string SIZE = "size";
         /// <summary>
         /// Size type.
@@ -37,8 +43,6 @@ namespace FlowLib.Containers
         /// </summary>
         public const string SIZETYPE = "sizetype";
         public const string EXTENTION = "ext";
-        public const string SENDER = "sender";
-
-
+        public const string TOKEN = "token";
     }
 }

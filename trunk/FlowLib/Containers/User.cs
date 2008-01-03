@@ -79,17 +79,17 @@ namespace FlowLib.Containers
                         userinfo.TagInfo.OP = value.TagInfo.OP;
                     if (value.TagInfo.Slots != -1)
                         userinfo.TagInfo.Slots = value.TagInfo.Slots;
-                    if (value.SID.Length != 0)
-                        userinfo.SID = value.SID;
-                    if (value.CID.Length != 0)
-                        userinfo.CID = value.CID;
+                    if (value.ContainsKey(UserInfo.SID))
+                        userinfo.Set(UserInfo.SID, value.Get(UserInfo.SID));
+                    if (value.ContainsKey(UserInfo.CID))
+                        userinfo.Set(UserInfo.CID, value.Get(UserInfo.CID));
                     // We want to create the tag if we have a version and a CID
                     // This is because we only want to create the tag if it is ADC protocol
-                    if (userinfo.TagInfo.Version != null && userinfo.CID.Length != 0 && userinfo.ID.Length != 0)
+                    if (userinfo.TagInfo.Version != null && userinfo.ContainsKey(UserInfo.CID) && userinfo.ID.Length != 0)
                         userinfo.TagInfo.CreateTag();
                 }
-                if (value.IP.Length != 0)
-                    userinfo.IP = value.IP;
+                if (value.ContainsKey(UserInfo.IP))
+                    userinfo.Set(UserInfo.IP, value.Get(UserInfo.IP));
                 if (value.Share.Length != 0)
                     userinfo.Share = value.Share;
                 if (value.Email.Length != 0)
@@ -98,12 +98,8 @@ namespace FlowLib.Containers
                     userinfo.Description = value.Description;
                 if (value.Connection.Length != 0)
                     userinfo.Connection = value.Connection;
-                if (value.IsSetOP)
-                    userinfo.IsOperator = value.IsOperator;
-
-                //userinfo = value;
-                // TODO : Gui Update thingy.
-                //updateView();
+                if (value.ContainsKey(UserInfo.ACCOUNT))
+                    userinfo.Set(UserInfo.ACCOUNT, value.Get(UserInfo.ACCOUNT));
             }
         }
         /// <summary>
@@ -155,8 +151,8 @@ namespace FlowLib.Containers
         /// <returns></returns>
         public override string ToString()
         {
-            if (userinfo.DisplayName.Length == 0)
-                return userinfo.SID;
+            if (userinfo.ContainsKey(UserInfo.SID))
+                return userinfo.Get(UserInfo.SID);
             return userinfo.DisplayName;
         }
     }

@@ -27,6 +27,438 @@ using FlowLib.Connections;
 namespace FlowLib.Protocols.Adc
 {
     #region Receive AND Send
+    public class SND : AdcBaseMessage
+    {
+        protected string contentType = null;
+        protected string identifier = null;
+        protected SegmentInfo segment = null;
+
+        public SND(Hub hub, string raw)
+            : base(hub, raw)
+        {
+            if (param.Count >= 4)
+            {
+                contentType = param[0];
+                identifier = param[1];
+                try
+                {
+                    long start = int.Parse(param[2]);
+                    long length = int.Parse(param[3]);
+                    segment = new SegmentInfo(-1, start, length);
+                    valid = true;
+                }
+                catch { }
+            }
+        }
+    }
+
+    public class GFI : AdcBaseMessage
+    {
+        protected string contentType = null;
+        protected string identifier = null;
+
+        public GFI(Hub hub, string raw)
+            : base(hub, raw)
+        {
+            if (param.Count >= 2)
+            {
+                contentType = param[0];
+                identifier = param[1];
+                valid = true;
+            }
+        }
+
+        public GFI(Hub hub, string type, string contentId)
+            : base(hub, null)
+        {
+            contentType = type;
+            identifier = contentId;
+            Raw = string.Format("CGFI {0} {1}\n", type, contentId);
+        }
+    }
+    public class GET : AdcBaseMessage
+    {
+        protected string contentType = null;
+        protected string identifier = null;
+        protected SegmentInfo segment = null;
+
+        public string ContentType
+        {
+            get { return contentType; }
+        }
+        public string Identifier
+        {
+            get { return identifier; }
+        }
+        public SegmentInfo SegmentInfo
+        {
+            get { return segment; }
+        }
+        public GET(Hub hub, string raw)
+            : base(hub, raw)
+        {
+            if (param.Count >= 4)
+            {
+                contentType = param[0];
+                identifier = param[1];
+                try
+                {
+                    long start = int.Parse(param[2]);
+                    long length = int.Parse(param[3]);
+                    segment = new SegmentInfo(-1, start, length);
+                    valid = true;
+                }
+                catch { }
+            }
+        }
+
+        public GET(Hub hub, ContentInfo info, SegmentInfo segment)
+            : this(hub, info, segment, "file") { }
+
+        public GET(Hub hub, ContentInfo info, SegmentInfo segment, string type)
+            : base(hub, null)
+        {
+            string req = null;
+            if (info.ContainsKey(ContentInfo.REQUEST))
+                req = info.Get(ContentInfo.REQUEST);
+            else if (info.ContainsKey(ContentInfo.TTH))
+                req = info.Get(ContentInfo.TTH);
+            else if (info.ContainsKey(ContentInfo.VIRTUAL))
+                req = info.Get(ContentInfo.VIRTUAL);
+
+            if (req == null)
+                throw new System.ArgumentException("ContentInfo must contain any of: REQUEST, TTH or VIRTUAL");
+
+            // TODO : Add support for list also
+            Raw = string.Format("CGET {0} {1} {2} {3}\n", type, req, segment.Position, segment.Length);
+        }
+    }
+    public class RCM : AdcBaseMessage
+    {
+        protected string protocol = null;
+        protected string token = null;
+
+        public string Protocol
+        {
+            get { return protocol; }
+        }
+        public string Token
+        {
+            get { return token; }
+        }
+
+        public RCM(Hub hub, string raw)
+            : base(hub, raw)
+        {
+            if (param.Count >= 2)
+            {
+                protocol = param[0];
+                token = param[1];
+                valid = true;
+            }
+        }
+
+        public RCM(string token, Hub hub)
+            : this(token, hub, "ADC/1.0") { }
+        public RCM(string token, Hub hub, string protocol)
+            : base(hub, null)
+        {
+            this.protocol = protocol;
+            this.token = token;
+            Raw = string.Format("DRCM {0} {1}\n", protocol, token);
+        }
+    }
+    public class CTM : AdcBaseMessage
+    {
+        protected string protocol = null;
+        protected int port = -1;
+        protected string token = null;
+
+        public string Protocol
+        {
+            get { return protocol; }
+        }
+        public int Port
+        {
+            get { return port; }
+        }
+        public string Token
+        {
+            get { return token; }
+        }
+        public CTM(Hub hub, string raw)
+            : base(hub, raw)
+        {
+            if (param.Count >= 3)
+            {
+                protocol = param[0];
+                try
+                {
+                    port = int.Parse(param[1]);
+                    valid = true;
+                }
+                catch { }
+                token = param[2];
+            }
+        }
+
+        public CTM(Hub hub, int port, string token)
+            : this(hub, "ADC/1.0", port, token) { }
+
+        public CTM(Hub hub, string protocol, int port, string token)
+            : base(hub, null)
+        {
+            Raw = string.Format("DCTM {0} {1} {2}\n", protocol, port.ToString(), token);
+        }
+    }
+    public class SCH : AdcBaseMessage
+    {
+        SearchInfo info = new SearchInfo();
+        public SCH(Hub hub, string raw)
+            : base(hub, raw)
+        {
+            // BSCH NRQF TRUDHPNB4BUIQV2LAI4HDWRL3KLJTUSXCTAMJHNII TOauto
+            for (int i = 0; i < param.Count; i++)
+            {
+                if (param[i].Length < 2)
+                    continue;
+                string key = param[i].Substring(0, 2);
+                string value = param[i].Substring(2);
+                switch (key)
+                {
+                    case "AN":
+                        //TODO : We should make it possible to have more then 1 AN.
+                        info.Set(SearchInfo.SEARCH, value);
+                        valid = true;
+                        break;
+                    case "NO":
+                        //TODO : We should make it possible to have more then 1 AN.
+                        info.Set(SearchInfo.NOSEARCH, value);
+                        break;
+                    case "EX":
+                        if (info.ContainsKey(SearchInfo.EXTENTION))
+                            value = value + " " + info.Get(SearchInfo.EXTENTION);
+                        info.Set(SearchInfo.EXTENTION, value);
+                        break;
+                    case "LE":
+                        info.Set(SearchInfo.SIZETYPE, "2");
+                        try
+                        {
+                            info.Set(SearchInfo.SIZE, long.Parse(value).ToString());
+                        }
+                        catch { }
+                        break;
+                    case "GE":
+                        info.Set(SearchInfo.SIZETYPE, "1");
+                        try
+                        {
+                            info.Set(SearchInfo.SIZE, long.Parse(value).ToString());
+                        }
+                        catch { }
+                        break;
+                    case "EQ":
+                        info.Set(SearchInfo.SIZETYPE, "3");
+                        try
+                        {
+                            info.Set(SearchInfo.SIZE, long.Parse(value).ToString());
+                        }
+                        catch { }
+                        break;
+                    case "TO":
+                        info.Set(SearchInfo.TOKEN, value);
+                        break;
+                    case "TY":
+                        switch (value)
+                        {
+                            case "1":   // File
+                                break;
+                            case "2":   // Directory
+                                info.Set(SearchInfo.TYPE, "1");
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    case "TR":
+                        info.Set(SearchInfo.SEARCH, value);
+                        info.Set(SearchInfo.TYPE, "2");
+                        valid = true;
+                        break;
+                }
+            }
+        }
+
+        public SCH(Hub hub, SearchInfo info)
+            : base(hub, null)
+        {
+            this.info = info;
+            // BSCH NRQF TRUDHPNB4BUIQV2LAI4HDWRL3KLJTUSXCTAMJHNII TOauto
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            #region EX
+            if (info.ContainsKey(SearchInfo.EXTENTION))
+            {
+                string[] ext = info.Get(SearchInfo.EXTENTION).Split(' ');
+                foreach (string extention in ext)
+                {
+                    sb.Append(" EX" + extention);
+                }
+            }
+            #endregion
+            #region TY
+            if (info.ContainsKey(SearchInfo.TYPE))
+            {
+                switch (info.Get(SearchInfo.TYPE))
+                {
+                    case "0":
+                        sb.Append(" TY" + HubAdcProtocol.ConvertOutgoing("1")); break;
+                    case "1":
+                        sb.Append(" TY" + HubAdcProtocol.ConvertOutgoing("2")); break;
+                    case "2":
+                        sb.Append(" AN" + info.Get(SearchInfo.SEARCH)); break;
+                }
+            }
+            #endregion
+            #region AN
+            if (info.ContainsKey(SearchInfo.SEARCH) && info.ContainsKey(SearchInfo.TYPE))
+                sb.Append(" AN" + HubAdcProtocol.ConvertOutgoing(info.Get(SearchInfo.SEARCH)));
+            #endregion
+            #region NO
+            if (info.ContainsKey(SearchInfo.NOSEARCH))
+                sb.Append(" NO" + HubAdcProtocol.ConvertOutgoing(info.Get(SearchInfo.NOSEARCH)));
+            #endregion
+            #region TO
+            if (info.ContainsKey(SearchInfo.TOKEN))
+                sb.Append(" TO" + HubAdcProtocol.ConvertOutgoing(info.Get(SearchInfo.TOKEN)));
+            #endregion
+            #region Size Type
+            if (info.ContainsKey(SearchInfo.SIZETYPE))
+            {
+                string size = info.Get(SearchInfo.SIZE);
+                switch (info.Get(SearchInfo.SIZETYPE))
+                {
+                    case "1":
+                        sb.Append(" GE" + size);
+                        break;
+                    case "2":
+                        sb.Append(" LE" + size);
+                        break;
+                    case "3":
+                        sb.Append(" EQ" + size);
+                        break;
+                }
+            }
+            #endregion
+            Raw = string.Format("BSCH {0}{1}\n", hub.Me.ID, sb.ToString());
+        }
+    }
+    public class RES : AdcBaseMessage
+    {
+        protected ContentInfo info = null;
+        protected string token = null;
+        protected long slots;
+        protected int port = -1;
+
+        public int Port
+        {
+            get { return port; }
+        }
+
+        public ContentInfo Info
+        {
+            get
+            {
+                return info;
+            }
+            set
+            {
+                info = value;
+            }
+        }
+
+        public string Token
+        {
+            get { return token; }
+        }
+
+        public long Slots
+        {
+            get { return slots; }
+        }
+
+        public RES(Hub hub, string raw)
+            : base(hub, raw)
+        {
+            info = new ContentInfo();
+            foreach (string var in param)
+            {
+                if (var.Length < 2)
+                    continue;
+                string key = var.Substring(0, 2);
+                string value = var.Substring(2);
+                switch (key)
+                {
+                    case "FN":
+                        info.Set(ContentInfo.VIRTUAL, value);
+                        valid = true;
+                        break;
+                    case "SI":
+                        try
+                        {
+                            info.Size = long.Parse(value);
+                        }
+                        catch { }
+                        break;
+                    case "SL":
+                        try
+                        {
+                            slots = long.Parse(value);
+                        }
+                        catch { }
+                        break;
+                    case "TO":
+                        token = value;
+                        break;
+                }
+            }
+        }
+
+        public RES(Hub hub, ContentInfo info, string token, string from)
+            : base(hub, null)
+        {
+            this.info = info;
+
+            User usr = null;
+            if ((usr = hub.GetUserById(from)) != null)
+            {
+                if (
+                    usr.UserInfo.ContainsKey(UserInfo.UDPPORT)
+                    && usr.UserInfo.ContainsKey("SU")
+                    && (usr.UserInfo.Get("SU").Contains("UDP4") || usr.UserInfo.Get("SU").Contains("UDP6"))
+                    )
+                {
+                    type = "U";
+                    try
+                    {
+                        port = int.Parse(usr.UserInfo.Get(UserInfo.UDPPORT));
+                    }
+                    catch { }
+                }
+                else
+                {
+                    type = "D";
+                }
+
+                System.Text.StringBuilder sb = new System.Text.StringBuilder();
+                if (info.ContainsKey(ContentInfo.VIRTUAL))
+                    sb.Append(" FN" + info.Get(ContentInfo.VIRTUAL));
+                sb.Append(" SI" + info.Size.ToString());
+                if (!string.IsNullOrEmpty(token))
+                    sb.Append(" TO" + token);
+                // TODO : Add Slots handling
+                Raw = string.Format("{0}RES{1}\n", type, sb.ToString());
+            }
+        }
+    }
     public class MSG : AdcBaseMessage
     {
         protected string content = null;
@@ -56,27 +488,29 @@ namespace FlowLib.Protocols.Adc
             //D: DMSG SHJV SH5B PIIP!! PMSHJV
             if (param == null)
                 return;
-            string[] sections = param.Split(' ');
-            if (sections.Length == 1)
-                content = sections[0];
-            else if (sections.Length == 2)
+            if (param.Count >= 1)
             {
-                from = sections[0];
-                content = sections[1];
+                content = param[0];
+                valid = true;
             }
-            else if (sections.Length >= 3)
+            // Param
+            for (int i = 1; i < param.Count; i++)
             {
-                from = sections[0];
-                to = sections[1];
-                content = sections[2];
-                for (int i = 3; i < sections.Length; i++)
+                if (param[i].Length < 2)
+                    continue;
+                string key = param[i].Substring(0,2);
+                string value = param[i].Substring(2);
+                switch (key)
                 {
-                    if (sections[i].StartsWith("PM"))
-                        pmgroup = sections[i].Substring(2);
-                    else if (sections[i].Equals("ME1"))
-                        me = true;
+                    case "PM":
+                        pmgroup = value;
+                        break;
+                    case "ME":
+                        me = value.Equals("1");
+                        break;
                 }
             }
+
             // Replacing stuff
             if (content != null)
             {
@@ -93,7 +527,7 @@ namespace FlowLib.Protocols.Adc
             : this(hub, me, content, null, null)
         {
             // BMSG SHJV PIP
-            this.Raw = "BMSG " + this.from + " " + HubAdcProtocol.ConvertOutgoing(this.content) + (this.me ? " ME1" : "") + "\n";
+            Raw = "BMSG " + this.from + " " + HubAdcProtocol.ConvertOutgoing(this.content) + (this.me ? " ME1" : "") + "\n";
         }
         /// <summary>
         /// Constructor for sending Private messages
@@ -110,7 +544,8 @@ namespace FlowLib.Protocols.Adc
             this.pmgroup = group;
             this.me = me;
             this.content = content;
-            this.from = hub.Me.SID;
+            if (hub.Me.ContainsKey(UserInfo.SID))
+                this.from = hub.Me.Get(UserInfo.SID);
             if (this.to == null || this.pmgroup == null)
             {
                 if (this.pmgroup != null)
@@ -119,7 +554,7 @@ namespace FlowLib.Protocols.Adc
                     return;
             }
             // DMSG SHJV SH5B PIIP!! PMSHJV
-            this.Raw = "DMSG " + this.from + " " + this.to + " " + HubAdcProtocol.ConvertOutgoing(this.content) + (this.me ? " ME1" : "") + ((this.pmgroup != null) ? (" PM" + this.pmgroup) : this.to) + "\n";
+            Raw = "DMSG " + this.from + " " + this.to + " " + HubAdcProtocol.ConvertOutgoing(this.content) + (this.me ? " ME1" : "") + ((this.pmgroup != null) ? (" PM" + this.pmgroup) : this.to) + "\n";
         }
     }
     public class SUP : AdcBaseMessage
@@ -160,46 +595,38 @@ namespace FlowLib.Protocols.Adc
             // IINF is from hub. all other should be from user =)
             // NIDCDev\sPublic HU1 HI1 DEThe\spublic\sDirect\sConnect\sdevelopment\shub VEADCH++\sv2.0.0-Release
             // TUOD SF0 SL1 SS0 SUTCP4,UDP4 DEPASIV HN4 HO0 HR0 I489.38.33.162 U41090 IDARJQDWZKC4MMC7PLQNOYSPHVI7V62QPS4IRF5KA EMLIVIUANDREI70@YAHOO.COM US104857600 VE++\s0.698 NI[RO][B][QUICK-NET]LIVIU
-            string[] sections = param.Split(' ');
-            int i = 0;
-            if (this.Type == "B")
+            for (int i = 0; i < param.Count; i++)
             {
-                from = sections[0];
-                info.SID = from;
-                i = 1;
-            }
-            for (; i < sections.Length; i++)
-            {
-                if (sections[i].Length < 2)
+                if (param[i].Length < 2)
                     continue;
-                string key = sections[i].Substring(0, 2);
-                string value = sections[i].Substring(2);
+                string key = param[i].Substring(0, 2);
+                string value = param[i].Substring(2);
                 switch (key)
                 {
                     case "ID":
-                        info.CID = value;
-                        break;
-                    case "PD":
+                        info.Set(UserInfo.CID, value);
                         break;
                     case "I4":
-                        info.IP = value;
+                        info.Set(UserInfo.IP, value);
                         break;
                     case "I6":
-                        info.IP = value;
+                        info.Set(UserInfo.IP, value);
                         break;
                     case "U4":
+                        info.Set(UserInfo.UDPPORT, value);
                         break;
                     case "U6":
+                        info.Set(UserInfo.UDPPORT, value);
                         break;
                     case "SS":
                         info.Share = value;
                         break;
-                    case "SF":
-                        break;
-                    case "US":
-                        break;
-                    case "DS":
-                        break;
+                    //case "SF":
+                    //    break;
+                    //case "US":
+                    //    break;
+                    //case "DS":
+                    //    break;
                     case "SL":
                         try
                         {
@@ -210,10 +637,10 @@ namespace FlowLib.Protocols.Adc
                             info.TagInfo.Slots = 0;
                         }
                         break;
-                    case "AS":
-                        break;
-                    case "AM":
-                        break;
+                    //case "AS":
+                    //    break;
+                    //case "AM":
+                    //    break;
                     case "EM":
                         info.Email = HubAdcProtocol.ConvertIncomming(value);
                         break;
@@ -247,21 +674,21 @@ namespace FlowLib.Protocols.Adc
                             info.TagInfo.OP = 0;
                         }
                         break;
-                    case "TO":
-                        break;
+                    //case "TO":
+                    //    break;
                     case "OP":
                         info.IsOperator = (value == "1");
                         break;
-                    case "AW":
-                        break;
-                    case "BO":
-                        break;
-                    case "HI":
-                        break;
-                    case "HU":
-                        break;
-                    case "SU":
-                        break;
+                    //case "AW":
+                    //    break;
+                    //case "BO":
+                    //    break;
+                    //case "HI":
+                    //    break;
+                    //case "HU":
+                    //    break;
+                    //case "SU":
+                    //    break;
                     case "NI":
                         info.DisplayName = HubAdcProtocol.ConvertIncomming(value);
                         break;
@@ -272,6 +699,8 @@ namespace FlowLib.Protocols.Adc
                         info.Description = HubAdcProtocol.ConvertIncomming(value);
                         break;
                     default:
+                        // We will add all unhandled fields to user. This is because developer may know how to handle it even if we dont.
+                        info.Set(key, value);
                         break;
                 }
             }
@@ -288,17 +717,25 @@ namespace FlowLib.Protocols.Adc
             if (info == null)
                 return;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
-            sb.Append("BINF " + info.SID);
-            sb.Append(" ID" + info.CID);
-            sb.Append(" PD" + info.PID);
+            sb.Append("BINF " + info.Get(UserInfo.SID));
+            sb.Append(" ID" + info.Get(UserInfo.CID));
+            sb.Append(" PD" + info.Get(UserInfo.PID));
             sb.Append(" DE" + HubAdcProtocol.ConvertOutgoing(info.Description));
 
             sb.Append(" HN" + info.TagInfo.Normal.ToString());
             sb.Append(" HO" + info.TagInfo.OP.ToString());
             sb.Append(" HR" + info.TagInfo.Regged.ToString());
 
-            // TODO: Add check for TCP-IP 4 or 6
-            sb.Append(" I40.0.0.0");
+            if (info.ContainsKey(UserInfo.IP))
+            {
+                string ip = info.Get(UserInfo.IP);
+                if (ip.Contains("."))
+                    sb.Append(" I4" + ip);
+                else
+                    sb.Append(" I6" + ip);
+            }
+            else
+                sb.Append(" I40.0.0.0");
             sb.Append(" NI" + HubAdcProtocol.ConvertOutgoing(info.DisplayName));
             sb.Append(" SL" + info.TagInfo.Slots); // Upload Slots Open
             sb.Append(" SF" + (Hub.Share != null ? Hub.Share.HashedCount : 0));  // Shared Files
@@ -341,7 +778,10 @@ namespace FlowLib.Protocols.Adc
 
         private void EncryptPassword()
         {
-            // TODO : Add Encryption here.
+            byte[] data = System.Text.Encoding.UTF8.GetBytes(password + random);
+            Utils.Hash.Tiger tiger = new FlowLib.Utils.Hash.Tiger();
+            data = tiger.ComputeHash(data);
+            encrypted = Utils.Convert.Base32.Encode(data);
         }
     }
     #endregion
@@ -363,6 +803,13 @@ namespace FlowLib.Protocols.Adc
         protected long time = 0;
         protected string msg = null;
         protected string address = null;
+        protected bool unwanted = false;
+
+        public bool Unwanted
+        {
+            get { return unwanted; }
+        }
+
         public string DisconnectedBy
         {
             get { return by; }
@@ -385,14 +832,12 @@ namespace FlowLib.Protocols.Adc
         {
             if (param == null)
                 return;
-            string[] sections = param.Split(' ');
-            from = sections[0];
-            for (int i = 1; i < sections.Length; i++)
+            for (int i = 0; i < param.Count; i++)
             {
-                if (sections[i].Length < 2)
+                if (param[i].Length < 2)
                     continue;
-                string key = sections[i].Substring(0, 2);
-                string value = sections[i].Substring(2);
+                string key = param[i].Substring(0, 2);
+                string value = param[i].Substring(2);
                 switch (key)
                 {
                     case "ID":
@@ -410,6 +855,9 @@ namespace FlowLib.Protocols.Adc
                         break;
                     case "RD":
                         address = value;
+                        break;
+                    case "DI":
+                        unwanted = true;
                         break;
                 }
             }
@@ -468,18 +916,19 @@ namespace FlowLib.Protocols.Adc
         {
             if (param == null)
                 return;
-            string[] sections = param.Split(' ');
-            if (sections[0].Length == 3)
+            if (param.Count >= 2 && param[0].Length == 3)
             {
-                severity = sections[0].Substring(0, 1);
-                code = sections[0].Substring(1);
+                severity = param[0].Substring(0, 1);
+                code = param[0].Substring(1);
+                content = HubAdcProtocol.ConvertIncomming(param[1]);
             }
-            for (int i = 1; i < sections.Length; i++)
+
+            for (int i = 2; i < param.Count; i++)
             {
-                if (sections[i].Length < 2)
+                if (param[i].Length < 2)
                     continue;
-                string key = sections[i].Substring(0, 2);
-                string value = sections[i].Substring(2);
+                string key = param[i].Substring(0, 2);
+                string value = param[i].Substring(2);
                 switch (key)
                 {
                     case "FC":
