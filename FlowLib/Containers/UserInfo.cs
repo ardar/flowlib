@@ -26,8 +26,47 @@ namespace FlowLib.Containers
     /// <summary>
     /// Class representing User Information. This is used by User Class.
     /// </summary>
-    public class UserInfo
+    public class UserInfo : PropertyContainer<string, string>
     {
+        /// <summary>
+        /// Private Id for User
+        /// </summary>
+        public const string PID = "pid";
+        /// <summary>
+        /// Client Id
+        /// </summary>
+        public const string CID = "cid";
+        /// <summary>
+        /// Session ID (Direct Connect network, ADC protocol)
+        /// </summary>
+        public const string SID = "sid";
+        /// <summary>
+        /// Port for Udp Connections
+        /// </summary>
+        public const string UDPPORT = "udpport";
+        /// <summary>
+        /// User IP Adress
+        /// </summary>
+        public const string IP = "ip";
+        /// <summary>
+        /// User account status
+        /// Available flags are ACCOUNT_FLAG_*
+        /// To know if super user use this:
+        /// ((ACCOUNT_FLAG_SUPERUSER | value) == ACCOUNT_FLAG_SUPERUSER)
+        /// To set super user:
+        /// value |= UserInfo.ACCOUNT_FLAG_SUPERUSER
+        /// To remove super user:
+        /// value ^= UserInfo.ACCOUNT_FLAG_SUPERUSER
+        /// </summary>
+        public const string ACCOUNT = "account";
+
+        public const int ACCOUNT_FLAG_USER = 0;
+        public const int ACCOUNT_FLAG_BOT = 1;
+        public const int ACCOUNT_FLAG_REGISTERED = 2;
+        public const int ACCOUNT_FLAG_OPERATOR = 4;
+        public const int ACCOUNT_FLAG_SUPERUSER = 8;
+        public const int ACCOUNT_FLAG_HUBOWNER = 16;
+
         #region Variables
         protected string name = "";
         protected string share_exact = "";
@@ -35,13 +74,7 @@ namespace FlowLib.Containers
         protected string description = "";
         protected string connection = "";
         protected string email = "";
-        protected string cid = "";    // Client ID
-        protected string sid = "";    // Session ID
-        protected string ip = "";
-        protected string pid = null;  // PID (For Me only)
-        protected int op = -1;
         protected TagInfo taginfo = new TagInfo(true);
-        //        private string supports;
 
         #endregion
         #region Properties
@@ -52,19 +85,11 @@ namespace FlowLib.Containers
         {
             get
             {
-                if (SID.Length != 0)
-                    return SID;
+                if (ContainsKey(UserInfo.SID))
+                    return Get(UserInfo.SID);
                 else
                     return DisplayName;
             }
-        }
-        /// <summary>
-        /// User Session ID (Direct Connect network, ADC protocol)
-        /// </summary>
-        public string SID
-        {
-            set { sid = value; }
-            get { return sid; }
         }
         /// <summary>
         /// Display name for user
@@ -73,20 +98,9 @@ namespace FlowLib.Containers
         {
             get
             {
-                if (name.Length != 0)
-                    return name;
-                else
-                    return SID;
+                return name;
             }
             set { name = value; }
-        }
-        /// <summary>
-        /// User IP Adress
-        /// </summary>
-        public string IP
-        {
-            get { return ip; }
-            set { ip = value; }
         }
         /// <summary>
         /// User description
@@ -136,35 +150,12 @@ namespace FlowLib.Containers
         /// </summary>
         public string Share
         {
-            set 
+            set
             {
                 share_exact = value;
                 formatShare(value);
             }
             get { return share_exact; }
-        }
-        /// <summary>
-        /// Private Id for User
-        /// </summary>
-        public string PID
-        {
-            get { return pid; }
-            set { pid = value; }
-        }
-        /// <summary>
-        /// Client Id
-        /// </summary>
-        public string CID
-        {
-            get { return cid; }
-            set { cid = value; }
-        }
-        /// <summary>
-        /// Indicates if operator status has been set to either operator status or normal
-        /// </summary>
-        public bool IsSetOP
-        {
-            get { return (op != -1); }
         }
         /// <summary>
         /// Specifies if this user is operator or not
@@ -173,14 +164,33 @@ namespace FlowLib.Containers
         {
             get
             {
-                return (op == 1);
+                if (ContainsKey(ACCOUNT))
+                {
+                    int size = 0;
+                    try
+                    {
+                        size = int.Parse(Get(ACCOUNT));
+                    }
+                    catch { }
+                    return ((ACCOUNT_FLAG_OPERATOR & size) == ACCOUNT_FLAG_OPERATOR);
+                }
+                else
+                    return false;
             }
             set
             {
+                int size = 0;
+                try
+                {
+                    size = int.Parse(Get(ACCOUNT));
+                }
+                catch { }
+
                 if (value)
-                    op = 1;
+                    size |= UserInfo.ACCOUNT_FLAG_OPERATOR;
                 else
-                    op = 0;
+                    size ^= UserInfo.ACCOUNT_FLAG_OPERATOR;
+                Set(ACCOUNT, size.ToString());
             }
         }
         /// <summary>

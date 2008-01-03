@@ -43,7 +43,7 @@ namespace FlowLib.Protocols
         protected string recieved = "";
 
         
-        protected static string yoursupports = "ADBASE ADTIGR BZIP";
+        protected static string yoursupports = "ADBASE ADTIGR";
 
         public event FmdcEventHandler MessageReceived;
         public event FmdcEventHandler MessageToSend;
@@ -245,9 +245,14 @@ namespace FlowLib.Protocols
             else if (message is SID)
             {
                 SID sid = (SID)message;
-                sid.Hub.Me.SID = sid.Param;
+                sid.Hub.Me.Set(UserInfo.SID, sid.Id);
             }
-
+            else if (message is STA)
+            {
+                STA sta = (STA)message;
+                MainMessage main = new MainMessage(info.ID, sta.Content);
+                hub.FireUpdate(Actions.MainMessage, main);
+            }
         }
         public void ActOnOutMessage(FmdcEventArgs e)
         {

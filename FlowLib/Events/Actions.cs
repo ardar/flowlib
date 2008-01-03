@@ -48,7 +48,7 @@ namespace FlowLib.Events
         public const int UsersOnline = 4;
         /// <summary>
         /// One user has gone offline.
-        /// object is of type string and is the User Id.
+        /// object is of type UserInfo
         /// </summary>
         public const int UserOffline = 5;
         /// <summary>

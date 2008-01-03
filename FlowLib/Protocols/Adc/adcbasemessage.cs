@@ -24,13 +24,17 @@ using FlowLib.Interfaces;
 using FlowLib.Containers;
 using FlowLib.Connections;
 
+using System.Collections.Generic;
+
 namespace FlowLib.Protocols.Adc
 {
     public class AdcBaseMessage : HubMessage
     {
         protected string action = null;
         protected string type = null;
-        protected string param = null;
+        protected List<string> param = null;
+        protected string id = null;
+        protected string idtwo = null;
         /// <summary>
         /// Action
         /// </summary>
@@ -57,20 +61,69 @@ namespace FlowLib.Protocols.Adc
         /// On the command "BINF CVNQ HN3\n"
         /// Param will be "CVNQ HN3"
         /// </summary>
-        public string Param
+        public List<string> Param
         {
             get { return param; }
+        }
+
+        public string Id
+        {
+            get { return id; }
+        }
+
+        /// <summary>
+        /// Present in D Messages
+        /// </summary>
+        public string IDTwo
+        {
+            get { return idtwo; }
         }
 
         public AdcBaseMessage(Hub hub, string raw)
             : base(hub, raw)
         {
-            if (raw != null && raw.Length >= 5)
-            {
-                type = raw.Substring(0, 1);
-                action = raw.Substring(1, 3);
+            if (raw == null)
+                return;
 
-                param = raw.Substring(5);
+            bool hasId = true;
+            bool hasId2 = true;
+            param = new System.Collections.Generic.List<string>(raw.Split(' '));
+            if (param.Count >= 1 && param[0].Length == 4)
+            {
+                type = param[0].Substring(0, 1);
+                switch (type)
+                {
+                    case "B":       // Broadcast Message
+                        hasId = true;
+                        break;
+                    case "C":       // Client Message
+                        hasId = true;
+                        break;
+                    case "I":
+                        hasId = false;
+                        break;
+                    case "D":       // Direct message
+                        hasId = true;
+                        hasId2 = true;
+                        break;
+                    case "U":       // UDP Message
+                        hasId = true;
+                        break;
+                }
+
+                action = param[0].Substring(1, 3);
+                param.RemoveAt(0);
+            }
+
+            if (hasId && param.Count >= 1)
+            {
+                id = param[0];
+                param.RemoveAt(0);
+            }
+            if (hasId2 && param.Count >= 1)
+            {
+                idtwo = param[0];
+                param.RemoveAt(0);
             }
         }
     }
