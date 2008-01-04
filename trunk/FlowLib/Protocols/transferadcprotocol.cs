@@ -28,7 +28,7 @@ namespace FlowLib.Protocols
     /// <summary>
     /// Transfer Adc Protocol
     /// </summary>
-    public class TransferAdcProtocol : IProtocol
+    public class TransferAdcProtocol : IProtocolTransfer
     {
         #region Variables
         protected IConnection con = null;
@@ -183,6 +183,26 @@ namespace FlowLib.Protocols
         {
 
         }
+        #endregion
+
+        #region IProtocolTransfer Members
+
+        public event FmdcEventHandler ChangeDownloadItem;
+
+        public event FmdcEventHandler RequestTransfer;
+
+        public event FmdcEventHandler Error;
+
+        public void OnDownload()
+        {
+            throw new System.Exception("The method or operation is not implemented.");
+        }
+
+        public void GetDownloadItem()
+        {
+            throw new System.Exception("The method or operation is not implemented.");
+        }
+
         #endregion
     }
 }
