@@ -743,22 +743,29 @@ namespace FlowLib.Protocols.Adc
             sb.Append(" HN" + info.TagInfo.Normal.ToString());
             sb.Append(" HO" + info.TagInfo.OP.ToString());
             sb.Append(" HR" + info.TagInfo.Regged.ToString());
-
-            if (info.ContainsKey(UserInfo.IP))
-            {
-                string ip = info.Get(UserInfo.IP);
-                if (ip.Contains("."))
-                    sb.Append(" I4" + ip);
-                else
-                    sb.Append(" I6" + ip);
-            }
-            else
-                sb.Append(" I40.0.0.0");
             sb.Append(" NI" + HubAdcProtocol.ConvertOutgoing(info.DisplayName));
             sb.Append(" SL" + info.TagInfo.Slots); // Upload Slots Open
             sb.Append(" SF" + (Hub.Share != null ? Hub.Share.HashedCount : 0));  // Shared Files
             sb.Append(" SS" + (Hub.Share != null ? Hub.Share.HashedSize : 0));    // Share Size in bytes
-            //sb.Append(" SU" + "ADC0,TCP4,UDP4 U4-6536");  // TODO : Add Support
+            if (Hub.Share != null)
+            {
+                string ip = info.Get(UserInfo.IP);
+                if (string.IsNullOrEmpty(ip) || ip.Contains("."))
+                {
+                    if (string.IsNullOrEmpty(ip))
+                        sb.Append(" I40.0.0.0");
+                    else
+                        sb.Append(" I4" + ip);
+                    sb.Append(" SU" + "ADC,TCP4,UDP4");  // Support
+                    sb.Append(" U4" + Hub.Share.Port.ToString());
+                }
+                else
+                {
+                    sb.Append(" I6" + ip);
+                    sb.Append(" SU" + "ADC,TCP6,UDP6");  // Support
+                    sb.Append(" U6" + Hub.Share.Port.ToString());
+                }
+            }
             sb.Append(" VE" + HubAdcProtocol.ConvertOutgoing(Hub.Me.TagInfo.Version));
             sb.Append("\n");
             Raw = sb.ToString();
@@ -973,6 +980,19 @@ namespace FlowLib.Protocols.Adc
                         break;
                 }
             }
+        }
+
+        public STA(Hub hub, string code, string description, string param)
+            : this(hub, null, code, description, param) { }
+
+        public STA(Hub hub, string userId, string code, string description, string param)
+            : base(hub, null)
+        {
+            param = " " + param;
+            if (string.IsNullOrEmpty(userId))
+                Raw = string.Format("DSTA {0} {1} DE{2}{3}\n", userId, code, HubAdcProtocol.ConvertOutgoing(description), param);
+            else
+                Raw = string.Format("CSTA {0} DE{1}{2}\n", code, HubAdcProtocol.ConvertOutgoing(description), param);
         }
     }
     public class GPA : AdcBaseMessage

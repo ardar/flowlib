@@ -322,6 +322,23 @@ namespace FlowLib.Protocols
                 CTM ctm = (CTM)message;
                 User usr = null;
                 string addr = null;
+
+                // Do we support same protocol?
+                double version = 0.0;
+                if (ctm.Protocol != null && ctm.Protocol.StartsWith("ADC/"))
+                {
+                    try
+                    {
+                        version = double.Parse(ctm.Protocol.Substring(4).Replace(".", ","));
+                    }
+                    catch { }
+                }
+                if (version > 1.0)
+                {
+                    hub.Send(new STA(hub, "141", "Protocol is not supported. I only support ADC 1.0", "TO" + ctm.Token + " PR" + ctm.Protocol));
+                    return;
+                }
+
                 if ((usr = hub.GetUserById(ctm.Id)) != null && usr.UserInfo.ContainsKey(UserInfo.IP))
                 {
                     addr = usr.UserInfo.Get(UserInfo.IP);
@@ -330,8 +347,26 @@ namespace FlowLib.Protocols
                     User me = hub.GetUserById(hub.Me.ID);
                     // We are doing this because we want to filter out PID and so on.
                     trans.Me = me.UserInfo;
-                    //trans.Protocol = new TransferAdcProtocol(trans);
+                    trans.Protocol = new TransferAdcProtocol(trans);
+                    hub.FireUpdate(Actions.TransferRequest, new TransferRequest(ctm.Token, hub, usr.UserInfo));
                     hub.FireUpdate(Actions.TransferStarted, trans);
+                }
+            }
+            else if (message is RCM)
+            {
+                RCM rcm = (RCM)message;
+                if (hub.Me.Mode != FlowLib.Enums.ConnectionTypes.Passive && hub.Share != null)
+                {
+                    User usr = null;
+                    if ((usr = hub.GetUserById(rcm.Id)) != null)
+                    {
+                        hub.FireUpdate(Actions.TransferRequest, new TransferRequest(rcm.Token, hub, usr.UserInfo));
+                        hub.Send(new CTM(hub, hub.Share.Port, rcm.Token));
+                    }
+                }
+                else
+                {
+                    // TODO : we should probably return a STA message.
                 }
             }
         }
