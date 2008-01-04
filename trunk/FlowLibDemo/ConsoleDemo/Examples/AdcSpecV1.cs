@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2007 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2008 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,8 +58,8 @@ namespace ConsoleDemo.Examples
 
             Hub hubConnection = new Hub(settings);
 
-            hubConnection.Me.PID = pid;
-            hubConnection.Me.CID = cid;
+            hubConnection.Me.Set(UserInfo.PID, pid);
+            hubConnection.Me.Set(UserInfo.CID, cid);
             hubConnection.Share = share;
 
             hubConnection.Update += new FlowLib.Events.FmdcEventHandler(hubConnection_Update);
@@ -73,23 +73,23 @@ namespace ConsoleDemo.Examples
 
         void hubConnection_Update(object sender, FlowLib.Events.FmdcEventArgs e)
         {
-            //switch (e.Action)
-            //{
-            //    case FlowLib.Events.Actions.MainMessage:
-            //        MainMessage msg = e.Data as MainMessage;
-            //        if (msg == null)
-            //            return;
-            //        System.Console.WriteLine(string.Format("<{0}> {1}", msg.From, msg.Content));
-            //        break;
-            //    default:
-            //        break;
-            //}
+            switch (e.Action)
+            {
+                case FlowLib.Events.Actions.MainMessage:
+                    MainMessage msg = e.Data as MainMessage;
+                    if (msg == null)
+                        return;
+                    System.Console.WriteLine(string.Format("<{0}> {1}", msg.From, msg.Content));
+                    break;
+                default:
+                    break;
+            }
         }
 
         void Protocol_MessageToSend(object sender, FlowLib.Events.FmdcEventArgs e)
         {
             HubMessage msg = e.Data as HubMessage;
-            if (msg != null)
+            if (msg != null && msg.Raw.Length >= 4)
             {
                 switch (msg.Raw.Substring(0, 4))
                 {
@@ -103,14 +103,14 @@ namespace ConsoleDemo.Examples
         void Protocol_MessageReceived(object sender, FlowLib.Events.FmdcEventArgs e)
         {
             HubMessage msg = e.Data as HubMessage;
-            if (msg != null)
+            if (msg != null && msg.Raw.Length >= 4)
             {
                 switch (msg.Raw.Substring(0, 4))
                 {
-                    case "BINF":
-                    case "BSCH":
-                    case "IMSG":
-                        break;
+                    //case "BINF":
+                    //case "BSCH":
+                    //case "IMSG":
+                        //break;
                     default:
                         System.Console.WriteLine("IN: " + msg.Raw);
                         break;

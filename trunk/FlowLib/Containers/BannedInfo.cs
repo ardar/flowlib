@@ -19,31 +19,36 @@
  *
  */
 
-using System.Net;
-
 namespace FlowLib.Containers
 {
-    public class SearchResultInfo
+    public class BannedInfo
     {
-        protected ContentInfo info = null;
-        protected string userid = null;
+        protected long time = -1;
+        protected string msg = null;
+        protected string banBy = null;
 
-        public ContentInfo Info
+        public long Time
         {
-            get { return info; }
-            set { info = value; }
+            get { return time; }
+        }
+        public string Message
+        {
+            get { return msg; }
+        }
+        public string BannedBy
+        {
+            get { return banBy; }
         }
 
-        public string UserId
+        public BannedInfo() {}
+        public BannedInfo(long time) : this(time, null) { }
+        public BannedInfo(long time, string msg) : this(time, msg, null) { }
+        public BannedInfo(long time, string msg, string bannedBy)
         {
-            get { return userid; }
-            set { userid = value; }
+            this.time = time;
+            this.msg = msg;
+            this.banBy = bannedBy;
         }
 
-        public SearchResultInfo(ContentInfo info, string userid)
-        {
-            this.info = info;
-            this.userid = userid;
-        }
     }
 }

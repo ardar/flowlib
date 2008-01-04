@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2007 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2008 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ namespace FlowLib.Connections
         static protected int regmode_regged = 0;
         static protected int regmode_operator = 0;
 
-        protected int interval = 120;
+        protected long interval = 120;
         protected User me = null;
         protected SortedList<string, User> userlist = new SortedList<string, User>();
         // For Connection Keepalive
@@ -74,11 +74,11 @@ namespace FlowLib.Connections
         /// <summary>
         /// Interval in seconds between commands sent to ensure connection.
         /// </summary>
-        public int KeepAliveInterval
+        public long KeepAliveInterval
         {
             get { return interval; }
             set {
-                interval = (value == 0) ? Timeout.Infinite : interval;
+                interval = (value == 0) ? Timeout.Infinite : (interval * 1000);
                 keepAliveTimer.Change(interval, interval);
             }
         }
@@ -225,7 +225,7 @@ namespace FlowLib.Connections
             #region Keep Alive
             // For Connection Keepalive
             TimerCallback timerDelegate = new TimerCallback(OnkeepAliveTimer_Elapsed);
-            keepAliveTimer = new System.Threading.Timer(timerDelegate, socket, interval, interval);
+            keepAliveTimer = new System.Threading.Timer(timerDelegate, socket, interval * 1000, interval * 1000);
             #endregion
         }
 

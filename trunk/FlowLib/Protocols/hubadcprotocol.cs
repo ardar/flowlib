@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2007 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2008 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -279,7 +279,20 @@ namespace FlowLib.Protocols
                     if (usr.ID == hub.Me.ID)
                     {
                         // TODO : Banning and redirect handling
-                        hub.Disconnect("QUI command");
+                        hub.Disconnect();
+                        // Redirect
+                        if (!string.IsNullOrEmpty(qui.Address))
+                            hub.FireUpdate(Actions.Redirect, new RedirectInfo(qui.Address, qui.Message, qui.DisconnectedBy));
+                        // Banned
+                        else
+                        {
+                            if (qui.Time != -1)
+                                // Sets reconnect attempt to infinite
+                                hub.KeepAliveInterval = 0;
+                            else
+                                hub.KeepAliveInterval = qui.Time;
+                            hub.FireUpdate(Actions.Banned, new BannedInfo(qui.Time, qui.Message, qui.DisconnectedBy));
+                        }
                     }
                 }
             }
