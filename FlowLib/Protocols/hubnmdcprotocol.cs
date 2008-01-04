@@ -414,6 +414,8 @@ namespace FlowLib.Protocols
                     usr.UserInfo = myinfo.UserInfo;
                     hub.FireUpdate(Actions.UserInfoChange, usr.UserInfo);
                 }
+                if (hub.RegMode < 0 && message.From == hub.Me.ID)
+                    hub.FireUpdate(Actions.RegMode, 0);
             }
             else if (message is Hello)
             {
@@ -422,6 +424,7 @@ namespace FlowLib.Protocols
                     hub.Send(new Version(hub));
                     hub.Send(new GetNickList(hub));
                     hub.Send(new MyINFO(hub));
+
                 }
             }
             else if (message is ConnectToMe)

@@ -357,8 +357,8 @@ namespace FlowLib.Connections
             // KeepAlive : Update ticks so we are not sending stuff to hub when we dont need to..
             keepAliveTicks = System.DateTime.Now.Ticks;
 
-            if (socket.Connected && RegMode < 0)    // Change Hub mode to 0
-                Update(this, new FmdcEventArgs(Actions.RegMode, 0));
+            //if (socket.Connected && RegMode < 0)    // Change Hub mode to 0
+            //    Update(this, new FmdcEventArgs(Actions.RegMode, 0));
         }
         #endregion
         #endregion

@@ -51,7 +51,6 @@ namespace FlowLib.Protocols.Adc
             }
         }
     }
-
     public class GFI : AdcBaseMessage
     {
         protected string contentType = null;
@@ -592,6 +591,7 @@ namespace FlowLib.Protocols.Adc
         {
             if (param == null)
                 return;
+            info.Set(UserInfo.SID, id);
             // IINF is from hub. all other should be from user =)
             // NIDCDev\sPublic HU1 HI1 DEThe\spublic\sDirect\sConnect\sdevelopment\shub VEADCH++\sv2.0.0-Release
             // TUOD SF0 SL1 SS0 SUTCP4,UDP4 DEPASIV HN4 HO0 HR0 I489.38.33.162 U41090 IDARJQDWZKC4MMC7PLQNOYSPHVI7V62QPS4IRF5KA EMLIVIUANDREI70@YAHOO.COM US104857600 VE++\s0.698 NI[RO][B][QUICK-NET]LIVIU
@@ -676,9 +676,9 @@ namespace FlowLib.Protocols.Adc
                         break;
                     //case "TO":
                     //    break;
-                    case "OP":
-                        info.IsOperator = (value == "1");
-                        break;
+                    //case "OP":
+                    //    info.IsOperator = (value == "1");
+                    //    break;
                     //case "AW":
                     //    break;
                     //case "BO":
@@ -697,6 +697,13 @@ namespace FlowLib.Protocols.Adc
                         break;
                     case "DE":
                         info.Description = HubAdcProtocol.ConvertIncomming(value);
+                        break;
+                    case "CT":
+                        try
+                        {
+                            info.Account = int.Parse(value);
+                        }
+                        catch { }
                         break;
                     default:
                         // We will add all unhandled fields to user. This is because developer may know how to handle it even if we dont.
@@ -791,7 +798,11 @@ namespace FlowLib.Protocols.Adc
         public SID(Hub hub, string raw)
             : base(hub, raw)
         {
-
+            if (param.Count >= 1)
+            {
+                id = param[0];
+                valid = true;
+            }
         }
     }
     /// <summary>
@@ -955,7 +966,22 @@ namespace FlowLib.Protocols.Adc
     }
     public class GPA : AdcBaseMessage
     {
-        public GPA(Hub hub, string raw) : base(hub, raw) { }
+        protected string randomData = null;
+
+        public string RandomData
+        {
+            get { return randomData; }
+        }
+
+        public GPA(Hub hub, string raw)
+            : base(hub, raw)
+        {
+            if (param.Count >= 1)
+            {
+                randomData = param[0];
+                valid = true;
+            }
+        }
     }
     #endregion
 }

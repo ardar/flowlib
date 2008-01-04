@@ -98,8 +98,8 @@ namespace FlowLib.Containers
                     userinfo.Description = value.Description;
                 if (value.Connection.Length != 0)
                     userinfo.Connection = value.Connection;
-                if (value.ContainsKey(UserInfo.ACCOUNT))
-                    userinfo.Set(UserInfo.ACCOUNT, value.Get(UserInfo.ACCOUNT));
+                if (value.Account != -1)
+                    userinfo.Account = value.Account;
             }
         }
         /// <summary>
