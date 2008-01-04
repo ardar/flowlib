@@ -447,10 +447,7 @@ namespace FlowLib.Protocols
                 trans.Me = hub.Me;
                 // Protocol has to be set last.
                 trans.Protocol = new TransferNmdcProtocol(trans);
-
                 hub.FireUpdate(Actions.TransferStarted, trans);
-
-                //TransferManager.StartTransfer(trans);
             }
             else if (message is RevConnectToMe)
             {
@@ -474,8 +471,6 @@ namespace FlowLib.Protocols
                     if (usr != null)
                     {
                         hub.FireUpdate(Actions.TransferRequest, new TransferRequest(revConToMe.From, hub, usr.UserInfo));
-
-                        //TransferManager.AddTransferReq(revConToMe.From, hub, usr.UserInfo);
                         hub.Send(new ConnectToMe(revConToMe.From, hub.Share.Port, hub));
                     }
                 }

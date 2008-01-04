@@ -170,12 +170,12 @@ namespace FlowLib.Containers
         {
             get
             {
-                return ((ACCOUNT_FLAG_OPERATOR & account) == ACCOUNT_FLAG_OPERATOR);
+                return ((ACCOUNT_FLAG_OPERATOR | account) == ACCOUNT_FLAG_OPERATOR);
             }
             set
             {
                 if (value)
-                    account |= UserInfo.ACCOUNT_FLAG_OPERATOR;
+                    account &= UserInfo.ACCOUNT_FLAG_OPERATOR;
                 else
                     account ^= UserInfo.ACCOUNT_FLAG_OPERATOR;
             }

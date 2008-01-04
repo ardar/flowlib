@@ -212,7 +212,12 @@ namespace FlowLib.Protocols.Adc
     }
     public class SCH : AdcBaseMessage
     {
-        SearchInfo info = new SearchInfo();
+        protected SearchInfo info = new SearchInfo();
+        public SearchInfo Info
+        {
+            get { return info; }
+        }
+
         public SCH(Hub hub, string raw)
             : base(hub, raw)
         {
@@ -355,11 +360,11 @@ namespace FlowLib.Protocols.Adc
         protected ContentInfo info = null;
         protected string token = null;
         protected long slots;
-        protected int port = -1;
+        protected System.Net.IPEndPoint address = null;
 
-        public int Port
+        public System.Net.IPEndPoint Address
         {
-            get { return port; }
+            get { return address; }
         }
 
         public ContentInfo Info
@@ -432,13 +437,19 @@ namespace FlowLib.Protocols.Adc
                 if (
                     usr.UserInfo.ContainsKey(UserInfo.UDPPORT)
                     && usr.UserInfo.ContainsKey("SU")
+                    && usr.UserInfo.ContainsKey(UserInfo.IP)
                     && (usr.UserInfo.Get("SU").Contains("UDP4") || usr.UserInfo.Get("SU").Contains("UDP6"))
                     )
                 {
                     type = "U";
+                    int port = -1;
+                    string addr = usr.UserInfo.Get(UserInfo.IP);
                     try
                     {
                         port = int.Parse(usr.UserInfo.Get(UserInfo.UDPPORT));
+                        if (port < 0 || port > 65535)
+                            port = 0;
+                        address = new System.Net.IPEndPoint(System.Net.IPAddress.Parse(addr), port);
                     }
                     catch { }
                 }
