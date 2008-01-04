@@ -306,8 +306,125 @@ namespace FlowLib.Protocols
                     hub.Disconnect("Hub doesnt support BASE or TIGR");
                 }
             }
+            else if (message is RES)
+            {
+                RES res = (RES)message;
+                SearchResultInfo srinfo = new SearchResultInfo(res.Info, res.Id);
+                hub.FireUpdate(Actions.SearchResult, srinfo);
+            }
+            else if (message is SCH)
+            {
+                SCH sch = (SCH)message;
+                if (hub.Share == null)
+                    return;
 
+            }
         }
+
+        protected void SendRES(SearchInfo info, UserInfo usrInfo)
+        {
+            /*
+            if (hub.Share == null)
+                return;
+            int maxReturns = 5;
+            bool active = false;
+            if (search.Address != null)
+            {
+                maxReturns = 10;
+                active = true;
+            }
+            System.Collections.Generic.List<ContentInfo> ret = new System.Collections.Generic.List<ContentInfo>(maxReturns);
+            // TODO : This lookup can be done nicer
+            lock (hub.Share)
+            {
+
+                foreach (System.Collections.Generic.KeyValuePair<string, Containers.ContentInfo> var in hub.Share)
+                {
+                    if (var.Value == null)
+                        continue;
+                    bool foundEnough = false;
+                    string ext = search.Info.Get(SearchInfo.EXTENTION);
+                    string sch = search.Info.Get(SearchInfo.SEARCH);
+                    if (ext != null && sch != null)
+                    {
+                        ContentInfo contentInfo = new ContentInfo();
+                        if (search.Info.ContainsKey(SearchInfo.TYPE))
+                        {
+                            switch (search.Info.Get(SearchInfo.TYPE))
+                            {
+                                case "2":
+
+                                    contentInfo.Set(ContentInfo.TTH, search.Info.Get(SearchInfo.SEARCH));
+                                    if (hub.Share.ContainsContent(ref contentInfo))
+                                    {
+                                        ret.Add(contentInfo);
+                                    }
+                                    // We are looking through whole share here.
+                                    // If no TTH matching. Ignore.
+                                    foundEnough = true;
+                                    break;
+                                case "1":
+                                default:
+                                    if (var.Value.ContainsKey(ContentInfo.VIRTUAL) && (System.IO.Path.GetDirectoryName(var.Value.Get(ContentInfo.VIRTUAL)).IndexOf(sch, System.StringComparison.OrdinalIgnoreCase) != -1))
+                                        ret.Add(var.Value);
+                                    break;
+                            }
+                        }
+
+                        if (!foundEnough)
+                        {
+                            string infoExt = System.IO.Path.GetExtension(var.Value.Get(ContentInfo.VIRTUAL)).TrimStart('.');
+                            if (
+                                    var.Value.ContainsKey(ContentInfo.VIRTUAL)
+                                    && (var.Value.Get(ContentInfo.VIRTUAL).IndexOf(sch, System.StringComparison.OrdinalIgnoreCase) != -1)
+                                    && (ext.Length == 0 || ext.Contains(infoExt))
+                                )
+                                ret.Add(var.Value);
+                        }
+                    }
+                    if (foundEnough || ret.Count >= maxReturns)
+                        break;
+                }
+            }
+            // Test against size restrictions
+            for (int i = 0; i < ret.Count; i++)
+            {
+                bool send = true;
+                long size = -1;
+                if (search.Info.ContainsKey(SearchInfo.SIZETYPE) && long.TryParse(search.Info.Get(SearchInfo.SIZE), out size))
+                {
+                    switch (search.Info.Get(SearchInfo.SIZETYPE))
+                    {
+                        case "1":       // Min Size
+                            send = (size <= ret[i].Size);
+                            break;
+                        case "2":       // Max Size
+                            send = (size >= ret[i].Size);
+                            break;
+                        case "3":       // Equal Size
+                            send = (size == ret[i].Size);
+                            break;
+                    }
+                }
+                // Should this be sent?
+                if (send)
+                {
+                    SR sr = new SR(hub, ret[i], (search.Info.ContainsKey(SearchInfo.EXTENTION) ? search.Info.Get(SearchInfo.EXTENTION).Equals("$0") : false), search.From);
+                    if (active)
+                    {
+                        // Send with UDP
+                        UdpConnection.Send(sr, search.Address);
+                    }
+                    else
+                    {
+                        // Send through hub
+                        hub.Send(sr);
+                    }
+                }
+            }
+            */
+        }
+
         public void ActOnOutMessage(FmdcEventArgs e)
         {
             if (e.Action.Equals(Actions.MainMessage))

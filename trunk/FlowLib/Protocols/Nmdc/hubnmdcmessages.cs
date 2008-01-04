@@ -360,7 +360,20 @@ namespace FlowLib.Protocols.HubNmdc
                 {
                     System.Net.IPAddress ip = null;
                     int port = -1;
-                    if (System.Net.IPAddress.TryParse(tmp[0], out ip) && int.TryParse(tmp[1], out port))
+                    try
+                    {
+                        ip = System.Net.IPAddress.Parse(tmp[0]);
+                    }
+                    catch { }
+                    try
+                    {
+                        port = int.Parse(tmp[1]);
+                        if (port < 0 || port > 65535)
+                            port = 0;
+                    }
+                    catch { }
+
+                    if (ip != null)
                     {
                         address = new System.Net.IPEndPoint(ip, port);
                     }

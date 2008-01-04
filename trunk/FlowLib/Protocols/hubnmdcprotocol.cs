@@ -271,31 +271,38 @@ namespace FlowLib.Protocols
                         if (ext != null && sch != null)
                         {
                             ContentInfo contentInfo = new ContentInfo();
-                            switch (search.Info.Get(SearchInfo.EXTENTION))
+                            if (search.Info.ContainsKey(SearchInfo.TYPE))
                             {
-                                case "$0":
-                                    if (var.Value.ContainsKey(ContentInfo.VIRTUAL) && (System.IO.Path.GetDirectoryName(var.Value.Get(ContentInfo.VIRTUAL)).IndexOf(sch, System.StringComparison.OrdinalIgnoreCase) != -1))
-                                        ret.Add(var.Value);
-                                    break;
-                                case "$1":
-                                    contentInfo.Set(ContentInfo.TTH, search.Info.Get(SearchInfo.SEARCH));
-                                    if (hub.Share.ContainsContent(ref contentInfo))
-                                    {
-                                        ret.Add(contentInfo);
-                                    }
-                                    // We are looking through whole share here.
-                                    // If no TTH matching. Ignore.
-                                    foundEnough = true;
-                                    break;
-                                default:
-                                    string infoExt = System.IO.Path.GetExtension(var.Value.Get(ContentInfo.VIRTUAL)).TrimStart('.');
-                                    if (
-                                            var.Value.ContainsKey(ContentInfo.VIRTUAL)
-                                            && (var.Value.Get(ContentInfo.VIRTUAL).IndexOf(sch, System.StringComparison.OrdinalIgnoreCase) != -1)
-                                            && (ext.Length == 0 || ext.Contains(infoExt))
-                                        )
-                                        ret.Add(var.Value);
-                                    break;
+                                switch (search.Info.Get(SearchInfo.TYPE))
+                                {
+                                    case "2":
+
+                                        contentInfo.Set(ContentInfo.TTH, search.Info.Get(SearchInfo.SEARCH));
+                                        if (hub.Share.ContainsContent(ref contentInfo))
+                                        {
+                                            ret.Add(contentInfo);
+                                        }
+                                        // We are looking through whole share here.
+                                        // If no TTH matching. Ignore.
+                                        foundEnough = true;
+                                        break;
+                                    case "1":
+                                    default:
+                                        if (var.Value.ContainsKey(ContentInfo.VIRTUAL) && (System.IO.Path.GetDirectoryName(var.Value.Get(ContentInfo.VIRTUAL)).IndexOf(sch, System.StringComparison.OrdinalIgnoreCase) != -1))
+                                            ret.Add(var.Value);
+                                        break;
+                                }
+                            }
+
+                            if (!foundEnough)
+                            {
+                                string infoExt = System.IO.Path.GetExtension(var.Value.Get(ContentInfo.VIRTUAL)).TrimStart('.');
+                                if (
+                                        var.Value.ContainsKey(ContentInfo.VIRTUAL)
+                                        && (var.Value.Get(ContentInfo.VIRTUAL).IndexOf(sch, System.StringComparison.OrdinalIgnoreCase) != -1)
+                                        && (ext.Length == 0 || ext.Contains(infoExt))
+                                    )
+                                    ret.Add(var.Value);
                             }
                         }
                         if (foundEnough || ret.Count >= maxReturns)
