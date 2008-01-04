@@ -340,7 +340,11 @@ namespace FlowLib.Protocols.TransferNmdc
                             download = false;
                             break;
                     }
-                    int.TryParse(tmp.Substring(++pos), out number);
+                    try
+                    {
+                        number = int.Parse(tmp.Substring(++pos));
+                    }
+                    catch { }
                 }
             }
         }
@@ -518,7 +522,11 @@ namespace FlowLib.Protocols.TransferNmdc
             if ((pos = raw.IndexOf(" ")) != -1)
             {
                 pos++;
-                long.TryParse(raw.Substring(pos), out length);
+                try
+                {
+                    length = long.Parse(raw.Substring(pos));
+                }
+                catch { }
             }
         }
     }
@@ -643,8 +651,12 @@ namespace FlowLib.Protocols.TransferNmdc
                 file = raw.Substring(pos, pos2 -pos);
                 pos2++;
                 string tmp = raw.Substring(pos2);
-                long.TryParse(tmp, out start);
-                if (start > 0)
+                try
+                {
+                    start = long.Parse(tmp);
+                }
+                catch { }
+                    if (start > 0)
                 {
                     start--;
                 }
@@ -738,8 +750,20 @@ namespace FlowLib.Protocols.TransferNmdc
                 {
                     case 1: type = sections[i]; break;
                     case 2: content = sections[i]; break;
-                    case 3: long.TryParse(sections[i], out start); break;
-                    case 4: long.TryParse(sections[i], out length); break;
+                    case 3:
+                        try
+                        {
+                            start = long.Parse(sections[i]);
+                        }
+                        catch { }
+                        break;
+                    case 4:
+                        try
+                        {
+                            length = long.Parse(sections[i]);
+                        }
+                        catch { }
+                        break;
                     case 5:
                         if (sections[i].Equals("ZL1"))
                             zlib =true;
@@ -863,8 +887,20 @@ namespace FlowLib.Protocols.TransferNmdc
                     {
                         case 0: type = sections[i]; break;                  // Type
                         case 1: content = sections[i]; break;               // Content
-                        case 2: long.TryParse(sections[i], out start); break;   // Start pos
-                        case 3: long.TryParse(sections[i], out length); break;  // Length pos
+                        case 2:   // Start pos
+                            try
+                            {
+                                start = long.Parse(sections[i]);
+                            }
+                            catch { }
+                            break;
+                        case 3:  // Length pos
+                            try
+                            {
+                                length = long.Parse(sections[i]);
+                            }
+                            catch { }
+                            break;
                         default:
                             supp.Insert(0, sections[i] + " ");
                             Check(sections[i]);
@@ -965,8 +1001,20 @@ namespace FlowLib.Protocols.TransferNmdc
                 {
                     switch (i)
                     {
-                        case 0: long.TryParse(sec[i], out start); break;
-                        case 1: long.TryParse(sec[i], out length); break;
+                        case 0:
+                            try
+                            {
+                                start = long.Parse(sec[i]);
+                            }
+                            catch { }
+                            break;
+                        case 1:
+                            try
+                            {
+                                length = long.Parse(sec[i]);
+                            }
+                            catch { }
+                            break;
                         case 2:
                         default:
                             if (filename.Length == 0)
@@ -1069,7 +1117,11 @@ namespace FlowLib.Protocols.TransferNmdc
             int pos;
             if ((pos = raw.IndexOf(" ")) != -1)
             {
-                long.TryParse(raw.Substring(pos), out length);
+                try
+                {
+                    length = long.Parse(raw.Substring(pos));
+                }
+                catch { }
             }
         }
     }

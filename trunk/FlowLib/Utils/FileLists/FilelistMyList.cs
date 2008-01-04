@@ -217,8 +217,12 @@ namespace FlowLib.Utils.FileLists
                 if ((sep = name.IndexOf("|")) != -1)
                 {
                     // We have file info
-                    long size;
-                    long.TryParse(name.Substring(sep + 1), out size);
+                    long size = -1;
+                    try
+                    {
+                        size = long.Parse(name.Substring(sep + 1));
+                    }
+                    catch { }
                     name = name.Substring(0, sep).Trim('\t');
                     ContentInfo ci = new ContentInfo(ContentInfo.NAME, name);
                     ci.Size = size;

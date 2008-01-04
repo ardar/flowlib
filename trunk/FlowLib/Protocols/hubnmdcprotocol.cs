@@ -314,7 +314,12 @@ namespace FlowLib.Protocols
                 {
                     bool send = true;
                     long size = -1;
-                    if (search.Info.ContainsKey(SearchInfo.SIZETYPE) && long.TryParse(search.Info.Get(SearchInfo.SIZE), out size))
+                    try
+                    {
+                        size = int.Parse(search.Info.Get(SearchInfo.SIZE));
+                    }
+                    catch { }
+                    if (search.Info.ContainsKey(SearchInfo.SIZETYPE) && size != -1)
                     {
                         switch (search.Info.Get(SearchInfo.SIZETYPE))
                         {

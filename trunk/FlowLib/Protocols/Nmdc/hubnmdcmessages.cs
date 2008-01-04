@@ -394,8 +394,11 @@ namespace FlowLib.Protocols.HubNmdc
                         info.Set(SearchInfo.SIZETYPE, (sections[1] == "F" ? "1" : "2"));
                     }
                     long size = 0;
-                    if (!long.TryParse(sections[2], out size))
-                        size = 0;
+                    try
+                    {
+                        size = long.Parse(sections[2]);
+                    }
+                    catch { size = 0; }
                     info.Set(SearchInfo.SIZE, size.ToString());
                     #endregion
                     #region Extention
@@ -679,10 +682,12 @@ namespace FlowLib.Protocols.HubNmdc
                         info.Set(ContentInfo.VIRTUAL, sections[0].Substring(pos2, tmp - pos2));
                     }
                     long size;
-                    if (long.TryParse(sections[index].Substring(0, tmp), out size))
+                    try
                     {
+                        size = long.Parse(sections[index].Substring(0, tmp));
                         info.Size = size;
                     }
+                    catch { }
                 }
                 index++;
                 pos1 = 0;
@@ -770,7 +775,12 @@ namespace FlowLib.Protocols.HubNmdc
             if (address.Length != 2)
                 return;
             this.address = address[0];
-            if (!string.IsNullOrEmpty(to) && !string.IsNullOrEmpty(this.address) && int.TryParse(address[1], out port) && port > 0 && port < 65535)
+            try
+            {
+                port = int.Parse(address[1]);
+            }
+            catch { }
+            if (!string.IsNullOrEmpty(to) && !string.IsNullOrEmpty(this.address) && port > 0 && port < 65535)
                 IsValid = true;
         }
     }
