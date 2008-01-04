@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2007 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2008 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -799,7 +799,7 @@ namespace FlowLib.Protocols.HubNmdc
         public ForceMove(Hub hub, string raw)
             : base(hub, raw)
         {
-            // $ForceMove porno.zapto.org
+            // $ForceMove flowlib.dummy.org
             string[] com = raw.Split(' ');
             if (com.Length != 2)
                 return;

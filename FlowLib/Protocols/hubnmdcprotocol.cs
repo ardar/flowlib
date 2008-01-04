@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2007 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2008 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -467,6 +467,12 @@ namespace FlowLib.Protocols
                         hub.Send(new ConnectToMe(revConToMe.From, hub.Share.Port, hub));
                     }
                 }
+            }
+            else if (message is ForceMove)
+            {
+                ForceMove forceMove = (ForceMove)message;
+                hub.Disconnect();
+                hub.FireUpdate(Actions.Redirect, new RedirectInfo(forceMove.Address));
             }
         }
 

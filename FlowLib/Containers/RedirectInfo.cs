@@ -19,31 +19,36 @@
  *
  */
 
-using System.Net;
-
 namespace FlowLib.Containers
 {
-    public class SearchResultInfo
+    public class RedirectInfo
     {
-        protected ContentInfo info = null;
-        protected string userid = null;
+        protected string msg = null;
+        protected string addr = null;
+        protected string redirBy = null;
 
-        public ContentInfo Info
+        public string Message
         {
-            get { return info; }
-            set { info = value; }
+            get { return msg; }
         }
-
-        public string UserId
+        public string Address
         {
-            get { return userid; }
-            set { userid = value; }
+            get { return addr; }
         }
-
-        public SearchResultInfo(ContentInfo info, string userid)
+        public string RedirectedBy
         {
-            this.info = info;
-            this.userid = userid;
+            get { return redirBy; }
+        }
+        public RedirectInfo(string addy)
+            : this(addy, null) { }
+        public RedirectInfo(string addy, string message)
+            : this(addy, message, null) { }
+
+        public RedirectInfo(string address, string message, string redirectedBy)
+        {
+            msg = message;
+            addr = address;
+            redirBy = redirectedBy;
         }
     }
 }
