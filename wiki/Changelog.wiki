@@ -24,6 +24,9 @@
   * CHANGE	- Added extendability in UserInfo. It has Reserved names for IP, CID, SID and more. You can use it through Get, Set ,Add, Remove functions.
   * ADD		- Account property in UserInfo.
   * ADD		- Unknown fields in INF command in ADC protocol will be added to user.
+  * ADD		- Added Actions.Banned and Actions.Redirect
+  * UPDATE	- Updated year in license header for all files to 2008.
+
 
 = 20071222 =
 
