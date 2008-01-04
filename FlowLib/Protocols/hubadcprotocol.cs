@@ -315,46 +315,58 @@ namespace FlowLib.Protocols
             else if (message is SCH)
             {
                 SCH sch = (SCH)message;
-                if (hub.Share == null)
-                    return;
-
+                SendRES(sch.Info, sch.Id);
+            }
+            else if (message is CTM)
+            {
+                CTM ctm = (CTM)message;
+                User usr = null;
+                string addr = null;
+                if ((usr = hub.GetUserById(ctm.Id)) != null && usr.UserInfo.ContainsKey(UserInfo.IP))
+                {
+                    addr = usr.UserInfo.Get(UserInfo.IP);
+                    Transfer trans = new Transfer(addr, ctm.Port);
+                    trans.Share = hub.Share;
+                    User me = hub.GetUserById(hub.Me.ID);
+                    // We are doing this because we want to filter out PID and so on.
+                    trans.Me = me.UserInfo;
+                    //trans.Protocol = new TransferAdcProtocol(trans);
+                    hub.FireUpdate(Actions.TransferStarted, trans);
+                }
             }
         }
 
-        protected void SendRES(SearchInfo info, UserInfo usrInfo)
+        protected void SendRES(SearchInfo info, string userId)
         {
-            /*
             if (hub.Share == null)
                 return;
-            int maxReturns = 5;
-            bool active = false;
-            if (search.Address != null)
-            {
-                maxReturns = 10;
-                active = true;
-            }
+
+            int maxReturns = 10;
+            string token = null;
+            if (info.ContainsKey(SearchInfo.TOKEN))
+                token = info.Get(SearchInfo.TOKEN);
+
             System.Collections.Generic.List<ContentInfo> ret = new System.Collections.Generic.List<ContentInfo>(maxReturns);
             // TODO : This lookup can be done nicer
             lock (hub.Share)
             {
-
                 foreach (System.Collections.Generic.KeyValuePair<string, Containers.ContentInfo> var in hub.Share)
                 {
                     if (var.Value == null)
                         continue;
                     bool foundEnough = false;
-                    string ext = search.Info.Get(SearchInfo.EXTENTION);
-                    string sch = search.Info.Get(SearchInfo.SEARCH);
+                    string ext = info.Get(SearchInfo.EXTENTION);
+                    string sch = info.Get(SearchInfo.SEARCH);
                     if (ext != null && sch != null)
                     {
                         ContentInfo contentInfo = new ContentInfo();
-                        if (search.Info.ContainsKey(SearchInfo.TYPE))
+                        if (info.ContainsKey(SearchInfo.TYPE))
                         {
-                            switch (search.Info.Get(SearchInfo.TYPE))
+                            switch (info.Get(SearchInfo.TYPE))
                             {
                                 case "2":
 
-                                    contentInfo.Set(ContentInfo.TTH, search.Info.Get(SearchInfo.SEARCH));
+                                    contentInfo.Set(ContentInfo.TTH, info.Get(SearchInfo.SEARCH));
                                     if (hub.Share.ContainsContent(ref contentInfo))
                                     {
                                         ret.Add(contentInfo);
@@ -370,7 +382,6 @@ namespace FlowLib.Protocols
                                     break;
                             }
                         }
-
                         if (!foundEnough)
                         {
                             string infoExt = System.IO.Path.GetExtension(var.Value.Get(ContentInfo.VIRTUAL)).TrimStart('.');
@@ -386,14 +397,22 @@ namespace FlowLib.Protocols
                         break;
                 }
             }
+
+            int x = 0;
+
             // Test against size restrictions
             for (int i = 0; i < ret.Count; i++)
             {
                 bool send = true;
                 long size = -1;
-                if (search.Info.ContainsKey(SearchInfo.SIZETYPE) && long.TryParse(search.Info.Get(SearchInfo.SIZE), out size))
+                try
                 {
-                    switch (search.Info.Get(SearchInfo.SIZETYPE))
+                    size = int.Parse(info.Get(SearchInfo.SIZE));
+                }
+                catch { }
+                if (info.ContainsKey(SearchInfo.SIZETYPE) && size != -1)
+                {
+                    switch (info.Get(SearchInfo.SIZETYPE))
                     {
                         case "1":       // Min Size
                             send = (size <= ret[i].Size);
@@ -409,20 +428,29 @@ namespace FlowLib.Protocols
                 // Should this be sent?
                 if (send)
                 {
-                    SR sr = new SR(hub, ret[i], (search.Info.ContainsKey(SearchInfo.EXTENTION) ? search.Info.Get(SearchInfo.EXTENTION).Equals("$0") : false), search.From);
-                    if (active)
+                    RES res = new RES(hub, ret[i], token, userId);
+                    if (res.Address != null)
                     {
-                        // Send with UDP
-                        UdpConnection.Send(sr, search.Address);
+                        if (10 > x++)
+                        {
+                            // Send with UDP
+                            try
+                            {
+                                UdpConnection.Send(res, res.Address);
+                            }
+                            catch { }
+                        }
                     }
                     else
                     {
-                        // Send through hub
-                        hub.Send(sr);
+                        if (5 > x++)
+                        {
+                            // Send through hub
+                            hub.Send(res);
+                        }
                     }
                 }
             }
-            */
         }
 
         public void ActOnOutMessage(FmdcEventArgs e)
