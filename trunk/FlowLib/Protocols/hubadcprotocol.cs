@@ -37,7 +37,7 @@ namespace FlowLib.Protocols
         #region Variables
         // Variables to remember
         protected string gpaString = "";        // GPA Random data
-        protected string hubsupports = null;    // What current hub support
+        protected SUP hubsupports = null;    // What current hub support
         protected User info = new User("");  // Hub Info (Name and description and so on).
         protected Hub hub = null;              // Current hub where this protocol is used
         protected string recieved = "";
@@ -161,7 +161,7 @@ namespace FlowLib.Protocols
                 if (!e.Handled)
                     ActOnInMessage(msg);
             }
-            // If wrong Protocol type has been set. change it to ADC
+            // If wrong Protocol type has been set. change it to Nmdc
             if (hub.RegMode == -1 && raw.Length > 5 && raw.StartsWith("$"))
             {   // Setting hubtype to NMDC
                 hub.Protocol = new HubNmdcProtocol(hub);
@@ -179,26 +179,35 @@ namespace FlowLib.Protocols
             switch (msg.Action)
             {
                 case "SUP":
-                    msg = new SUP(hub, raw);
-                    break;
+                    msg = new SUP(hub, raw); break;
                 case "SID":
-                    msg = new SID(hub, raw);
-                    break;
+                    msg = new SID(hub, raw); break;
                 case "MSG":
-                    msg = new MSG(hub, raw);
-                    break;
+                    msg = new MSG(hub, raw); break;
                 case "INF":
-                    msg = new INF(hub, raw);
-                    break;
+                    msg = new INF(hub, raw); break;
                 case "STA":
-                    msg = new STA(hub, raw);
-                    break;
+                    msg = new STA(hub, raw); break;
                 case "QUI":
-                    msg = new QUI(hub, raw);
-                    break;
+                    msg = new QUI(hub, raw); break;
                 case "GPA":
-                    msg = new GPA(hub, raw);
-                    break;
+                    msg = new GPA(hub, raw); break;
+                case "CTM":
+                    msg = new CTM(hub, raw); break;
+                case "SND":
+                    msg = new SND(hub, raw); break;
+                case "GFI":
+                    msg = new GFI(hub, raw); break;
+                case "GET":
+                    msg = new GET(hub, raw); break;
+                case "RCM":
+                    msg = new RCM(hub, raw); break;
+                case "SCH":
+                    msg = new SCH(hub, raw); break;
+                case "RES":
+                    msg = new RES(hub, raw); break;
+                case "PAS":
+                    msg = new PAS(hub, raw); break;
             }
             return msg;
         }
@@ -222,10 +231,12 @@ namespace FlowLib.Protocols
                 }
                 else
                 {
-                    if (hub.GetUserById(inf.From) == null)
+                    if (hub.GetUserById(inf.Id) == null)
                         hub.FireUpdate(Actions.UserOnline, inf.UserInfo);
                     else
                         hub.FireUpdate(Actions.UserInfoChange, inf.UserInfo);
+                    if (hub.RegMode < 0 && hub.Me.ID == inf.Id)
+                        hub.FireUpdate(Actions.RegMode, 0);
                 }
             }
             else if (message is MSG)
@@ -253,6 +264,36 @@ namespace FlowLib.Protocols
                 MainMessage main = new MainMessage(info.ID, sta.Content);
                 hub.FireUpdate(Actions.MainMessage, main);
             }
+            else if (message is GPA)
+            {
+                GPA gpa = (GPA)message;
+                hub.Send(new PAS(hub, gpa.RandomData, hub.HubSetting.Password));
+            }
+            else if (message is QUI)
+            {
+                QUI qui = (QUI)message;
+                User usr = null;
+                if ((usr = hub.GetUserById(qui.Id)) != null)
+                {
+                    hub.FireUpdate(Actions.UserOffline, usr.UserInfo);
+                    if (usr.ID == hub.Me.ID)
+                    {
+                        // TODO : Banning and redirect handling
+                        hub.Disconnect("QUI command");
+                    }
+                }
+            }
+            else if (message is SUP)
+            {
+                hubsupports = (SUP)message;
+                // TODO : We should really care about what hub support.
+                if (!hubsupports.Param.Contains("ADBASE") || !hubsupports.Param.Contains("ADTIGR"))
+                {
+                    // We will just simply disconnect if hub doesnt support this right now
+                    hub.Disconnect("Hub doesnt support BASE or TIGR");
+                }
+            }
+
         }
         public void ActOnOutMessage(FmdcEventArgs e)
         {

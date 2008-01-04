@@ -48,17 +48,6 @@ namespace FlowLib.Containers
         /// User IP Adress
         /// </summary>
         public const string IP = "ip";
-        /// <summary>
-        /// User account status
-        /// Available flags are ACCOUNT_FLAG_*
-        /// To know if super user use this:
-        /// ((ACCOUNT_FLAG_SUPERUSER | value) == ACCOUNT_FLAG_SUPERUSER)
-        /// To set super user:
-        /// value |= UserInfo.ACCOUNT_FLAG_SUPERUSER
-        /// To remove super user:
-        /// value ^= UserInfo.ACCOUNT_FLAG_SUPERUSER
-        /// </summary>
-        public const string ACCOUNT = "account";
 
         public const int ACCOUNT_FLAG_USER = 0;
         public const int ACCOUNT_FLAG_BOT = 1;
@@ -74,10 +63,26 @@ namespace FlowLib.Containers
         protected string description = "";
         protected string connection = "";
         protected string email = "";
+        protected int account = -1;
         protected TagInfo taginfo = new TagInfo(true);
 
         #endregion
         #region Properties
+        /// <summary>
+        /// User account status
+        /// Available flags are ACCOUNT_FLAG_*
+        /// To know if super user use this:
+        /// ((ACCOUNT_FLAG_SUPERUSER | value) == ACCOUNT_FLAG_SUPERUSER)
+        /// To set super user:
+        /// value |= UserInfo.ACCOUNT_FLAG_SUPERUSER
+        /// To remove super user:
+        /// value ^= UserInfo.ACCOUNT_FLAG_SUPERUSER
+        /// </summary>
+        public int Account
+        {
+            get { return account; }
+            set { account = value; }
+        }
         /// <summary>
         /// User Id (SID or Display name)
         /// </summary>
@@ -160,37 +165,19 @@ namespace FlowLib.Containers
         /// <summary>
         /// Specifies if this user is operator or not
         /// </summary>
+        [System.Xml.Serialization.XmlIgnore()]
         public bool IsOperator
         {
             get
             {
-                if (ContainsKey(ACCOUNT))
-                {
-                    int size = 0;
-                    try
-                    {
-                        size = int.Parse(Get(ACCOUNT));
-                    }
-                    catch { }
-                    return ((ACCOUNT_FLAG_OPERATOR & size) == ACCOUNT_FLAG_OPERATOR);
-                }
-                else
-                    return false;
+                return ((ACCOUNT_FLAG_OPERATOR & account) == ACCOUNT_FLAG_OPERATOR);
             }
             set
             {
-                int size = 0;
-                try
-                {
-                    size = int.Parse(Get(ACCOUNT));
-                }
-                catch { }
-
                 if (value)
-                    size |= UserInfo.ACCOUNT_FLAG_OPERATOR;
+                    account |= UserInfo.ACCOUNT_FLAG_OPERATOR;
                 else
-                    size ^= UserInfo.ACCOUNT_FLAG_OPERATOR;
-                Set(ACCOUNT, size.ToString());
+                    account ^= UserInfo.ACCOUNT_FLAG_OPERATOR;
             }
         }
         /// <summary>

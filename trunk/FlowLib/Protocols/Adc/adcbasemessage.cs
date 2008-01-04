@@ -86,7 +86,7 @@ namespace FlowLib.Protocols.Adc
                 return;
 
             bool hasId = true;
-            bool hasId2 = true;
+            bool hasId2 = false;
             param = new System.Collections.Generic.List<string>(raw.Split(' '));
             if (param.Count >= 1 && param[0].Length == 4)
             {
