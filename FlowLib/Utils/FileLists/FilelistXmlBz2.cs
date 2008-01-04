@@ -175,8 +175,12 @@ namespace FlowLib.Utils.FileLists
                                 if (reader.Name.Equals("File", StringComparison.OrdinalIgnoreCase))
                                 {
                                     string name = reader.GetAttribute("Name");
-                                    long size;
-                                    long.TryParse(reader.GetAttribute("Size"), out size);
+                                    long size = -1;
+                                    try
+                                    {
+                                        size = long.Parse(reader.GetAttribute("Size"));
+                                    }
+                                    catch { }
                                     string tth = reader.GetAttribute("TTH");
                                     Containers.ContentInfo ci = null;
                                     if (string.IsNullOrEmpty(tth))

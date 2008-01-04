@@ -125,9 +125,14 @@ namespace FlowLib.Containers
                         string[] sections;
                         if ((sections = tagsections[2].Split('/')).Length == 3)
                         {
-                            int.TryParse(sections[0], out hubs_normal);
-                            int.TryParse(sections[1], out hubs_regged);
-                            int.TryParse(sections[1], out hubs_op);
+                            try
+                            {
+                                hubs_normal = int.Parse(sections[0]);
+                                hubs_regged = int.Parse(sections[1]);
+                                hubs_op = int.Parse(sections[2]);
+                            }
+                            catch { }
+
                         }
                     }
                     #endregion
