@@ -20,7 +20,10 @@
   * FIX		- Parsing of NickList and OpList made list containing empty usernames.
   * CHANGE	- Actions.UserInfoChange now contains the updated UserInfo. Not only the changes as before.
   * CHANGE	- Actions.UserOffline now contains UserInfo related to User. This is so developers can disconnect transfers and so on.
-
+  * REMOVE	- Removed IP, CID and SID properties from UserInfo. This is because they are not used in all protocols.
+  * CHANGE	- Added extendability in UserInfo. It has Reserved names for IP, CID, SID and more. You can use it through Get, Set ,Add, Remove functions.
+  * ADD		- Account Property in UserInfo.
+  * ADD		- Unknown fields in INF commmand in ADC protocol will be added to user.
 
 = 20071222 =
 
