@@ -26,6 +26,9 @@
   * ADD		- Unknown fields in INF command in ADC protocol will be added to user.
   * ADD		- Added Actions.Banned and Actions.Redirect
   * UPDATE	- Updated year in license header for all files to 2008.
+  * FIX		- XmlBz2 filelists not having files in it in latest dc++ (TTH tag was wrong)
+  * FIX		- Share will now add ending \ to virtualdir if not present.
+  * FIX		- Fixed a crash in XmlBz2 filelist creating if not all files was hashed
 
 
 = 20071222 =
