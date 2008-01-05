@@ -736,6 +736,18 @@ namespace FlowLib.Protocols.Adc
                 return;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
             sb.Append("BINF " + info.Get(UserInfo.SID));
+            // Do PID exist? If not. Create PID and CID
+            FlowLib.Utils.Hash.Tiger tiger = new FlowLib.Utils.Hash.Tiger();
+            byte[] data = null;
+            if (!info.ContainsKey(UserInfo.PID))
+            {
+                data = tiger.ComputeHash(System.Text.Encoding.UTF8.GetBytes("FlowLib" + System.DateTime.Now.Ticks.ToString()));
+                info.Set(UserInfo.PID,FlowLib.Utils.Convert.Base32.Encode(data));
+            }
+            // Make CID from PID. This will always be done.
+            data = tiger.ComputeHash(FlowLib.Utils.Convert.Base32.Decode(info.Get(UserInfo.PID)));
+            info.Set(UserInfo.CID, FlowLib.Utils.Convert.Base32.Encode(data));
+
             sb.Append(" ID" + info.Get(UserInfo.CID));
             sb.Append(" PD" + info.Get(UserInfo.PID));
             sb.Append(" DE" + HubAdcProtocol.ConvertOutgoing(info.Description));
@@ -756,13 +768,13 @@ namespace FlowLib.Protocols.Adc
                         sb.Append(" I40.0.0.0");
                     else
                         sb.Append(" I4" + ip);
-                    sb.Append(" SU" + "ADC,TCP4,UDP4");  // Support
+                    sb.Append(" SU" + "TCP4,UDP4");  // Support
                     sb.Append(" U4" + Hub.Share.Port.ToString());
                 }
                 else
                 {
                     sb.Append(" I6" + ip);
-                    sb.Append(" SU" + "ADC,TCP6,UDP6");  // Support
+                    sb.Append(" SU" + "TCP6,UDP6");  // Support
                     sb.Append(" U6" + Hub.Share.Port.ToString());
                 }
             }
