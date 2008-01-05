@@ -29,6 +29,8 @@
   * FIX		- XmlBz2 filelists not having files in it in latest dc++ (TTH tag was wrong)
   * FIX		- Share will now add ending \ to virtualdir if not present.
   * FIX		- Fixed a crash in XmlBz2 filelist creating if not all files was hashed
+  * CHANGE	- Hub.StartTransfer has been removed. You should now use UpdateBase event and Actions.StartTransfer.
+
 
 
 = 20071222 =
