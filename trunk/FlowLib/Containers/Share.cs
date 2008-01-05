@@ -340,6 +340,9 @@ namespace FlowLib.Containers
         public virtual bool AddVirtualDir(string virtualdir, string systempath)
         {
             bool value = true;
+
+            if (!virtualdir.EndsWith(@"\"))
+                virtualdir = virtualdir + @"\";
             VirtualDir vd = new VirtualDir(systempath, virtualdir);
             try
             {

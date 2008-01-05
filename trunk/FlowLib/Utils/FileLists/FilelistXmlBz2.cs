@@ -370,10 +370,10 @@ namespace FlowLib.Utils.FileLists
                 writer.WriteEndAttribute();
                 if (content.IsTth)
                 {
-                    writer.WriteStartAttribute("Tth");
+                    writer.WriteStartAttribute("TTH");
                     writer.WriteValue(content.Get(Containers.ContentInfo.TTH));
+                    writer.WriteEndAttribute();
                 }
-                writer.WriteEndAttribute();
                 writer.WriteEndElement();
             }
             else
