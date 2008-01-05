@@ -26,6 +26,7 @@ using FlowLib.Protocols.Adc;
 using FlowLib.Events;
 using FlowLib.Containers;
 using FlowLib.Connections;
+using FlowLib.Enums;
 
 namespace FlowLib.Protocols
 {
@@ -300,7 +301,7 @@ namespace FlowLib.Protocols
             {
                 hubsupports = (SUP)message;
                 // TODO : We should really care about what hub support.
-                if (!hubsupports.Param.Contains("ADBASE") || !hubsupports.Param.Contains("ADTIGR"))
+                if (!hubsupports.Param.Contains("ADBASE")/* || !hubsupports.Param.Contains("ADTIGR")*/)
                 {
                     // We will just simply disconnect if hub doesnt support this right now
                     hub.Disconnect("Hub doesnt support BASE or TIGR");
@@ -521,7 +522,26 @@ namespace FlowLib.Protocols
         #region IProtocolHub Members
         public bool OnStartTransfer(User usr)
         {
-            throw new System.Exception("The method or operation is not implemented.");
+            switch (hub.Me.Mode)
+            {
+                case ConnectionTypes.Direct:
+                case ConnectionTypes.UPnP:
+                case ConnectionTypes.Forward:
+                    hub.FireUpdate(Actions.TransferRequest, new TransferRequest(usr.ID, hub, usr.UserInfo));
+                    hub.Send(new CTM(hub, hub.Share.Port, usr.ID));
+                    return true;
+                case ConnectionTypes.Passive:
+                case ConnectionTypes.Socket5:
+                case ConnectionTypes.Unknown:
+                default:
+                    if (usr.UserInfo.Mode == ConnectionTypes.Passive)
+                    {
+                        return false;
+                    }
+                    hub.Send(new RCM(usr.ID, hub));
+                    return true;
+            }
+
         }
 
         #endregion

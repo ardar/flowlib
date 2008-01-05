@@ -232,6 +232,8 @@ namespace FlowLib.Protocols.Adc
                 {
                     case "AN":
                         //TODO : We should make it possible to have more then 1 AN.
+                        if (info.ContainsKey(SearchInfo.SEARCH))
+                            value = value + " " + info.Get(SearchInfo.SEARCH);
                         info.Set(SearchInfo.SEARCH, value);
                         valid = true;
                         break;
@@ -500,6 +502,7 @@ namespace FlowLib.Protocols.Adc
                 return;
             if (param.Count >= 1)
             {
+                from = id;
                 content = param[0];
                 valid = true;
             }
