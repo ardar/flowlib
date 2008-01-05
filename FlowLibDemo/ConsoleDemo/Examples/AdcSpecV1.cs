@@ -43,12 +43,19 @@ namespace ConsoleDemo.Examples
             }
 
             HubSetting settings = new HubSetting();
-            settings.Address = "vidfamne.myftp.org";
-            settings.Port = 12345;
+            //settings.Address = "vidfamne.myftp.org";
+            //settings.Port = 12345;
+
+            settings.Address = "devpublic.myhub.org";
+            settings.Port = 16591;
+
+            //settings.Address = "flow84.no-ip.org";
+            //settings.Port = 2876;
+
             settings.DisplayName = "FlowLibNick";
             settings.UserDescription = "FlowLib";
             // TODO : Do this work
-            //settings.Protocol = "Nmdc";
+            settings.Protocol = "Auto";
 
             Tiger tiger = new Tiger();
             byte[] data = tiger.ComputeHash(System.Text.Encoding.UTF8.GetBytes("FlowLib"));
@@ -58,17 +65,22 @@ namespace ConsoleDemo.Examples
 
             Hub hubConnection = new Hub(settings);
 
-            hubConnection.Me.Set(UserInfo.PID, pid);
-            hubConnection.Me.Set(UserInfo.CID, cid);
+            //hubConnection.Me.Set(UserInfo.PID, pid);
+            //hubConnection.Me.Set(UserInfo.CID, cid);
             hubConnection.Share = share;
 
+            hubConnection.ProtocolChange += new FlowLib.Events.FmdcEventHandler(hubConnection_ProtocolChange);
             hubConnection.Update += new FlowLib.Events.FmdcEventHandler(hubConnection_Update);
 
-            hubConnection.Protocol = new FlowLib.Protocols.HubAdcProtocol(hubConnection);
+            //hubConnection.Protocol = new FlowLib.Protocols.HubAdcProtocol(hubConnection);
+            hubConnection.Connect();
+        }
+
+        void hubConnection_ProtocolChange(object sender, FlowLib.Events.FmdcEventArgs e)
+        {
+            Hub hubConnection = sender as Hub;
             hubConnection.Protocol.MessageReceived += new FlowLib.Events.FmdcEventHandler(Protocol_MessageReceived);
             hubConnection.Protocol.MessageToSend += new FlowLib.Events.FmdcEventHandler(Protocol_MessageToSend);
-
-            hubConnection.Connect();
         }
 
         void hubConnection_Update(object sender, FlowLib.Events.FmdcEventArgs e)

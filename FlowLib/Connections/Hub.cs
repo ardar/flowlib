@@ -316,6 +316,7 @@ namespace FlowLib.Connections
                     case "Nmdc":     // NMDC
                         Protocol = new HubNmdcProtocol(this);
                         break;
+                    case "":        // Auto Detect
                     case "Auto":    // Auto Detect
                     case "Adc":     // ADC
                         Protocol = new HubAdcProtocol(this);
