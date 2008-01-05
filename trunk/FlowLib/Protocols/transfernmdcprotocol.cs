@@ -51,7 +51,7 @@ namespace FlowLib.Protocols
         protected Supports mySupport = null;
         protected Timer timer = null;
 
-        string directory = string.Empty;
+        protected string directory = string.Empty;
         /// <summary>
         /// Internal identification for Supports
         /// 
@@ -60,7 +60,7 @@ namespace FlowLib.Protocols
         /// $GetZBlock needs SupportGetZBlock.
         /// $ADCGET needs SupportADCGet.
         /// </summary>
-        Supports userSupport = null;
+        protected Supports userSupport = null;
 
         public event FmdcEventHandler MessageReceived;
         public event FmdcEventHandler MessageToSend;
