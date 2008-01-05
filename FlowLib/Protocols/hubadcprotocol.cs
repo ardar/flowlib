@@ -522,26 +522,38 @@ namespace FlowLib.Protocols
         #region IProtocolHub Members
         public bool OnStartTransfer(User usr)
         {
-            switch (hub.Me.Mode)
+            // Do user support connecting?
+            if (
+                usr.UserInfo.ContainsKey(UserInfo.UDPPORT)
+                && usr.UserInfo.ContainsKey("SU")
+                && usr.UserInfo.ContainsKey(UserInfo.IP)
+                && (usr.UserInfo.Get("SU").Contains("UDP4") || usr.UserInfo.Get("SU").Contains("UDP6"))
+                )
             {
-                case ConnectionTypes.Direct:
-                case ConnectionTypes.UPnP:
-                case ConnectionTypes.Forward:
-                    hub.FireUpdate(Actions.TransferRequest, new TransferRequest(usr.ID, hub, usr.UserInfo));
-                    hub.Send(new CTM(hub, hub.Share.Port, usr.ID));
-                    return true;
-                case ConnectionTypes.Passive:
-                case ConnectionTypes.Socket5:
-                case ConnectionTypes.Unknown:
-                default:
-                    if (usr.UserInfo.Mode == ConnectionTypes.Passive)
-                    {
-                        return false;
-                    }
-                    hub.Send(new RCM(usr.ID, hub));
-                    return true;
+                switch (hub.Me.Mode)
+                {
+                    case ConnectionTypes.Direct:
+                    case ConnectionTypes.UPnP:
+                    case ConnectionTypes.Forward:
+                        hub.FireUpdate(Actions.TransferRequest, new TransferRequest(usr.ID, hub, usr.UserInfo));
+                        hub.Send(new CTM(hub, hub.Share.Port, usr.ID));
+                        return true;
+                    case ConnectionTypes.Passive:
+                    case ConnectionTypes.Socket5:
+                    case ConnectionTypes.Unknown:
+                    default:
+                        if (usr.UserInfo.Mode == ConnectionTypes.Passive)
+                        {
+                            return false;
+                        }
+                        hub.Send(new RCM(usr.ID, hub));
+                        return true;
+                }
             }
-
+            else
+            {
+                return false;
+            }
         }
 
         #endregion
