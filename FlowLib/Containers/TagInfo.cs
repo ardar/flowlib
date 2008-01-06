@@ -35,6 +35,7 @@ namespace FlowLib.Containers
         private int hubs_regged = 0;
         private int hubs_op = 0;
         private int slots = 0;
+        private bool generateTag = false;
 
         /// <summary>
         /// Default Constructor
@@ -58,12 +59,21 @@ namespace FlowLib.Containers
         }
 
         /// <summary>
+        /// Should tag be generated
+        /// </summary>
+        public bool GenerateTag
+        {
+            get { return generateTag; }
+            set { generateTag = value; }
+        }
+
+        /// <summary>
         /// Client Version information
         /// </summary>
         public string Version
         {
             get { return version; }
-            set { version = value; }
+            set { version = value; CreateTag(); }
         }
 
         /// <summary>
@@ -72,7 +82,7 @@ namespace FlowLib.Containers
         public int Normal
         {
             get { return hubs_normal; }
-            set { hubs_normal = value; }
+            set { hubs_normal = value; CreateTag(); }
         }
 
         /// <summary>
@@ -81,7 +91,7 @@ namespace FlowLib.Containers
         public int Regged
         {
             get { return hubs_regged; }
-            set { hubs_regged = value; }
+            set { hubs_regged = value; CreateTag(); }
         }
         /// <summary>
         /// OP Hub count
@@ -89,7 +99,7 @@ namespace FlowLib.Containers
         public int OP
         {
             get { return hubs_op; }
-            set { hubs_op = value; }
+            set { hubs_op = value; CreateTag(); }
         }
 
         /// <summary>
@@ -98,7 +108,7 @@ namespace FlowLib.Containers
         public int Slots
         {
             get { return slots; }
-            set { slots = value; }
+            set { slots = value; CreateTag(); }
         }
         /// <summary>
         /// Client Connection Mode.
@@ -107,15 +117,17 @@ namespace FlowLib.Containers
         public ConnectionTypes Mode
         {
             get { return mode; }
-            set { mode = value; }
+            set { mode = value; CreateTag(); }
         }
 
         public string Tag
         {
             get { return tag; }
             set {
-                // <++ V:0.699,M:A,H:2/0/0,S:1>
                 tag = value;
+                if (tag == null)
+                    return;
+                // <++ V:0.699,M:A,H:2/0/0,S:1>
                 string[] tagsections = tag.Split(',');
                 if (tagsections.Length >= 4)
                 {
@@ -140,16 +152,16 @@ namespace FlowLib.Containers
                     switch (tagsections[1])
                     {
                         case "M:A":
-                            Mode = ConnectionTypes.Direct;
+                            mode = ConnectionTypes.Direct;
                             break;
                         case "M:P":
-                            Mode = ConnectionTypes.Passive;
+                            mode = ConnectionTypes.Passive;
                             break;
                         case "M:5":
-                            Mode = ConnectionTypes.Socket5;
+                            mode = ConnectionTypes.Socket5;
                             break;
                         default:
-                            Mode = ConnectionTypes.Unknown;
+                            mode = ConnectionTypes.Unknown;
                             break;
                     }
                     #endregion
@@ -159,6 +171,8 @@ namespace FlowLib.Containers
 
         public void CreateTag()
         {
+            if (!generateTag)
+                return;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
             sb.Append("<" + version);                   // Version
             sb.Append(",M:");                           // Mode
