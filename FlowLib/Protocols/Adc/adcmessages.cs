@@ -563,11 +563,9 @@ namespace FlowLib.Protocols.Adc
             {
                 if (this.pmgroup != null)
                     this.to = this.pmgroup;
-                else
-                    return;
             }
             // DMSG SHJV SH5B PIIP!! PMSHJV
-            Raw = "DMSG " + this.from + " " + this.to + " " + HubAdcProtocol.ConvertOutgoing(this.content) + (this.me ? " ME1" : "") + ((this.pmgroup != null) ? (" PM" + this.pmgroup) : this.to) + "\n";
+            Raw = "DMSG " + this.from + " " + this.to + " " + HubAdcProtocol.ConvertOutgoing(this.content) + (this.me ? " ME1" : "") + " PM"+((this.pmgroup != null) ? (this.pmgroup) : this.from) + "\n";
         }
     }
     public class SUP : AdcBaseMessage
