@@ -186,11 +186,6 @@ namespace FlowLib.Connections
         #endregion
 
         #region Functions
-        public bool StartTransfer(User usr)
-        {
-            return Protocol.OnStartTransfer(usr);
-        }
-
         protected void UpdateRegMode()
         {
             // Updates user if event havnt been handled already

@@ -26,6 +26,6 @@ namespace FlowLib.Interfaces
 {
     public interface IProtocolHub : IProtocol
     {
-        bool OnStartTransfer(User usr);
+
     }
 }

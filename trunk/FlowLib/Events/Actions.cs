@@ -117,5 +117,10 @@ namespace FlowLib.Events
         /// object is BannedInfo
         /// </summary>
         public const int Banned = 20;
+        /// <summary>
+        /// Telling hub that we want to start transfer with User
+        /// object is User
+        /// </summary>
+        public const int StartTransfer = 21;
     }
 }
