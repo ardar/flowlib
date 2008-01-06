@@ -57,12 +57,13 @@ namespace FlowLib.Containers
             get { return userinfo; }
             set
             {
+                userinfo.TagInfo.GenerateTag = value.TagInfo.GenerateTag;
                 // If this is just a update. Dont empty all other values.
                 if (value.DisplayName.Length != 0)
                     userinfo.DisplayName = value.DisplayName;
                 if (value.TagInfo.Mode != ConnectionTypes.Unknown)
                     userinfo.TagInfo.Mode = value.TagInfo.Mode;
-                if (value.TagInfo.Tag != null)
+                if (!value.TagInfo.GenerateTag/* value.TagInfo.Tag != null*/)
                     userinfo.TagInfo.Tag = value.TagInfo.Tag;
                 if (value.TagInfo.Version != null)
                     userinfo.TagInfo.Version = value.TagInfo.Version;
