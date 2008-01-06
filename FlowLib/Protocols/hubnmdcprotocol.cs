@@ -76,29 +76,6 @@ namespace FlowLib.Protocols
         }
         #endregion
 
-        public bool OnStartTransfer(User usr)
-        {
-            switch (hub.Me.Mode)
-            {
-                case ConnectionTypes.Direct:
-                case ConnectionTypes.UPnP:
-                case ConnectionTypes.Forward:
-                    hub.FireUpdate(Actions.TransferRequest, new TransferRequest(usr.ID, hub, usr.UserInfo));
-                    hub.Send(new ConnectToMe(usr.ID, hub.Share.Port, hub));
-                    return true;
-                case ConnectionTypes.Passive:
-                case ConnectionTypes.Socket5:
-                case ConnectionTypes.Unknown:
-                default:
-                    if (usr.UserInfo.Mode == ConnectionTypes.Passive)
-                    {
-                        return false;
-                    }
-                    hub.Send(new RevConnectToMe(usr.ID, hub));
-                    return true;
-            }
-        }
-
         #region Parse
         public void ParseRaw(byte[] b, int length)
         {
@@ -470,8 +447,8 @@ namespace FlowLib.Protocols
                 {
                     if (usr != null)
                     {
-                        hub.FireUpdate(Actions.TransferRequest, new TransferRequest(revConToMe.From, hub, usr.UserInfo));
-                        hub.Send(new ConnectToMe(revConToMe.From, hub.Share.Port, hub));
+                        hub.FireUpdate(Actions.TransferRequest, new TransferRequest(usr.ID, hub, usr.UserInfo));
+                        hub.Send(new ConnectToMe(usr.ID, hub.Share.Port, hub));
                     }
                 }
             }
@@ -502,6 +479,31 @@ namespace FlowLib.Protocols
             else if (e.Action.Equals(Actions.Search))
             {
                 hub.Send(new Search(hub, (SearchInfo)e.Data));
+            }
+            else if (e.Action.Equals(Actions.StartTransfer))
+            {
+                User usr = e.Data as User;
+                if (usr == null)
+                    return;
+                switch (hub.Me.Mode)
+                {
+                    case ConnectionTypes.Direct:
+                    case ConnectionTypes.UPnP:
+                    case ConnectionTypes.Forward:
+                        hub.FireUpdate(Actions.TransferRequest, new TransferRequest(usr.ID, hub, usr.UserInfo));
+                        hub.Send(new ConnectToMe(usr.ID, hub.Share.Port, hub));
+                        break;
+                    case ConnectionTypes.Passive:
+                    case ConnectionTypes.Socket5:
+                    case ConnectionTypes.Unknown:
+                    default:
+                        if (usr.UserInfo.Mode == ConnectionTypes.Passive)
+                        {
+                            break;
+                        }
+                        hub.Send(new RevConnectToMe(usr.ID, hub));
+                        break;
+                }
             }
         }
         #endregion
