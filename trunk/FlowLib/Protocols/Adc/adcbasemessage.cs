@@ -28,6 +28,39 @@ using System.Collections.Generic;
 
 namespace FlowLib.Protocols.Adc
 {
+    /*
+    public class StrMessage
+    {
+        #region Variables
+        protected string raw = null;        // Raw Message
+        protected bool valid = false;       // Tells if message is a valid/correct.
+        #endregion
+        #region Properties
+        /// <summary>
+        /// Indicates if parsing of message was OK and if message was delivered in correct state
+        /// </summary>
+        public bool IsValid
+        {
+            get { return valid; }
+            set { valid = true; }
+        }
+        /// <summary>
+        /// raw message
+        /// </summary>
+        public string Raw
+        {
+            get { return raw; }
+            set
+            {
+                raw = value;
+                if (Hub != null && raw != null)
+                    bytes = Hub.Protocol.Encoding.GetBytes(raw);
+            }
+        }
+        #endregion
+    }
+    */
+
     public class AdcBaseMessage : HubMessage
     {
         protected string action = null;

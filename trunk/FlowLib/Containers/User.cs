@@ -62,32 +62,22 @@ namespace FlowLib.Containers
                     userinfo.DisplayName = value.DisplayName;
                 if (value.TagInfo.Mode != ConnectionTypes.Unknown)
                     userinfo.TagInfo.Mode = value.TagInfo.Mode;
-                // Tag
                 if (value.TagInfo.Tag != null)
-                {
                     userinfo.TagInfo.Tag = value.TagInfo.Tag;
-                }
-                else
-                {   // We need to regenerate the tag
-                    if (value.TagInfo.Version != null)
-                        userinfo.TagInfo.Version = value.TagInfo.Version;
-                    if (value.TagInfo.Normal != -1)
-                        userinfo.TagInfo.Normal = value.TagInfo.Normal;
-                    if (value.TagInfo.Regged != -1)
-                        userinfo.TagInfo.Regged = value.TagInfo.Regged;
-                    if (value.TagInfo.OP != -1)
-                        userinfo.TagInfo.OP = value.TagInfo.OP;
-                    if (value.TagInfo.Slots != -1)
-                        userinfo.TagInfo.Slots = value.TagInfo.Slots;
-                    if (value.ContainsKey(UserInfo.SID))
-                        userinfo.Set(UserInfo.SID, value.Get(UserInfo.SID));
-                    if (value.ContainsKey(UserInfo.CID))
-                        userinfo.Set(UserInfo.CID, value.Get(UserInfo.CID));
-                    // We want to create the tag if we have a version and a CID
-                    // This is because we only want to create the tag if it is ADC protocol
-                    if (userinfo.TagInfo.Version != null && userinfo.ContainsKey(UserInfo.CID) && userinfo.ID.Length != 0)
-                        userinfo.TagInfo.CreateTag();
-                }
+                if (value.TagInfo.Version != null)
+                    userinfo.TagInfo.Version = value.TagInfo.Version;
+                if (value.TagInfo.Normal != -1)
+                    userinfo.TagInfo.Normal = value.TagInfo.Normal;
+                if (value.TagInfo.Regged != -1)
+                    userinfo.TagInfo.Regged = value.TagInfo.Regged;
+                if (value.TagInfo.OP != -1)
+                    userinfo.TagInfo.OP = value.TagInfo.OP;
+                if (value.TagInfo.Slots != -1)
+                    userinfo.TagInfo.Slots = value.TagInfo.Slots;
+                if (value.ContainsKey(UserInfo.SID))
+                    userinfo.Set(UserInfo.SID, value.Get(UserInfo.SID));
+                if (value.ContainsKey(UserInfo.CID))
+                    userinfo.Set(UserInfo.CID, value.Get(UserInfo.CID));
                 if (value.ContainsKey(UserInfo.IP))
                     userinfo.Set(UserInfo.IP, value.Get(UserInfo.IP));
                 if (value.Share.Length != 0)

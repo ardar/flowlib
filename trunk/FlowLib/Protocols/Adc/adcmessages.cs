@@ -605,6 +605,7 @@ namespace FlowLib.Protocols.Adc
         {
             if (param == null)
                 return;
+            info.TagInfo.GenerateTag = true;
             info.Set(UserInfo.SID, id);
             // IINF is from hub. all other should be from user =)
             // NIDCDev\sPublic HU1 HI1 DEThe\spublic\sDirect\sConnect\sdevelopment\shub VEADCH++\sv2.0.0-Release
