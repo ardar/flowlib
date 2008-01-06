@@ -877,6 +877,11 @@ namespace FlowLib.Protocols.Adc
         {
             if (param == null)
                 return;
+            if (param.Count >= 1)
+            {
+                id = param[0];
+                param.RemoveAt(0);
+            }
             for (int i = 0; i < param.Count; i++)
             {
                 if (param[i].Length < 2)
