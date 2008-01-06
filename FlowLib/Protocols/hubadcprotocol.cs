@@ -232,10 +232,14 @@ namespace FlowLib.Protocols
                 }
                 else
                 {
-                    if (hub.GetUserById(inf.Id) == null)
+                    User usr = null;
+                    if ((usr = hub.GetUserById(inf.Id)) == null)
                         hub.FireUpdate(Actions.UserOnline, inf.UserInfo);
                     else
-                        hub.FireUpdate(Actions.UserInfoChange, inf.UserInfo);
+                    {
+                        usr.UserInfo = inf.UserInfo;
+                        hub.FireUpdate(Actions.UserInfoChange, usr.UserInfo);
+                    }
                     if (hub.RegMode < 0 && hub.Me.ID == inf.Id)
                         hub.FireUpdate(Actions.RegMode, 0);
                 }
