@@ -31,6 +31,7 @@
   * FIX		- Fixed a crash in XmlBz2 filelist creating if not all files was hashed
   * CHANGE	- Hub.StartTransfer has been removed. You should now use UpdateBase event and Actions.StartTransfer.
   * CHANGE	- ShareManager now has the same save/load behavior as Share.
+  * ADD		- Adc 1.0 support has been implemented.
 
 
 = 20071222 =
