@@ -31,6 +31,7 @@ namespace FlowLib.Managers
     public class ShareManager
     {
         protected const int IndexShareNames = 0;
+        protected string directory = System.AppDomain.CurrentDomain.BaseDirectory;
 
         public string FileName = "Shares";
         protected SortedList<string, Share> shares = new SortedList<string, Share>();
@@ -131,7 +132,7 @@ namespace FlowLib.Managers
         /// </summary>
         public void Load()
         {
-            Load(System.AppDomain.CurrentDomain.BaseDirectory);
+            Load(directory);
         }
         /// <summary>
         /// Load shares from setting files from dir
@@ -139,6 +140,7 @@ namespace FlowLib.Managers
         /// <param name="dir">directory where you want to load your shares from</param>
         public void Load(string dir)
         {
+            directory = dir;
             SettingsGroup setting = new SettingsGroup();
             SettingsGroup.Load(dir + FileName + ".xml", out setting, FileName);
 
@@ -206,7 +208,7 @@ namespace FlowLib.Managers
         /// </summary>
         public void Save()
         {
-            Save(System.AppDomain.CurrentDomain.BaseDirectory);
+            Save(directory);
         }
         /// <summary>
         /// Saves shares in directory specified
@@ -214,6 +216,7 @@ namespace FlowLib.Managers
         /// <param name="dir">Directory where we should save settings to</param>
         public void Save(string dir)
         {
+            directory = dir;
             SettingsGroup setting = new SettingsGroup();
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
             foreach (KeyValuePair<string, Share> item in shares)
