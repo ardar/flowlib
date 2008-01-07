@@ -817,10 +817,19 @@ namespace FlowLib.Protocols.Adc
 
         private void EncryptPassword()
         {
-            byte[] data = System.Text.Encoding.UTF8.GetBytes(password + random);
-            Utils.Hash.Tiger tiger = new FlowLib.Utils.Hash.Tiger();
-            data = tiger.ComputeHash(data);
-            encrypted = Utils.Convert.Base32.Encode(data);
+            try
+            {
+                Utils.Hash.Tiger tiger = new FlowLib.Utils.Hash.Tiger();
+                byte[] data = System.Text.Encoding.UTF8.GetBytes(password);
+                System.IO.MemoryStream ms = new System.IO.MemoryStream();
+                ms.Write(data, 0, data.Length);
+                data = Utils.Convert.Base32.Decode(random);
+                ms.Write(data, 0, data.Length);
+
+                data = tiger.ComputeHash(ms.ToArray());
+                encrypted = Utils.Convert.Base32.Encode(data);
+            }
+            catch { }
         }
     }
     #endregion
