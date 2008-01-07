@@ -37,7 +37,6 @@ namespace FlowLib.Protocols
     {
         #region Variables
         // Variables to remember
-        protected string gpaString = "";        // GPA Random data
         protected SUP hubsupports = null;       // What current hub support
         protected User info = new User("");     // Hub Info (Name and description and so on).
         protected Hub hub = null;               // Current hub where this protocol is used
@@ -514,7 +513,7 @@ namespace FlowLib.Protocols
             }
             else if (e.Action.Equals(Actions.Password))
             {
-                hub.Send(new PAS(hub, this.gpaString, (string)e.Data));
+                hub.Send(new PAS(hub, this.randomData, (string)e.Data));
             }
             else if (e.Action.Equals(Actions.StartTransfer))
             {
