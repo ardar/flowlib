@@ -474,7 +474,7 @@ namespace FlowLib.Protocols
             }
             else if (e.Action.Equals(Actions.Password))
             {
-                hub.Send(new MyPass(hub, (string)e.Data));
+                hub.Send(new MyPass(hub, hub.HubSetting.Password));
             }
             else if (e.Action.Equals(Actions.Search))
             {
