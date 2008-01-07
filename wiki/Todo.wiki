@@ -19,7 +19,7 @@ _Note that just because it is on this list it is not a promise that it will be d
 
 = Release A =
   * UPnP Support
-  * Converting hub settings (hub favorites) from/to other clients
+  * Converting settings (hub favorites, share, and maybe more or less) from/to other clients
 
 = Release ? =
   * Support for encrypted connections
