@@ -25,6 +25,7 @@ namespace FlowLib.Events
     {
         /// <summary>
         /// We needs to supply a password and we have none saved.
+        /// Update Hub.HubSetting.Password
         /// </summary>
         public const int Password = 0;
         /// <summary>

@@ -513,7 +513,7 @@ namespace FlowLib.Protocols
             }
             else if (e.Action.Equals(Actions.Password))
             {
-                hub.Send(new PAS(hub, this.randomData, (string)e.Data));
+                hub.Send(new PAS(hub, this.randomData, hub.HubSetting.Password));
             }
             else if (e.Action.Equals(Actions.StartTransfer))
             {
