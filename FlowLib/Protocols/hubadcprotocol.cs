@@ -38,10 +38,11 @@ namespace FlowLib.Protocols
         #region Variables
         // Variables to remember
         protected string gpaString = "";        // GPA Random data
-        protected SUP hubsupports = null;    // What current hub support
-        protected User info = new User("");  // Hub Info (Name and description and so on).
-        protected Hub hub = null;              // Current hub where this protocol is used
+        protected SUP hubsupports = null;       // What current hub support
+        protected User info = new User("");     // Hub Info (Name and description and so on).
+        protected Hub hub = null;               // Current hub where this protocol is used
         protected string recieved = "";
+        protected string randomData = "";       // If hub wants password. We will save randomData here.
 
         
         protected static string yoursupports = "ADBASE ADTIGR";
@@ -272,7 +273,13 @@ namespace FlowLib.Protocols
             else if (message is GPA)
             {
                 GPA gpa = (GPA)message;
-                hub.Send(new PAS(hub, gpa.RandomData, hub.HubSetting.Password));
+                if (hub.HubSetting.Password.Length == 0)
+                {
+                    randomData = gpa.RandomData;
+                    hub.FireUpdate(Actions.Password, gpa);
+                }
+                else
+                    hub.Send(new PAS(hub, gpa.RandomData, hub.HubSetting.Password));
             }
             else if (message is QUI)
             {
