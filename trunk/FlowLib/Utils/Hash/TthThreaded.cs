@@ -247,14 +247,15 @@ namespace FlowLib.Utils.Hash
             Tiger TG = new Tiger();
             byte[] DataBlock;
             byte[] Data = new byte[LeafSize + 1];
-            int LeafIndex, BlockLeafs;
+            long LeafIndex;
+            int BlockLeafs;
             int i;
 
             ThreadFilePtr.Position = ThreadFileBlock.Start;
 
             while (ThreadFilePtr.Position < ThreadFileBlock.End)
             {
-                LeafIndex = (int)ThreadFilePtr.Position / 1024;
+                LeafIndex = (long)ThreadFilePtr.Position / 1024;
 
                 if (ThreadFileBlock.End - ThreadFilePtr.Position < DataBlockSize)
                     DataBlock = new byte[ThreadFileBlock.End - ThreadFilePtr.Position];
