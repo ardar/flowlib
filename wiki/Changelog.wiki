@@ -33,6 +33,9 @@
   * CHANGE	- ShareManager now has the same save/load behavior as Share.
   * ADD		- Adc 1.0 support has been implemented.
   * FIX		- TthThreaded, out of range exception. (Thanks Teobald for reporting. Thanks Carraya for submiting patch)
+  * FIX		- ObjectDisposedException in TcpConnectionListener. (Thanks Carraya for reporting)
+
+
 
 = 20071222 =
 
