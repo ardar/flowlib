@@ -70,19 +70,27 @@ namespace FlowLib.Connections
 
         protected void SetupConnection(Socket sc)
         {
-            AsyncCallback startTransfer = new AsyncCallback(OnStartConnection);
-            sc.BeginAccept(startTransfer, sc);
+            try
+            {
+                AsyncCallback startTransfer = new AsyncCallback(OnStartConnection);
+                sc.BeginAccept(startTransfer, sc);
+            }
+            catch (ObjectDisposedException) { /* End has been called */ }
         }
 
         protected void OnStartConnection(IAsyncResult ar)
         {
-            Socket s = (Socket)ar.AsyncState;
-            Transfer t = new Transfer(s.EndAccept(ar));
-            FmdcEventArgs e = new FmdcEventArgs(Actions.TransferStarted, t);
-            Update(this, e);
-            if (!e.Handled)
-                t.Disconnect();
-            SetupConnection(s);
+            try
+            {
+                Socket s = (Socket)ar.AsyncState;
+                Transfer t = new Transfer(s.EndAccept(ar));
+                FmdcEventArgs e = new FmdcEventArgs(Actions.TransferStarted, t);
+                Update(this, e);
+                if (!e.Handled)
+                    t.Disconnect();
+                SetupConnection(s);
+            }
+            catch (ObjectDisposedException) { /* End has been called */ }
         }
     }
 }
