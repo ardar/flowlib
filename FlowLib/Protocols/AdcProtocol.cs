@@ -33,17 +33,19 @@ namespace FlowLib.Protocols
     /// <summary>
     /// ADC Protocol
     /// </summary>
-    public class HubAdcProtocol : IProtocolHub
+    public class AdcProtocol : IProtocolHub //, IProtocolTransfer
     {
         #region Variables
         // Variables to remember
-        protected SUP hubsupports = null;       // What current hub support
-        protected User info = new User("");     // Hub Info (Name and description and so on).
+        protected string gpaString = "";        // GPA Random data
+        protected SUP supports = null;          // Current support
+        protected User info = new User("");     // Hub/User Info (Name and description and so on).
+        protected IConnection con = null;       // Current Connection where this protocol is used
         protected Hub hub = null;               // Current hub where this protocol is used
+        protected Transfer trans = null;        // Current transfer where this protocol is used
         protected string recieved = "";
-        protected string randomData = "";       // If hub wants password. We will save randomData here.
 
-        
+
         protected static string yoursupports = "ADBASE ADTIGR";
 
         public event FmdcEventHandler MessageReceived;
@@ -59,24 +61,21 @@ namespace FlowLib.Protocols
             get { return info.UserInfo; }
             set { info.UserInfo = value; }
         }
-
         public static string Support
         {
             get { return yoursupports; }
         }
-
         public IConMessage KeepAliveCommand
         {
-            get { return new StrMessage(hub, Seperator); }
+            get { return new StrMessage(con, Seperator); }
         }
-
         public IConMessage FirstCommand
         {
-            get {
-                return new SUP(hub);
+            get
+            {
+                return new SUP(con);
             }
         }
-
         public System.Text.Encoding Encoding
         {
             get { return System.Text.Encoding.UTF8; }
@@ -87,11 +86,26 @@ namespace FlowLib.Protocols
         }
         #endregion
         #region Constructor(s)
-        public HubAdcProtocol(Hub hub)
+        public AdcProtocol()
         {
-            this.hub = hub;
             MessageReceived = new FmdcEventHandler(OnMessageReceived);
             MessageToSend = new FmdcEventHandler(OnMessageToSend);
+        }
+        protected AdcProtocol(IConnection con)
+            :this()
+        {
+            this.con = con;
+        }
+
+        public AdcProtocol(Hub hub)
+            : this((IConnection)hub)
+        {
+            this.hub = hub;
+        }
+        public AdcProtocol(Transfer trans)
+            : this((ITransfer)trans)
+        {
+            this.trans = trans;
         }
         #endregion
         #region Functions
@@ -124,7 +138,7 @@ namespace FlowLib.Protocols
         public bool OnSend(IConMessage msg)
         {
             FmdcEventArgs e = new FmdcEventArgs(Actions.CommandOutgoing, msg);
-            MessageToSend(hub, e);
+            MessageToSend(con, e);
             if (!e.Handled)
             {
                 return true;
@@ -135,7 +149,7 @@ namespace FlowLib.Protocols
         #region Parse
         public void ParseRaw(byte[] b, int length)
         {
-            ParseRaw(this.Encoding.GetString(b, 0, length));
+            ParseRaw(Encoding.GetString(b, 0, length));
         }
         public void ParseRaw(string raw)
         {
@@ -158,12 +172,12 @@ namespace FlowLib.Protocols
                 raw = raw.Remove(0, pos);
                 // Plugin handling here
                 FmdcEventArgs e = new FmdcEventArgs(Actions.CommandIncomming, msg);
-                MessageReceived(hub, e);
+                MessageReceived(con, e);
                 if (!e.Handled)
                     ActOnInMessage(msg);
             }
             // If wrong Protocol type has been set. change it to Nmdc
-            if (hub.RegMode == -1 && raw.Length > 5 && raw.StartsWith("$"))
+            if (hub != null && hub.RegMode == -1 && raw.Length > 5 && raw.StartsWith("$"))
             {   // Setting hubtype to NMDC
                 hub.Protocol = new HubNmdcProtocol(hub);
                 hub.HubSetting.Protocol = hub.Protocol.Name;
@@ -176,39 +190,39 @@ namespace FlowLib.Protocols
         protected StrMessage ParseMessage(string raw)
         {
             raw = raw.Replace(this.Seperator, "");
-            AdcBaseMessage msg = new AdcBaseMessage(hub, raw);
+            AdcBaseMessage msg = new AdcBaseMessage(con, raw);
             switch (msg.Action)
             {
                 case "SUP":
-                    msg = new SUP(hub, raw); break;
+                    msg = new SUP(con, raw); break;
                 case "SID":
-                    msg = new SID(hub, raw); break;
+                    msg = new SID(con, raw); break;
                 case "MSG":
-                    msg = new MSG(hub, raw); break;
+                    msg = new MSG(con, raw); break;
                 case "INF":
-                    msg = new INF(hub, raw); break;
+                    msg = new INF(con, raw); break;
                 case "STA":
-                    msg = new STA(hub, raw); break;
+                    msg = new STA(con, raw); break;
                 case "QUI":
-                    msg = new QUI(hub, raw); break;
+                    msg = new QUI(con, raw); break;
                 case "GPA":
-                    msg = new GPA(hub, raw); break;
+                    msg = new GPA(con, raw); break;
                 case "CTM":
-                    msg = new CTM(hub, raw); break;
+                    msg = new CTM(con, raw); break;
                 case "SND":
-                    msg = new SND(hub, raw); break;
+                    msg = new SND(con, raw); break;
                 case "GFI":
-                    msg = new GFI(hub, raw); break;
+                    msg = new GFI(con, raw); break;
                 case "GET":
-                    msg = new GET(hub, raw); break;
+                    msg = new GET(con, raw); break;
                 case "RCM":
-                    msg = new RCM(hub, raw); break;
+                    msg = new RCM(con, raw); break;
                 case "SCH":
-                    msg = new SCH(hub, raw); break;
+                    msg = new SCH(con, raw); break;
                 case "RES":
-                    msg = new RES(hub, raw); break;
+                    msg = new RES(con, raw); break;
                 case "PAS":
-                    msg = new PAS(hub, raw); break;
+                    msg = new PAS(con, raw); break;
             }
             return msg;
         }
@@ -220,17 +234,22 @@ namespace FlowLib.Protocols
             if (message is INF)
             {
                 INF inf = (INF)message;
-                if (inf.Type.Equals("I"))
+                if (hub != null && inf.Type.Equals("I"))
                 {
                     //if (inf.Hub.RegMode == -1)    // TODO : We shouldnt have RegMode == 0 here. Fix it.
-                    hub.Send(new INF(hub,hub.Me));
+                    con.Send(new INF(con, hub.Me));
                     Info = inf.UserInfo;
-                    if (Info.Description == null)
+                    if (hub != null && Info.Description == null)
                         hub.FireUpdate(Actions.Name, new Containers.HubName(Info.DisplayName));
-                    else
+                    else if (hub != null)
                         hub.FireUpdate(Actions.Name, new Containers.HubName(Info.DisplayName, Info.Description));
                 }
-                else
+                else if (trans != null && inf.Type.Equals("C"))
+                {
+                    //User usr = null;
+                    //if (trans.User 
+                }
+                else if (hub != null)
                 {
                     User usr = null;
                     if ((usr = hub.GetUserById(inf.Id)) == null)
@@ -244,7 +263,7 @@ namespace FlowLib.Protocols
                         hub.FireUpdate(Actions.RegMode, 0);
                 }
             }
-            else if (message is MSG)
+            else if (message is MSG && hub != null)
             {
                 MSG msg = (MSG)message;
                 if (msg.To == null)
@@ -258,7 +277,7 @@ namespace FlowLib.Protocols
                     hub.FireUpdate(Actions.PrivateMessage, pm);
                 }
             }
-            else if (message is SID)
+            else if (message is SID && hub != null)
             {
                 SID sid = (SID)message;
                 hub.Me.Set(UserInfo.SID, sid.Id);
@@ -266,21 +285,18 @@ namespace FlowLib.Protocols
             else if (message is STA)
             {
                 STA sta = (STA)message;
-                MainMessage main = new MainMessage(info.ID, sta.Content);
-                hub.FireUpdate(Actions.MainMessage, main);
+                if (hub != null)
+                {
+                    MainMessage main = new MainMessage(info.ID, sta.Content);
+                    hub.FireUpdate(Actions.MainMessage, main);
+                }
             }
-            else if (message is GPA)
+            else if (message is GPA && hub != null)
             {
                 GPA gpa = (GPA)message;
-                if (hub.HubSetting.Password.Length == 0)
-                {
-                    randomData = gpa.RandomData;
-                    hub.FireUpdate(Actions.Password, null);
-                }
-                else
-                    hub.Send(new PAS(hub, gpa.RandomData, hub.HubSetting.Password));
+                hub.Send(new PAS(hub, gpa.RandomData, hub.HubSetting.Password));
             }
-            else if (message is QUI)
+            else if (message is QUI && hub != null)
             {
                 QUI qui = (QUI)message;
                 User usr = null;
@@ -309,31 +325,37 @@ namespace FlowLib.Protocols
             }
             else if (message is SUP)
             {
-                hubsupports = (SUP)message;
+                supports = (SUP)message;
                 // TODO : We should really care about what hub support.
-                if (!hubsupports.Param.Contains("ADBASE")/* || !hubsupports.Param.Contains("ADTIGR")*/)
+                if (!supports.Param.Contains("ADBASE") && !supports.Param.Contains("ADBAS0") /* !hubsupports.Param.Contains("ADTIGR")*/)
                 {
                     // We will just simply disconnect if hub doesnt support this right now
-                    hub.Disconnect("Hub doesnt support BASE or TIGR");
+                    con.Disconnect("Connection doesnt support BASE or BAS0");
                 }
             }
             else if (message is RES)
             {
                 RES res = (RES)message;
                 SearchResultInfo srinfo = new SearchResultInfo(res.Info, res.Id);
-                hub.FireUpdate(Actions.SearchResult, srinfo);
+                if (hub != null)
+                    hub.FireUpdate(Actions.SearchResult, srinfo);
             }
             else if (message is SCH)
             {
                 SCH sch = (SCH)message;
                 UserInfo usr = null;
-                User u = null;
-                u = hub.GetUserById(sch.Id);
-                if (u != null)
-                    usr = u.UserInfo;
+                if (hub != null)
+                {
+                    User u = hub.GetUserById(sch.Id);
+                    if (u != null)
+                        usr = u.UserInfo;
+                }
+                else if (trans != null)
+                    usr = trans.User;
+
                 SendRES(sch.Info, usr);
             }
-            else if (message is CTM)
+            else if (message is CTM && hub != null)
             {
                 CTM ctm = (CTM)message;
                 User usr = null;
@@ -368,7 +390,7 @@ namespace FlowLib.Protocols
                     hub.FireUpdate(Actions.TransferStarted, trans);
                 }
             }
-            else if (message is RCM)
+            else if (message is RCM && hub != null)
             {
                 RCM rcm = (RCM)message;
                 if (hub.Me.Mode != FlowLib.Enums.ConnectionTypes.Passive && hub.Share != null)
@@ -389,7 +411,7 @@ namespace FlowLib.Protocols
 
         protected void SendRES(SearchInfo info, UserInfo usr)
         {
-            if (hub.Share == null)
+            if (hub.Share == null || usr == null)
                 return;
 
             int maxReturns = 10;
@@ -479,8 +501,8 @@ namespace FlowLib.Protocols
                 // Should this be sent?
                 if (send)
                 {
-                    RES res = new RES(hub, ret[i], token, usr);
-                    if (res.Address != null)
+                    RES res = new RES(con, ret[i], token, usr);
+                    if (res.Address != null && hub != null)
                     {
                         if (10 > x++)
                         {
@@ -506,21 +528,21 @@ namespace FlowLib.Protocols
 
         public void ActOnOutMessage(FmdcEventArgs e)
         {
-            if (e.Action.Equals(Actions.MainMessage))
+            if (e.Action.Equals(Actions.MainMessage) && hub != null)
             {
                 Containers.MainMessage main = (Containers.MainMessage)e.Data;
                 hub.Send(new MSG(hub, hub.Me, main.ShowAsMe, main.Content));
             }
-            else if (e.Action.Equals(Actions.PrivateMessage))
+            else if (e.Action.Equals(Actions.PrivateMessage) && hub != null)
             {
                 Containers.PrivateMessage pm = (Containers.PrivateMessage)e.Data;
                 hub.Send(new MSG(hub, hub.Me, pm.ShowAsMe, pm.Content, pm.To, pm.Group));
             }
             else if (e.Action.Equals(Actions.Password))
             {
-                hub.Send(new PAS(hub, this.randomData, (string)e.Data));
+                hub.Send(new PAS(hub, this.gpaString, e.Data.ToString()));
             }
-            else if (e.Action.Equals(Actions.StartTransfer))
+            else if (e.Action.Equals(Actions.StartTransfer) && hub != null)
             {
                 User usr = e.Data as User;
                 if (usr == null)
@@ -562,14 +584,8 @@ namespace FlowLib.Protocols
         #endregion
         #endregion
         #region Event(s)
-        protected void OnMessageReceived(object sender, FmdcEventArgs e)
-        {
-
-        }
-        protected void OnMessageToSend(object sender, FmdcEventArgs e)
-        {
-
-        }
+        protected void OnMessageReceived(object sender, FmdcEventArgs e) {}
+        protected void OnMessageToSend(object sender, FmdcEventArgs e) { }
         #endregion
     }
 }

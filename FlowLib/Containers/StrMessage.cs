@@ -20,62 +20,45 @@
  */
 
 using FlowLib.Interfaces;
-using FlowLib.Events;
-using FlowLib.Containers;
 
-namespace FlowLib.Interfaces
+namespace FlowLib.Containers
 {
-    public interface ITransfer : IConnection
+    public class StrMessage : ConMessage
     {
+        #region Variables
+        protected string raw = null;        // Raw Message
+        protected bool valid = false;       // Tells if message is a valid/correct.
+        #endregion
+        #region Properties
         /// <summary>
-        /// Occurs when DownloadItem has been changed.
+        /// Indicates if parsing of message was OK and if message was delivered in correct state
         /// </summary>
-        event FmdcEventHandler DownloadItemChanged;
-
-        SegmentInfo CurrentSegment
+        public bool IsValid
         {
-            get;
-            set;
-        }
-
-        long LastEventTimeStamp
-        {
-            get;
-            set;
+            get { return valid; }
+            set { valid = true; }
         }
 
         /// <summary>
-        /// Current ContentInfo for this connection.
+        /// raw message
         /// </summary>
-        DownloadItem DownloadItem
+        public string Raw
         {
-            get;
-            set;
+            get { return raw; }
+            set
+            {
+                raw = value;
+                if (con != null && raw != null)
+                    bytes = con.Protocol.Encoding.GetBytes(raw);
+            }
         }
-        /// <summary>
-        /// User that representate us
-        /// </summary>
-        UserInfo Me
+        #endregion
+
+        public StrMessage(IConnection con, string raw)
+            : base(con, null)
         {
-            get;
-            set;
-        }
-        /// <summary>
-        /// Other user we are connected to
-        /// </summary>
-        UserInfo User
-        {
-            get;
-            set;
+            Raw = raw;
         }
 
-        /// <summary>
-        /// Current ContentInfo for this connection.
-        /// </summary>
-        ContentInfo Content
-        {
-            get;
-            set;
-        }
     }
 }

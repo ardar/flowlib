@@ -20,6 +20,7 @@
  */
 
 using FlowLib.Events;
+using FlowLib.Containers;
 using System.Net;
 
 namespace FlowLib.Interfaces
@@ -47,6 +48,14 @@ namespace FlowLib.Interfaces
         IPEndPoint RemoteAddress
         {
             get;
+        }
+        /// <summary>
+        /// Sharing instance for this transfer
+        /// </summary>
+        Share Share
+        {
+            get;
+            set;
         }
         #endregion
         #region Functions

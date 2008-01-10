@@ -97,7 +97,7 @@ namespace FlowLib.Connections
         /// <summary>
         /// Sharing instance for this transfer
         /// </summary>
-        public Share Share
+        public override Share Share
         {
             get { return share; }
             set { share = value; }
