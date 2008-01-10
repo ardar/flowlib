@@ -37,7 +37,7 @@ namespace FlowLib.Connections
     /// <summary>
     /// Class represents a Tcp/Ip connection supporting diffrent protocols
     /// </summary>
-    public class TcpConnection : IConnection
+    public abstract class TcpConnection : IConnection
     {
         /// <summary>
         /// A connection is trying to be made
@@ -81,6 +81,14 @@ namespace FlowLib.Connections
 
         #endregion
         #region Properties
+        /// <summary>
+        /// Sharing instance for this transfer
+        /// </summary>
+        public abstract Share Share
+        {
+            get;
+            set;
+        }
         /// <summary>
         /// Protocol that is beeing used for this connection.
         /// </summary>

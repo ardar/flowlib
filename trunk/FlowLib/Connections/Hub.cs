@@ -97,7 +97,7 @@ namespace FlowLib.Connections
         /// <summary>
         /// Share related to this hub
         /// </summary>
-        public Share Share
+        public override Share Share
         {
             get { return share; }
             set
@@ -314,7 +314,7 @@ namespace FlowLib.Connections
                     case "":        // Auto Detect
                     case "Auto":    // Auto Detect
                     case "Adc":     // ADC
-                        Protocol = new HubAdcProtocol(this);
+                        Protocol = new AdcProtocol(this);
                         break;
                     default:
                         FmdcEventArgs e = new FmdcEventArgs(0);

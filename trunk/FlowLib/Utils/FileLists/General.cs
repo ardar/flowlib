@@ -46,6 +46,13 @@ namespace FlowLib.Utils.FileLists
             xml.CreateFilelist();
             share.RemoveFile(xml.ContentInfo);
             share.AddFile(xml.ContentInfo);
+            // Xml Utf-8 (Adc Standard list)
+            xml.Bz2 = false;
+            xml.SystemPath = directory;
+            xml.Encoding = System.Text.Encoding.UTF8;
+            xml.CreateFilelist();
+            share.RemoveFile(xml.ContentInfo);
+            share.AddFile(xml.ContentInfo);
             // BzList
             FlowLib.Utils.FileLists.FilelistMyList dclst = new FlowLib.Utils.FileLists.FilelistMyList(share);
             dclst.SystemPath = directory;

@@ -33,8 +33,8 @@ namespace FlowLib.Protocols.Adc
         protected string identifier = null;
         protected SegmentInfo segment = null;
 
-        public SND(Hub hub, string raw)
-            : base(hub, raw)
+        public SND(IConnection con, string raw)
+            : base(con, raw)
         {
             if (param.Count >= 4)
             {
@@ -56,8 +56,8 @@ namespace FlowLib.Protocols.Adc
         protected string contentType = null;
         protected string identifier = null;
 
-        public GFI(Hub hub, string raw)
-            : base(hub, raw)
+        public GFI(IConnection con, string raw)
+            : base(con, raw)
         {
             if (param.Count >= 2)
             {
@@ -67,8 +67,8 @@ namespace FlowLib.Protocols.Adc
             }
         }
 
-        public GFI(Hub hub, string type, string contentId)
-            : base(hub, null)
+        public GFI(IConnection con, string type, string contentId)
+            : base(con, null)
         {
             contentType = type;
             identifier = contentId;
@@ -93,8 +93,8 @@ namespace FlowLib.Protocols.Adc
         {
             get { return segment; }
         }
-        public GET(Hub hub, string raw)
-            : base(hub, raw)
+        public GET(IConnection con, string raw)
+            : base(con, raw)
         {
             if (param.Count >= 4)
             {
@@ -111,11 +111,11 @@ namespace FlowLib.Protocols.Adc
             }
         }
 
-        public GET(Hub hub, ContentInfo info, SegmentInfo segment)
-            : this(hub, info, segment, "file") { }
+        public GET(IConnection con, ContentInfo info, SegmentInfo segment)
+            : this(con, info, segment, "file") { }
 
-        public GET(Hub hub, ContentInfo info, SegmentInfo segment, string type)
-            : base(hub, null)
+        public GET(IConnection con, ContentInfo info, SegmentInfo segment, string type)
+            : base(con, null)
         {
             string req = null;
             if (info.ContainsKey(ContentInfo.REQUEST))
@@ -146,8 +146,8 @@ namespace FlowLib.Protocols.Adc
             get { return token; }
         }
 
-        public RCM(Hub hub, string raw)
-            : base(hub, raw)
+        public RCM(IConnection con, string raw)
+            : base(con, raw)
         {
             if (param.Count >= 2)
             {
@@ -157,10 +157,10 @@ namespace FlowLib.Protocols.Adc
             }
         }
 
-        public RCM(string token, Hub hub)
-            : this(token, hub, "ADC/1.0") { }
-        public RCM(string token, Hub hub, string protocol)
-            : base(hub, null)
+        public RCM(string token, IConnection con)
+            : this(token, con, "ADC/1.0") { }
+        public RCM(string token, IConnection con, string protocol)
+            : base(con, null)
         {
             this.protocol = protocol;
             this.token = token;
@@ -185,8 +185,8 @@ namespace FlowLib.Protocols.Adc
         {
             get { return token; }
         }
-        public CTM(Hub hub, string raw)
-            : base(hub, raw)
+        public CTM(IConnection con, string raw)
+            : base(con, raw)
         {
             if (param.Count >= 3)
             {
@@ -201,11 +201,11 @@ namespace FlowLib.Protocols.Adc
             }
         }
 
-        public CTM(Hub hub, int port, string token)
-            : this(hub, "ADC/1.0", port, token) { }
+        public CTM(IConnection con, int port, string token)
+            : this(con, "ADC/1.0", port, token) { }
 
-        public CTM(Hub hub, string protocol, int port, string token)
-            : base(hub, null)
+        public CTM(IConnection con, string protocol, int port, string token)
+            : base(con, null)
         {
             Raw = string.Format("DCTM {0} {1} {2}\n", protocol, port.ToString(), token);
         }
@@ -218,8 +218,8 @@ namespace FlowLib.Protocols.Adc
             get { return info; }
         }
 
-        public SCH(Hub hub, string raw)
-            : base(hub, raw)
+        public SCH(IConnection con, string raw)
+            : base(con, raw)
         {
             // BSCH NRQF TRUDHPNB4BUIQV2LAI4HDWRL3KLJTUSXCTAMJHNII TOauto
             for (int i = 0; i < param.Count; i++)
@@ -294,8 +294,8 @@ namespace FlowLib.Protocols.Adc
             }
         }
 
-        public SCH(Hub hub, SearchInfo info)
-            : base(hub, null)
+        public SCH(IConnection con, SearchInfo info, string userId)
+            : base(con, null)
         {
             this.info = info;
             // BSCH NRQF TRUDHPNB4BUIQV2LAI4HDWRL3KLJTUSXCTAMJHNII TOauto
@@ -354,7 +354,7 @@ namespace FlowLib.Protocols.Adc
                 }
             }
             #endregion
-            Raw = string.Format("BSCH {0}{1}\n", hub.Me.ID, sb.ToString());
+            Raw = string.Format("BSCH {0}{1}\n", userId, sb.ToString());
         }
     }
     public class RES : AdcBaseMessage
@@ -391,8 +391,8 @@ namespace FlowLib.Protocols.Adc
             get { return slots; }
         }
 
-        public RES(Hub hub, string raw)
-            : base(hub, raw)
+        public RES(IConnection con, string raw)
+            : base(con, raw)
         {
             info = new ContentInfo();
             foreach (string var in param)
@@ -428,47 +428,43 @@ namespace FlowLib.Protocols.Adc
             }
         }
 
-        public RES(Hub hub, ContentInfo info, string token, string from)
-            : base(hub, null)
+        public RES(IConnection con, ContentInfo info, string token, UserInfo usr)
+            : base(con, null)
         {
             this.info = info;
 
-            User usr = null;
-            if ((usr = hub.GetUserById(from)) != null)
+            if (
+                usr.ContainsKey(UserInfo.UDPPORT)
+                && usr.ContainsKey("SU")
+                && usr.ContainsKey(UserInfo.IP)
+                && (usr.Get("SU").Contains("UDP4") || usr.Get("SU").Contains("UDP6"))
+                )
             {
-                if (
-                    usr.UserInfo.ContainsKey(UserInfo.UDPPORT)
-                    && usr.UserInfo.ContainsKey("SU")
-                    && usr.UserInfo.ContainsKey(UserInfo.IP)
-                    && (usr.UserInfo.Get("SU").Contains("UDP4") || usr.UserInfo.Get("SU").Contains("UDP6"))
-                    )
+                type = "U";
+                int port = -1;
+                string addr = usr.Get(UserInfo.IP);
+                try
                 {
-                    type = "U";
-                    int port = -1;
-                    string addr = usr.UserInfo.Get(UserInfo.IP);
-                    try
-                    {
-                        port = int.Parse(usr.UserInfo.Get(UserInfo.UDPPORT));
-                        if (port < 0 || port > 65535)
-                            port = 0;
-                        address = new System.Net.IPEndPoint(System.Net.IPAddress.Parse(addr), port);
-                    }
-                    catch { }
+                    port = int.Parse(usr.Get(UserInfo.UDPPORT));
+                    if (port < 0 || port > 65535)
+                        port = 0;
+                    address = new System.Net.IPEndPoint(System.Net.IPAddress.Parse(addr), port);
                 }
-                else
-                {
-                    type = "D";
-                }
-
-                System.Text.StringBuilder sb = new System.Text.StringBuilder();
-                if (info.ContainsKey(ContentInfo.VIRTUAL))
-                    sb.Append(" FN" + info.Get(ContentInfo.VIRTUAL));
-                sb.Append(" SI" + info.Size.ToString());
-                if (!string.IsNullOrEmpty(token))
-                    sb.Append(" TO" + token);
-                // TODO : Add Slots handling
-                Raw = string.Format("{0}RES{1}\n", type, sb.ToString());
+                catch { }
             }
+            else
+            {
+                type = "D";
+            }
+
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            if (info.ContainsKey(ContentInfo.VIRTUAL))
+                sb.Append(" FN" + info.Get(ContentInfo.VIRTUAL));
+            sb.Append(" SI" + info.Size.ToString());
+            if (!string.IsNullOrEmpty(token))
+                sb.Append(" TO" + token);
+            // TODO : Add Slots handling
+            Raw = string.Format("{0}RES{1}\n", type, sb.ToString());
         }
     }
     public class MSG : AdcBaseMessage
@@ -476,6 +472,8 @@ namespace FlowLib.Protocols.Adc
         protected string content = null;
         protected bool me = false;
         protected string pmgroup = null;
+        protected string from = null;
+        protected string to = null;
         /// <summary>
         /// Group/chatroom where Pm was received from.
         /// </summary>
@@ -487,13 +485,23 @@ namespace FlowLib.Protocols.Adc
         {
             get { return content; }
         }
+        public string From
+        {
+            get { return from; }
+            set { from = value; }
+        }
+        public string To
+        {
+            get { return to; }
+            set { to = value; }
+        }
         /// <summary>
         /// Constructor for recieving
         /// </summary>
         /// <param name="hub"></param>
         /// <param name="raw"></param>
-        public MSG(Hub hub, string raw)
-            : base(hub, raw)
+        public MSG(IConnection con, string raw)
+            : base(con, raw)
         {
             //I: IMSG Have\sa\snice\sday,\sand\sbehave\s;)
             //B: BMSG SHJV PIP
@@ -527,7 +535,7 @@ namespace FlowLib.Protocols.Adc
             // Replacing stuff
             if (content != null)
             {
-                content = HubAdcProtocol.ConvertIncomming(content);
+                content = AdcProtocol.ConvertIncomming(content);
             }
         }
         /// <summary>
@@ -536,11 +544,11 @@ namespace FlowLib.Protocols.Adc
         /// <param name="hub"></param>
         /// <param name="me"></param>
         /// <param name="content"></param>
-        public MSG(Hub hub, bool me, string content)
-            : this(hub, me, content, null, null)
+        public MSG(IConnection con, UserInfo usr,  bool me, string content)
+            : this(con, usr, me, content, null, null)
         {
             // BMSG SHJV PIP
-            Raw = "BMSG " + this.from + " " + HubAdcProtocol.ConvertOutgoing(this.content) + (this.me ? " ME1" : "") + "\n";
+            Raw = "BMSG " + this.from + " " + AdcProtocol.ConvertOutgoing(this.content) + (this.me ? " ME1" : "") + "\n";
         }
         /// <summary>
         /// Constructor for sending Private messages
@@ -550,22 +558,22 @@ namespace FlowLib.Protocols.Adc
         /// <param name="content"></param>
         /// <param name="to"></param>
         /// <param name="group"></param>
-        public MSG(Hub hub, bool me, string content, string to, string group)
-            : base(hub, null)
+        public MSG(IConnection con, UserInfo usr, bool me, string content, string to, string group)
+            : base(con, null)
         {
             this.to = to;
             this.pmgroup = group;
             this.me = me;
             this.content = content;
-            if (hub.Me.ContainsKey(UserInfo.SID))
-                this.from = hub.Me.Get(UserInfo.SID);
+            if (usr.ContainsKey(UserInfo.SID))
+                this.from = usr.Get(UserInfo.SID);
             if (this.to == null || this.pmgroup == null)
             {
                 if (this.pmgroup != null)
                     this.to = this.pmgroup;
             }
             // DMSG SHJV SH5B PIIP!! PMSHJV
-            Raw = "DMSG " + this.from + " " + this.to + " " + HubAdcProtocol.ConvertOutgoing(this.content) + (this.me ? " ME1" : "") + " PM"+((this.pmgroup != null) ? (this.pmgroup) : this.from) + "\n";
+            Raw = "DMSG " + this.from + " " + this.to + " " + AdcProtocol.ConvertOutgoing(this.content) + (this.me ? " ME1" : "") + " PM"+((this.pmgroup != null) ? (this.pmgroup) : this.from) + "\n";
         }
     }
     public class SUP : AdcBaseMessage
@@ -573,14 +581,14 @@ namespace FlowLib.Protocols.Adc
         /// <summary>
         /// Sending Support to hub
         /// </summary>
-        public SUP(Hub hub)
-            : base(hub, null)
+        public SUP(IConnection con)
+            : base(con, null)
         {
-            Raw = "HSUP " + HubAdcProtocol.Support + "\n";
+            Raw = "HSUP " + AdcProtocol.Support + "\n";
         }
 
-        public SUP(Hub hub, string raw)
-            : base(hub, raw)
+        public SUP(IConnection con, string raw)
+            : base(con, raw)
         {
 
         }
@@ -598,8 +606,8 @@ namespace FlowLib.Protocols.Adc
             }
         }
         // Receiving
-        public INF(Hub hub, string raw)
-            : base(hub, raw)
+        public INF(IConnection con, string raw)
+            : base(con, raw)
         {
             if (param == null)
                 return;
@@ -655,7 +663,7 @@ namespace FlowLib.Protocols.Adc
                     //case "AM":
                     //    break;
                     case "EM":
-                        info.Email = HubAdcProtocol.ConvertIncomming(value);
+                        info.Email = AdcProtocol.ConvertIncomming(value);
                         break;
                     case "HN":
                         try
@@ -689,9 +697,9 @@ namespace FlowLib.Protocols.Adc
                         break;
                     //case "TO":
                     //    break;
-                    //case "OP":
-                    //    info.IsOperator = (value == "1");
-                    //    break;
+                    case "OP":      // Before ADC 1.0
+                        info.IsOperator = (value == "1");
+                        break;
                     //case "AW":
                     //    break;
                     //case "BO":
@@ -703,13 +711,13 @@ namespace FlowLib.Protocols.Adc
                     //case "SU":
                     //    break;
                     case "NI":
-                        info.DisplayName = HubAdcProtocol.ConvertIncomming(value);
+                        info.DisplayName = AdcProtocol.ConvertIncomming(value);
                         break;
                     case "VE":
-                        info.TagInfo.Version = HubAdcProtocol.ConvertIncomming(value);
+                        info.TagInfo.Version = AdcProtocol.ConvertIncomming(value);
                         break;
                     case "DE":
-                        info.Description = HubAdcProtocol.ConvertIncomming(value);
+                        info.Description = AdcProtocol.ConvertIncomming(value);
                         break;
                     case "CT":
                         try
@@ -725,10 +733,10 @@ namespace FlowLib.Protocols.Adc
                 }
             }
         }
-        public INF(Hub hub)
-            : base(hub, null)
+        public INF(IConnection con, UserInfo info)
+            : base(con, null)
         {
-            info = hub.Me;
+            this.info = info;
             CreateRaw();
         }
 
@@ -752,35 +760,41 @@ namespace FlowLib.Protocols.Adc
 
             sb.Append(" ID" + info.Get(UserInfo.CID));
             sb.Append(" PD" + info.Get(UserInfo.PID));
-            sb.Append(" DE" + HubAdcProtocol.ConvertOutgoing(info.Description));
+            sb.Append(" DE" + AdcProtocol.ConvertOutgoing(info.Description));
 
             sb.Append(" HN" + info.TagInfo.Normal.ToString());
             sb.Append(" HO" + info.TagInfo.OP.ToString());
             sb.Append(" HR" + info.TagInfo.Regged.ToString());
-            sb.Append(" NI" + HubAdcProtocol.ConvertOutgoing(info.DisplayName));
+            sb.Append(" NI" + AdcProtocol.ConvertOutgoing(info.DisplayName));
             sb.Append(" SL" + info.TagInfo.Slots); // Upload Slots Open
-            sb.Append(" SF" + (Hub.Share != null ? Hub.Share.HashedCount : 0));  // Shared Files
-            sb.Append(" SS" + (Hub.Share != null ? Hub.Share.HashedSize : 0));    // Share Size in bytes
-            if (Hub.Share != null)
+            sb.Append(" SF" + (con.Share != null ? con.Share.HashedCount : 0));  // Shared Files
+            sb.Append(" SS" + (con.Share != null ? con.Share.HashedSize : 0));    // Share Size in bytes
+            if (con.Share != null)
             {
                 string ip = info.Get(UserInfo.IP);
+                System.Text.StringBuilder support = new System.Text.StringBuilder();
                 if (string.IsNullOrEmpty(ip) || ip.Contains("."))
                 {
                     if (string.IsNullOrEmpty(ip))
                         sb.Append(" I40.0.0.0");
                     else
                         sb.Append(" I4" + ip);
-                    sb.Append(" SU" + "TCP4,UDP4");  // Support
-                    sb.Append(" U4" + Hub.Share.Port.ToString());
+                    support.Append("TCP4,");    // Support
+                    support.Append("UDP4,");    // Support
+                    sb.Append(" U4" + con.Share.Port.ToString());
                 }
                 else
                 {
                     sb.Append(" I6" + ip);
-                    sb.Append(" SU" + "TCP6,UDP6");  // Support
-                    sb.Append(" U6" + Hub.Share.Port.ToString());
+                    support.Append("TCP6,");    // Support
+                    support.Append("UDP6,");    // Support
+                    sb.Append(" U6" + con.Share.Port.ToString());
                 }
+
+                support.Append("BZIP");         // Support
+                sb.Append(" SU" + support.ToString());  // Support
             }
-            sb.Append(" VE" + HubAdcProtocol.ConvertOutgoing(Hub.Me.TagInfo.Version));
+            sb.Append(" VE" + AdcProtocol.ConvertOutgoing(info.TagInfo.Version));
             sb.Append("\n");
             Raw = sb.ToString();
         }
@@ -802,9 +816,14 @@ namespace FlowLib.Protocols.Adc
                 CreateRaw();
             }
         }
-        public PAS(Hub hub, string randomdata) : this(hub, randomdata, hub.HubSetting.Password) { }
-        public PAS(Hub hub, string randomdata, string password)
-            : base(hub, null)
+        public PAS(IConnection con, string raw)
+            : base(con, raw)
+        {
+
+        }
+
+        public PAS(IConnection con, string randomdata, string password)
+            : base(con, null)
         {
             this.random = randomdata;
             Password = password;
@@ -836,8 +855,8 @@ namespace FlowLib.Protocols.Adc
     #region Receive
     public class SID : AdcBaseMessage
     {
-        public SID(Hub hub, string raw)
-            : base(hub, raw)
+        public SID(IConnection con, string raw)
+            : base(con, raw)
         {
             if (param.Count >= 1)
             {
@@ -879,8 +898,8 @@ namespace FlowLib.Protocols.Adc
             get { return time; }
         }
 
-        public QUI(Hub hub, string raw)
-            : base(hub, raw)
+        public QUI(IConnection con, string raw)
+            : base(con, raw)
         {
             if (param == null)
                 return;
@@ -968,8 +987,8 @@ namespace FlowLib.Protocols.Adc
             get { return content; }
         }
 
-        public STA(Hub hub, string raw)
-            : base(hub, raw)
+        public STA(IConnection con, string raw)
+            : base(con, raw)
         {
             if (param == null)
                 return;
@@ -977,7 +996,7 @@ namespace FlowLib.Protocols.Adc
             {
                 severity = param[0].Substring(0, 1);
                 code = param[0].Substring(1);
-                content = HubAdcProtocol.ConvertIncomming(param[1]);
+                content = AdcProtocol.ConvertIncomming(param[1]);
             }
 
             for (int i = 2; i < param.Count; i++)
@@ -1010,17 +1029,17 @@ namespace FlowLib.Protocols.Adc
             }
         }
 
-        public STA(Hub hub, string code, string description, string param)
-            : this(hub, null, code, description, param) { }
+        public STA(IConnection con, string code, string description, string param)
+            : this(con, null, code, description, param) { }
 
-        public STA(Hub hub, string userId, string code, string description, string param)
-            : base(hub, null)
+        public STA(IConnection con, string userId, string code, string description, string param)
+            : base(con, null)
         {
             param = " " + param;
             if (string.IsNullOrEmpty(userId))
-                Raw = string.Format("DSTA {0} {1} DE{2}{3}\n", userId, code, HubAdcProtocol.ConvertOutgoing(description), param);
+                Raw = string.Format("DSTA {0} {1} DE{2}{3}\n", userId, code, AdcProtocol.ConvertOutgoing(description), param);
             else
-                Raw = string.Format("CSTA {0} DE{1}{2}\n", code, HubAdcProtocol.ConvertOutgoing(description), param);
+                Raw = string.Format("CSTA {0} DE{1}{2}\n", code, AdcProtocol.ConvertOutgoing(description), param);
         }
     }
     public class GPA : AdcBaseMessage
@@ -1032,8 +1051,8 @@ namespace FlowLib.Protocols.Adc
             get { return randomData; }
         }
 
-        public GPA(Hub hub, string raw)
-            : base(hub, raw)
+        public GPA(IConnection con, string raw)
+            : base(con, raw)
         {
             if (param.Count >= 1)
             {
