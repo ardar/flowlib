@@ -33,6 +33,16 @@ namespace FlowLib.Protocols.Adc
         protected string identifier = null;
         protected SegmentInfo segment = null;
 
+        public SND(IConnection con, string contentType, string identifier, SegmentInfo info)
+            : base(con, null)
+        {
+            this.contentType = contentType;
+            this.identifier = identifier;
+            this.segment = info;
+
+            Raw = string.Format("CSND {0} {1} {2} {3}\n", contentType, identifier, info.Start, info.Length);
+        }
+
         public SND(IConnection con, string raw)
             : base(con, raw)
         {
@@ -201,13 +211,13 @@ namespace FlowLib.Protocols.Adc
             }
         }
 
-        public CTM(IConnection con, int port, string token)
-            : this(con, "ADC/1.0", port, token) { }
+        public CTM(IConnection con, string usrId, string meId, int port, string token)
+            : this(con, usrId, meId, "ADC/1.0", port, token) { }
 
-        public CTM(IConnection con, string protocol, int port, string token)
+        public CTM(IConnection con, string usrId, string meId, string protocol, int port, string token)
             : base(con, null)
         {
-            Raw = string.Format("DCTM {0} {1} {2}\n", protocol, port.ToString(), token);
+            Raw = string.Format("DCTM {3} {4} {0} {1} {2}\n", protocol, port.ToString(), token, meId, usrId);
         }
     }
     public class SCH : AdcBaseMessage
@@ -316,9 +326,9 @@ namespace FlowLib.Protocols.Adc
                 switch (info.Get(SearchInfo.TYPE))
                 {
                     case "0":
-                        sb.Append(" TY" + HubAdcProtocol.ConvertOutgoing("1")); break;
+                        sb.Append(" TY" + AdcProtocol.ConvertOutgoing("1")); break;
                     case "1":
-                        sb.Append(" TY" + HubAdcProtocol.ConvertOutgoing("2")); break;
+                        sb.Append(" TY" + AdcProtocol.ConvertOutgoing("2")); break;
                     case "2":
                         sb.Append(" AN" + info.Get(SearchInfo.SEARCH)); break;
                 }
@@ -326,15 +336,15 @@ namespace FlowLib.Protocols.Adc
             #endregion
             #region AN
             if (info.ContainsKey(SearchInfo.SEARCH) && info.ContainsKey(SearchInfo.TYPE))
-                sb.Append(" AN" + HubAdcProtocol.ConvertOutgoing(info.Get(SearchInfo.SEARCH)));
+                sb.Append(" AN" + AdcProtocol.ConvertOutgoing(info.Get(SearchInfo.SEARCH)));
             #endregion
             #region NO
             if (info.ContainsKey(SearchInfo.NOSEARCH))
-                sb.Append(" NO" + HubAdcProtocol.ConvertOutgoing(info.Get(SearchInfo.NOSEARCH)));
+                sb.Append(" NO" + AdcProtocol.ConvertOutgoing(info.Get(SearchInfo.NOSEARCH)));
             #endregion
             #region TO
             if (info.ContainsKey(SearchInfo.TOKEN))
-                sb.Append(" TO" + HubAdcProtocol.ConvertOutgoing(info.Get(SearchInfo.TOKEN)));
+                sb.Append(" TO" + AdcProtocol.ConvertOutgoing(info.Get(SearchInfo.TOKEN)));
             #endregion
             #region Size Type
             if (info.ContainsKey(SearchInfo.SIZETYPE))
@@ -584,7 +594,10 @@ namespace FlowLib.Protocols.Adc
         public SUP(IConnection con)
             : base(con, null)
         {
-            Raw = "HSUP " + AdcProtocol.Support + "\n";
+            if (con is Hub)
+                Raw = "HSUP " + AdcProtocol.Support + "\n";
+            else
+                Raw = "CSUP " + AdcProtocol.Support + "\n";
         }
 
         public SUP(IConnection con, string raw)
@@ -745,56 +758,64 @@ namespace FlowLib.Protocols.Adc
             if (info == null)
                 return;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
-            sb.Append("BINF " + info.Get(UserInfo.SID));
-            // Do PID exist? If not. Create PID and CID
-            FlowLib.Utils.Hash.Tiger tiger = new FlowLib.Utils.Hash.Tiger();
-            byte[] data = null;
-            if (!info.ContainsKey(UserInfo.PID))
+            if (con is Transfer)
             {
-                data = tiger.ComputeHash(System.Text.Encoding.UTF8.GetBytes("FlowLib" + System.DateTime.Now.Ticks.ToString()));
-                info.Set(UserInfo.PID,FlowLib.Utils.Convert.Base32.Encode(data));
+                sb.Append("CINF");
+                sb.Append(" ID" + info.Get(UserInfo.CID));
             }
-            // Make CID from PID. This will always be done.
-            data = tiger.ComputeHash(FlowLib.Utils.Convert.Base32.Decode(info.Get(UserInfo.PID)));
-            info.Set(UserInfo.CID, FlowLib.Utils.Convert.Base32.Encode(data));
-
-            sb.Append(" ID" + info.Get(UserInfo.CID));
-            sb.Append(" PD" + info.Get(UserInfo.PID));
-            sb.Append(" DE" + AdcProtocol.ConvertOutgoing(info.Description));
-
-            sb.Append(" HN" + info.TagInfo.Normal.ToString());
-            sb.Append(" HO" + info.TagInfo.OP.ToString());
-            sb.Append(" HR" + info.TagInfo.Regged.ToString());
-            sb.Append(" NI" + AdcProtocol.ConvertOutgoing(info.DisplayName));
-            sb.Append(" SL" + info.TagInfo.Slots); // Upload Slots Open
-            sb.Append(" SF" + (con.Share != null ? con.Share.HashedCount : 0));  // Shared Files
-            sb.Append(" SS" + (con.Share != null ? con.Share.HashedSize : 0));    // Share Size in bytes
-            if (con.Share != null)
+            else
             {
-                string ip = info.Get(UserInfo.IP);
-                System.Text.StringBuilder support = new System.Text.StringBuilder();
-                if (string.IsNullOrEmpty(ip) || ip.Contains("."))
+                sb.Append("BINF " + info.Get(UserInfo.SID));
+                // Do PID exist? If not. Create PID and CID
+                FlowLib.Utils.Hash.Tiger tiger = new FlowLib.Utils.Hash.Tiger();
+                byte[] data = null;
+                if (!info.ContainsKey(UserInfo.PID))
                 {
-                    if (string.IsNullOrEmpty(ip))
-                        sb.Append(" I40.0.0.0");
+                    data = tiger.ComputeHash(System.Text.Encoding.UTF8.GetBytes("FlowLib" + System.DateTime.Now.Ticks.ToString()));
+                    info.Set(UserInfo.PID, FlowLib.Utils.Convert.Base32.Encode(data));
+                }
+                // Make CID from PID. This will always be done.
+                data = tiger.ComputeHash(FlowLib.Utils.Convert.Base32.Decode(info.Get(UserInfo.PID)));
+                info.Set(UserInfo.CID, FlowLib.Utils.Convert.Base32.Encode(data));
+
+                sb.Append(" ID" + info.Get(UserInfo.CID));
+                sb.Append(" PD" + info.Get(UserInfo.PID));
+                sb.Append(" DE" + AdcProtocol.ConvertOutgoing(info.Description));
+
+                sb.Append(" HN" + info.TagInfo.Normal.ToString());
+                sb.Append(" HO" + info.TagInfo.OP.ToString());
+                sb.Append(" HR" + info.TagInfo.Regged.ToString());
+                sb.Append(" NI" + AdcProtocol.ConvertOutgoing(info.DisplayName));
+                sb.Append(" SL" + info.TagInfo.Slots); // Upload Slots Open
+                sb.Append(" SF" + (con.Share != null ? con.Share.HashedCount : 0));  // Shared Files
+                sb.Append(" SS" + (con.Share != null ? con.Share.HashedSize : 0));    // Share Size in bytes
+                if (con.Share != null)
+                {
+                    string ip = info.Get(UserInfo.IP);
+                    System.Text.StringBuilder support = new System.Text.StringBuilder();
+                    if (string.IsNullOrEmpty(ip) || ip.Contains("."))
+                    {
+                        if (string.IsNullOrEmpty(ip))
+                            sb.Append(" I40.0.0.0");
+                        else
+                            sb.Append(" I4" + ip);
+                        support.Append("TCP4,");    // Support
+                        support.Append("UDP4,");    // Support
+                        sb.Append(" U4" + con.Share.Port.ToString());
+                    }
                     else
-                        sb.Append(" I4" + ip);
-                    support.Append("TCP4,");    // Support
-                    support.Append("UDP4,");    // Support
-                    sb.Append(" U4" + con.Share.Port.ToString());
-                }
-                else
-                {
-                    sb.Append(" I6" + ip);
-                    support.Append("TCP6,");    // Support
-                    support.Append("UDP6,");    // Support
-                    sb.Append(" U6" + con.Share.Port.ToString());
-                }
+                    {
+                        sb.Append(" I6" + ip);
+                        support.Append("TCP6,");    // Support
+                        support.Append("UDP6,");    // Support
+                        sb.Append(" U6" + con.Share.Port.ToString());
+                    }
 
-                support.Append("BZIP");         // Support
-                sb.Append(" SU" + support.ToString());  // Support
+                    support.Append("BZIP");         // Support
+                    sb.Append(" SU" + support.ToString());  // Support
+                }
+                sb.Append(" VE" + AdcProtocol.ConvertOutgoing(info.TagInfo.Version));
             }
-            sb.Append(" VE" + AdcProtocol.ConvertOutgoing(info.TagInfo.Version));
             sb.Append("\n");
             Raw = sb.ToString();
         }
@@ -1035,8 +1056,11 @@ namespace FlowLib.Protocols.Adc
         public STA(IConnection con, string userId, string code, string description, string param)
             : base(con, null)
         {
-            param = " " + param;
-            if (string.IsNullOrEmpty(userId))
+            if (param != null)
+                param = " " + param;
+            else
+                param = string.Empty;
+            if (!string.IsNullOrEmpty(userId))
                 Raw = string.Format("DSTA {0} {1} DE{2}{3}\n", userId, code, AdcProtocol.ConvertOutgoing(description), param);
             else
                 Raw = string.Format("CSTA {0} DE{1}{2}\n", code, AdcProtocol.ConvertOutgoing(description), param);

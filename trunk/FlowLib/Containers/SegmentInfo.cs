@@ -51,6 +51,7 @@ namespace FlowLib.Containers
         public long Length
         {
             get { return vLength; }
+            set { vLength = value; }
         }
 
         /// <summary>

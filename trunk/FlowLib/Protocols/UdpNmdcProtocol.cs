@@ -40,6 +40,7 @@ namespace FlowLib.Protocols
     {
         public event FmdcEventHandler MessageReceived;
         public event FmdcEventHandler MessageToSend;
+        public event FmdcEventHandler Update;
 
         public IConMessage KeepAliveCommand
         {
@@ -66,8 +67,10 @@ namespace FlowLib.Protocols
         {
             MessageReceived = new FmdcEventHandler(UdpNmdcProtocol_MessageReceived);
             MessageToSend = new FmdcEventHandler(UdpNmdcProtocol_MessageToSend);
+            Update = new FmdcEventHandler(UdpNmdcProtocol_Update);
         }
 
+        void UdpNmdcProtocol_Update(object sender, FmdcEventArgs e) { }
         void UdpNmdcProtocol_MessageToSend(object sender, FmdcEventArgs e) { }
         void UdpNmdcProtocol_MessageReceived(object sender, FmdcEventArgs e) { }
 

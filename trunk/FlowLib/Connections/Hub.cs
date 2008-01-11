@@ -44,11 +44,6 @@ namespace FlowLib.Connections
         /// </summary>
         public static event FmdcEventHandler RegModeUpdated;
         /// <summary>
-        /// Events have happen in this hub and we want to tell others.
-        /// Mainmessages, private messages and more.
-        /// </summary>
-        public event FmdcEventHandler Update;
-        /// <summary>
         /// If HubSettings contains a unknown protocol Id. This will be trigged
         /// </summary>
         public event FmdcEventHandler UnknownProtocolId;
@@ -208,20 +203,27 @@ namespace FlowLib.Connections
             UpdateRegMode();
             UpdateShare();
             #region Event(s)
-            Update = new FmdcEventHandler(OnUpdate);
             UnknownProtocolId = new FmdcEventHandler(OnUnknownProtocolId);
             RegModeUpdated += new FmdcEventHandler(Hub_RegModeUpdated);
+            ProtocolChange += new FmdcEventHandler(Hub_ProtocolChange);
             #endregion
             #region Event(s)
             if (gui != null)
                 gui.UpdateBase += new FmdcEventHandler(OnUpdateBase);
             #endregion
-            FireUpdate(Actions.Name, new HubName(HubSetting.Address + ":" + HubSetting.Port.ToString()));
+            //FireUpdate(Actions.Name, new HubName(HubSetting.Address + ":" + HubSetting.Port.ToString()));
             #region Keep Alive
             // For Connection Keepalive
             TimerCallback timerDelegate = new TimerCallback(OnkeepAliveTimer_Elapsed);
             keepAliveTimer = new System.Threading.Timer(timerDelegate, socket, interval * 1000, interval * 1000);
             #endregion
+        }
+
+        void Hub_ProtocolChange(object sender, FmdcEventArgs e)
+        {
+            IProtocol prot = e.Data as IProtocol;
+            if (prot != null)
+                prot.Update +=new FmdcEventHandler(OnProtocolUpdate);
         }
 
         /// <summary>
@@ -239,11 +241,6 @@ namespace FlowLib.Connections
         {
             if (share != null)
                 me.UserInfo.Share = share.HashedSize.ToString();
-        }
-
-        public void FireUpdate(int action, object obj)
-        {
-            Update(this,  new FmdcEventArgs(action, obj));
         }
 
         /// <summary>
@@ -371,28 +368,6 @@ namespace FlowLib.Connections
             UpdateShare();
         }
 
-        protected override void OnConnectionStatusChanged(object sender, FmdcEventArgs e)
-        {
-            base.OnConnectionStatusChanged(sender, e);
-            HubStatus h;
-            switch (e.Action)
-            {
-                case TcpConnection.Disconnected:
-                    if (e.Data is System.Exception)
-                        h = new HubStatus(HubStatus.Codes.Disconnected, (System.Exception)e.Data);
-                    else
-                        h = new HubStatus(HubStatus.Codes.Disconnected);
-                    break;
-                case TcpConnection.Connected:
-                    h = new HubStatus(HubStatus.Codes.Connected);
-                    break;
-                case TcpConnection.Connecting:
-                default:
-                    h = new HubStatus(HubStatus.Codes.Connecting);
-                    break;
-            }
-            FireUpdate(Actions.StatusChange, h);
-        }
         protected void OnkeepAliveTimer_Elapsed(System.Object stateInfo)
         {
             long second = 10000000;
@@ -428,7 +403,7 @@ namespace FlowLib.Connections
 
         }
 
-        protected void OnUpdate(object sender, FmdcEventArgs e)
+        protected void OnProtocolUpdate(object sender, FmdcEventArgs e)
         {
             switch (e.Action)
             {

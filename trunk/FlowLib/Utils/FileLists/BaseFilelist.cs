@@ -29,6 +29,7 @@ namespace FlowLib.Utils.FileLists
     {
         public const string UNKNOWN = "UNKNOWN";
         public const string XMLBZ = "XMLBZ";
+        public const string XML = "XML";
         public const string BZ = "BZ";
         public const string HUFFMAN = "HUFFMAN";
 

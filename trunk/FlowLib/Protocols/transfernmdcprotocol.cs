@@ -34,10 +34,9 @@ namespace FlowLib.Protocols
     /// <summary>
     /// Transfer NMDC Protocol
     /// </summary>
-    public class TransferNmdcProtocol : IProtocolTransfer
+    public class TransferNmdcProtocol : BaseTransferProtocol, IProtocolTransfer
     {
         #region Variables
-        protected ITransfer trans = null;
         protected string received = string.Empty;
         protected bool rawData = false;
         protected bool compressedZLib = false;
@@ -67,6 +66,7 @@ namespace FlowLib.Protocols
         public event FmdcEventHandler ChangeDownloadItem;
         public event FmdcEventHandler RequestTransfer;
         public event FmdcEventHandler Error;
+        public event FmdcEventHandler Update;
         #endregion
 
         #region Properties
@@ -113,6 +113,7 @@ namespace FlowLib.Protocols
             ChangeDownloadItem = new FmdcEventHandler(OnChangeDownloadItem);
             RequestTransfer = new FmdcEventHandler(OnRequestTransfer);
             Error = new FmdcEventHandler(OnError);
+            Update = new FmdcEventHandler(OnUpdate);
 
             TimerCallback timerDelegate = new TimerCallback(OnTimer);
             long interval = 10 * 1000; // 10 seconds
@@ -122,6 +123,7 @@ namespace FlowLib.Protocols
             trans.ConnectionStatusChange += new FmdcEventHandler(trans_ConnectionStatusChange);
         }
 
+        void OnUpdate(object sender, FmdcEventArgs e) { }
         void OnError(object sender, FmdcEventArgs e) { }
         void OnRequestTransfer(object sender, FmdcEventArgs e) { }
         void OnChangeDownloadItem(object sender, FmdcEventArgs e) { }
@@ -725,7 +727,7 @@ namespace FlowLib.Protocols
                     //Util.Compression.ZLib zlib = null;
                     //if (adcget.ZL1)
                     //    zlib = new Fmdc.Util.Compression.ZLib();
-                    while (connectionStatus != TcpConnection.Disconnected && (bytesToSend = GetContent(System.Text.Encoding.UTF8, trans.CurrentSegment.Position, trans.CurrentSegment.Length - -trans.CurrentSegment.Position)) != null)
+                    while (connectionStatus != TcpConnection.Disconnected && (bytesToSend = GetContent(System.Text.Encoding.UTF8, trans.CurrentSegment.Position, trans.CurrentSegment.Length - trans.CurrentSegment.Position)) != null)
                     {
                         if (firstTime)
                         {
@@ -733,7 +735,7 @@ namespace FlowLib.Protocols
                             adcsend.Type = adcget.Type;
                             adcsend.Content = adcget.Content;
                             adcsend.Start = adcget.Start;
-                            adcsend.Length = trans.Content.Size;
+                            adcsend.Length = trans.CurrentSegment.Length;
                             adcsend.ZL1 = adcget.ZL1;
                             trans.Send(adcsend);
 
@@ -807,20 +809,6 @@ namespace FlowLib.Protocols
                 if (!e.Handled)
                     trans.Disconnect();
             }
-        }
-
-        protected byte[] GetContent(System.Text.Encoding encoding, long start, long length)
-        {
-            Share share = trans.Share;
-            Containers.ContentInfo info = trans.Content;
-            if (share != null && share.ContainsContent(ref info))
-            {
-                trans.Content = info;
-                if (length == -1 && start == 0)
-                    length = trans.Content.Size;
-                return share.GetContent(trans.Content, start, length);
-            }
-            return null;
         }
 
         public void ActOnOutMessage(FmdcEventArgs e)

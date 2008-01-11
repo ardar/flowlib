@@ -99,5 +99,6 @@ namespace FlowLib.Enums
         INACTIVITY = 1,
         NO_FREE_SLOTS = 2,
         FILE_NOT_AVAILABLE = 4,
+        USERID_MISMATCH = 8
     }
 }
