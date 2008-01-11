@@ -36,7 +36,7 @@ namespace FlowLib.Protocols
             {
                 trans.Content = info;
                 if (length == -1 && start == 0)
-                    trans.CurrentSegment.Length = trans.Content.Size;
+                    trans.CurrentSegment.Length = length = trans.Content.Size;
                 return share.GetContent(trans.Content, start, length);
             }
             return null;

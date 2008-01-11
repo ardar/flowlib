@@ -500,7 +500,7 @@ namespace FlowLib.Protocols
                 }
                 if (version > 1.0)
                 {
-                    hub.Send(new STA(hub, ctm.Id, "141", "Protocol is not supported. I only support ADC 1.0", "TO" + ctm.Token + " PR" + ctm.Protocol));
+                    hub.Send(new STA(hub, ctm.Id, hub.Me.ID, "241", "Protocol is not supported. I only support ADC 1.0", "TO" + ctm.Token + " PR" + ctm.Protocol));
                     return;
                 }
 
@@ -537,14 +537,15 @@ namespace FlowLib.Protocols
                                 version = double.Parse(rcm.Protocol.Substring(4).Replace(".", ","));
                             }
                             catch { }
-                            if (version <= 1.0)
+                            //if (version <= 1.0)
+                            if (version == 1.0)
                             {
-                                hub.Send(new CTM(hub, rcm.Id, rcm.IDTwo, hub.Share.Port, rcm.Token));
-                                //hub.Send(new CTM(hub, rcm.Id, rcm.IDTwo, rcm.Protocol, hub.Share.Port, rcm.Token));
+                                //hub.Send(new CTM(hub, rcm.Id, rcm.IDTwo, hub.Share.Port, rcm.Token));
+                                hub.Send(new CTM(hub, rcm.Id, rcm.IDTwo, rcm.Protocol, hub.Share.Port, rcm.Token));
                             }
                             else
                             {
-                                hub.Send(new STA(hub, rcm.Id, "141", "Protocol is not supported. I only support ADC 1.0", "TO" + rcm.Token + " PR" + rcm.Protocol));
+                                hub.Send(new STA(hub, rcm.Id, hub.Me.ID, "241", "Protocol is not supported. I only support ADC 1.0", "TO" + rcm.Token + " PR" + rcm.Protocol));
                                 return;
                             }
                         }
@@ -570,12 +571,10 @@ namespace FlowLib.Protocols
 
                 if (get.Identifier != null)
                 {
-
-
+                    trans.Content = new ContentInfo();
                     switch (get.ContentType)
                     {
                         case "file":        // Requesting file
-                            trans.Content = new ContentInfo();
                             // This is because we have support for old DC++ client and mods like (DCDM who has ASCII encoding)
                             if (get.Identifier.Equals("files.xml.bz2"))
                             {
@@ -592,9 +591,55 @@ namespace FlowLib.Protocols
                             }
                             break;
                         case "list":        // TODO : We dont care about what subdirectoy user whats list for
-                            trans.Content = new ContentInfo(ContentInfo.FILELIST, Utils.FileLists.BaseFilelist.XML);
+                            trans.Content.Set(ContentInfo.FILELIST, Utils.FileLists.BaseFilelist.XML);
                             trans.Content.Set(ContentInfo.VIRTUAL, System.Text.Encoding.UTF8.WebName + "files.xml");
                             break;
+                        case "tthl":
+                            // TTH/DQSGG2MYKKLXX4N2P7TBPKSC5HVBO3ISYZPLMWA
+                            if (get.Identifier.StartsWith("TTH/"))
+                            {
+                                trans.Content.Set(ContentInfo.TTH, get.Identifier.Substring(4));
+
+                                ContentInfo tmp = trans.Content;
+                                if (con.Share != null && con.Share.ContainsContent(ref tmp) && tmp.ContainsKey(ContentInfo.STORAGEPATH))
+                                {
+                                    try
+                                    {
+                                        FlowLib.Utils.Hash.TthThreaded t = new FlowLib.Utils.Hash.TthThreaded(tmp.Get(ContentInfo.STORAGEPATH));
+                                        byte[][][] tree = null;
+                                        // TODO : what are the possible TTH Tree values? 
+                                        if ((tree = t.GetTTH_Tree()) != null && tree.Length > 0)
+                                        {
+                                            System.IO.MemoryStream ms = new System.IO.MemoryStream();
+                                            for (int i = 0; i < tree[0].Length; i++)
+                                            {
+                                                ms.Write(tree[0][i], 0, tree[0][i].Length);
+                                            }
+                                            // Update current segment
+                                            trans.CurrentSegment = new SegmentInfo(-1, 0, ms.Length);
+
+                                            con.Send(new SND(trans, get.ContentType, get.Identifier, new SegmentInfo(-1, get.SegmentInfo.Start, trans.CurrentSegment.Length)));
+                                            // Send content to user
+                                            byte[] bytes = ms.ToArray();
+                                            con.Send(new BinaryMessage(con, bytes, bytes.Length));
+                                            //System.Console.WriteLine("TTH Leaves:" + FlowLib.Utils.Convert.Base32.Encode(bytes));
+                                            firstTime = true;
+                                        }
+                                    }
+                                    catch (System.Exception e) { }
+                                }
+                            }
+                            if (!firstTime)
+                            {
+                                // We should not get here if file is in share.
+                                con.Send(new STA(con, "251", "File not available", null));
+                                con.Disconnect();
+                            }
+                            return;
+                        default:            // We are not supporting type. Disconnect
+                            con.Send(new STA(con, "251", "Type now known:" + get.ContentType, null));
+                            con.Disconnect();
+                            return;
                     }
                     trans.CurrentSegment = get.SegmentInfo;
                     byte[] bytesToSend = null;
@@ -630,13 +675,10 @@ namespace FlowLib.Protocols
                     }
                     catch (System.Exception e) { System.Console.WriteLine("ERROR:" + e); }
                 }
-
+                trans.Content = null;
                 if (firstTime)
                 {
                     // We should not get here if file is in share.
-                    // TODO : Return error message
-
-                    //trans.Send(new Error("File Not Available", trans));
                     con.Send(new STA(con, "251", "File not available", null));
                     con.Disconnect();
                 }
