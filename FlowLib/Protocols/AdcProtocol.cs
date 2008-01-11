@@ -216,6 +216,15 @@ namespace FlowLib.Protocols
                 recieved = string.Empty;
             }
             int pos;
+
+            // If wrong Protocol type has been set. change it to Nmdc
+            if (hub != null && hub.RegMode == -1 && raw.Length > 5 && raw.StartsWith("$"))
+            {   // Setting hubtype to NMDC
+                hub.Protocol = new HubNmdcProtocol(hub);
+                hub.HubSetting.Protocol = hub.Protocol.Name;
+                hub.Reconnect();
+            }
+
             // Loop through Commands.
             while ((pos = raw.IndexOf(Seperator)) > 0)
             {
@@ -227,13 +236,6 @@ namespace FlowLib.Protocols
                 MessageReceived(con, e);
                 if (!e.Handled)
                     ActOnInMessage(msg);
-            }
-            // If wrong Protocol type has been set. change it to Nmdc
-            if (hub != null && hub.RegMode == -1 && raw.Length > 5 && raw.StartsWith("$"))
-            {   // Setting hubtype to NMDC
-                hub.Protocol = new HubNmdcProtocol(hub);
-                hub.HubSetting.Protocol = hub.Protocol.Name;
-                hub.Reconnect();
             }
             // If Something is still left. Save it to buffer for later use.
             if (raw.Length > 0)
