@@ -97,9 +97,10 @@ namespace FlowLib.Connections
             get { return protocol; }
             set
             {
+                IProtocol tmp = protocol;
                 protocol = value;
                 // Trigger Protocol Changed Event.
-                ProtocolChange(this, new FmdcEventArgs(0, protocol));
+                ProtocolChange(this, new FmdcEventArgs(0, tmp));
             }
         }
         /// <summary>
