@@ -429,7 +429,9 @@ namespace FlowLib.Protocols
                     Update(hub, new FmdcEventArgs(Actions.UserOnline, myinfo.UserInfo));
                 else
                 {
+                    bool op = usr.IsOperator;
                     usr.UserInfo = myinfo.UserInfo;
+                    usr.UserInfo.IsOperator = op;
                     Update(hub, new FmdcEventArgs(Actions.UserInfoChange, usr.UserInfo));
                 }
                 if (hub.RegMode < 0 && message.From == hub.Me.ID)
