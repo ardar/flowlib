@@ -158,7 +158,7 @@ namespace FlowLib.Protocols
                     h = new HubStatus(HubStatus.Codes.Connecting);
                     break;
             }
-            Update(trans, new FmdcEventArgs(Actions.StatusChange, h));
+            Update(con, new FmdcEventArgs(Actions.StatusChange, h));
         }
         #region Functions
         #region Convert
@@ -293,9 +293,9 @@ namespace FlowLib.Protocols
                     con.Send(new INF(con, hub.Me));
                     Info = inf.UserInfo;
                     if (hub != null && Info.Description == null)
-                        Update(trans, new FmdcEventArgs(Actions.Name, new Containers.HubName(Info.DisplayName)));
+                        Update(con, new FmdcEventArgs(Actions.Name, new Containers.HubName(Info.DisplayName)));
                     else if (hub != null)
-                        Update(trans, new FmdcEventArgs(Actions.Name, new Containers.HubName(Info.DisplayName, Info.Description)));
+                        Update(con, new FmdcEventArgs(Actions.Name, new Containers.HubName(Info.DisplayName, Info.Description)));
                 }
                 else if (trans != null && inf.Type.Equals("C"))
                 {
@@ -348,14 +348,14 @@ namespace FlowLib.Protocols
                 {
                     User usr = null;
                     if ((usr = hub.GetUserById(inf.Id)) == null)
-                        Update(trans, new FmdcEventArgs(Actions.UserOnline, inf.UserInfo));
+                        Update(con, new FmdcEventArgs(Actions.UserOnline, inf.UserInfo));
                     else
                     {
                         usr.UserInfo = inf.UserInfo;
-                        Update(trans, new FmdcEventArgs(Actions.UserInfoChange, usr.UserInfo));
+                        Update(con, new FmdcEventArgs(Actions.UserInfoChange, usr.UserInfo));
                     }
                     if (hub.RegMode < 0 && hub.Me.ID == inf.Id)
-                        Update(trans, new FmdcEventArgs(Actions.RegMode, 0));
+                        Update(con, new FmdcEventArgs(Actions.RegMode, 0));
                 }
             }
             #endregion
@@ -366,12 +366,12 @@ namespace FlowLib.Protocols
                 if (msg.To == null)
                 {
                     MainMessage main = new MainMessage(msg.From, msg.Content);
-                    Update(trans, new FmdcEventArgs(Actions.MainMessage, main));
+                    Update(con, new FmdcEventArgs(Actions.MainMessage, main));
                 }
                 else
                 {
                     PrivateMessage pm = new PrivateMessage(msg.To, msg.From, msg.Content, msg.PmGroup);
-                    Update(trans, new FmdcEventArgs(Actions.PrivateMessage, pm));
+                    Update(con, new FmdcEventArgs(Actions.PrivateMessage, pm));
                 }
             }
             #endregion
@@ -389,7 +389,7 @@ namespace FlowLib.Protocols
                 if (hub != null)
                 {
                     MainMessage main = new MainMessage(info.ID, sta.Content);
-                    Update(trans, new FmdcEventArgs(Actions.MainMessage, main));
+                    Update(con, new FmdcEventArgs(Actions.MainMessage, main));
                 }
             }
             #endregion
@@ -400,11 +400,11 @@ namespace FlowLib.Protocols
                 this.gpaString = gpa.RandomData;
                 if (trans != null)
                 {
-                    Update(trans, new FmdcEventArgs(Actions.Password, null));
+                    Update(con, new FmdcEventArgs(Actions.Password, null));
                 }
                 if (hub != null && hub.HubSetting.Password.Length == 0)
                 {
-                    Update(hub, new FmdcEventArgs(Actions.Password, null));
+                    Update(con, new FmdcEventArgs(Actions.Password, null));
                 }
                 else
                     hub.Send(new PAS(hub, gpa.RandomData, hub.HubSetting.Password));
@@ -417,14 +417,14 @@ namespace FlowLib.Protocols
                 User usr = null;
                 if ((usr = hub.GetUserById(qui.Id)) != null)
                 {
-                    Update(trans, new FmdcEventArgs(Actions.UserOffline, usr.UserInfo));
+                    Update(con, new FmdcEventArgs(Actions.UserOffline, usr.UserInfo));
                     if (usr.ID == hub.Me.ID)
                     {
                         // TODO : Banning and redirect handling
                         hub.Disconnect();
                         // Redirect
                         if (!string.IsNullOrEmpty(qui.Address))
-                            Update(trans, new FmdcEventArgs(Actions.Redirect, new RedirectInfo(qui.Address, qui.Message, qui.DisconnectedBy)));
+                            Update(con, new FmdcEventArgs(Actions.Redirect, new RedirectInfo(qui.Address, qui.Message, qui.DisconnectedBy)));
                         // Banned
                         else
                         {
@@ -433,7 +433,7 @@ namespace FlowLib.Protocols
                                 hub.KeepAliveInterval = 0;
                             else
                                 hub.KeepAliveInterval = qui.Time;
-                            Update(trans, new FmdcEventArgs(Actions.Banned, new BannedInfo(qui.Time, qui.Message, qui.DisconnectedBy)));
+                            Update(con, new FmdcEventArgs(Actions.Banned, new BannedInfo(qui.Time, qui.Message, qui.DisconnectedBy)));
                         }
                     }
                 }
@@ -461,7 +461,7 @@ namespace FlowLib.Protocols
                 RES res = (RES)message;
                 SearchResultInfo srinfo = new SearchResultInfo(res.Info, res.Id);
                 if (hub != null)
-                    Update(trans, new FmdcEventArgs(Actions.SearchResult, srinfo));
+                    Update(con, new FmdcEventArgs(Actions.SearchResult, srinfo));
             }
             #endregion
             #region SCH
@@ -513,8 +513,8 @@ namespace FlowLib.Protocols
                     // We are doing this because we want to filter out PID and so on.
                     trans.Me = me.UserInfo;
                     trans.Protocol = new AdcProtocol(trans);
-                    Update(trans, new FmdcEventArgs(Actions.TransferRequest, new TransferRequest(ctm.Token, hub, usr.UserInfo,false)));
-                    Update(trans, new FmdcEventArgs(Actions.TransferStarted, trans));
+                    Update(con, new FmdcEventArgs(Actions.TransferRequest, new TransferRequest(ctm.Token, hub, usr.UserInfo,false)));
+                    Update(con, new FmdcEventArgs(Actions.TransferStarted, trans));
                 }
             }
             #endregion
@@ -527,7 +527,7 @@ namespace FlowLib.Protocols
                     User usr = null;
                     if ((usr = hub.GetUserById(rcm.Id)) != null)
                     {
-                        Update(trans, new FmdcEventArgs(Actions.TransferRequest, new TransferRequest(rcm.Token, hub, usr.UserInfo,false)));
+                        Update(con, new FmdcEventArgs(Actions.TransferRequest, new TransferRequest(rcm.Token, hub, usr.UserInfo,false)));
                         // Do we support same protocol?
                         double version = 0.0;
                         if (rcm.Protocol != null && rcm.Protocol.StartsWith("ADC/"))
@@ -837,7 +837,7 @@ namespace FlowLib.Protocols
                         case ConnectionTypes.Direct:
                         case ConnectionTypes.UPnP:
                         case ConnectionTypes.Forward:
-                            Update(trans, new FmdcEventArgs(Actions.TransferRequest, new TransferRequest(usr.ID, hub, usr.UserInfo)));
+                            Update(con, new FmdcEventArgs(Actions.TransferRequest, new TransferRequest(usr.ID, hub, usr.UserInfo)));
                             hub.Send(new CTM(hub, usr.ID, hub.Me.ID, hub.Share.Port, usr.ID));
                             break;
                         case ConnectionTypes.Passive:
