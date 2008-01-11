@@ -123,6 +123,12 @@ namespace FlowLib.Containers
         protected const int IndexShareBegin = 2;
         protected const int IndexShareCount = 3;
         protected const int IndexLastModifiedTimeStamp = 4;
+        protected const int IndexPort = 5;
+        protected const int IndexHashAllowDuplicate = 6;
+        protected const int IndexHashAutoSaveCount = 7;
+        protected const int IndexHashThreadCount = 8;
+        protected const int IndexHashThreadPriority = 9;
+        protected const int IndexHashThreadSleep = 10;
 
         protected int hashDelay = 0;
         protected System.Threading.ThreadPriority hashPriority = ThreadPriority.Lowest;
@@ -136,8 +142,7 @@ namespace FlowLib.Containers
         protected long lastModifiedTimeStamp = -1;
 
         // Values only stored in memory.
-        // TODO : Change static Port number to one in settings. (Should not be set here)
-        protected int port = 6001;
+        protected int port = -1;
         protected string name = string.Empty;
         protected bool isHashing = false;
         protected bool cancelHashing = false;
@@ -852,9 +857,28 @@ namespace FlowLib.Containers
             directory = dir;
             SettingsGroup setting = new SettingsGroup();
             SettingsGroup.Load(directory + "Share" + name + ".xml", out setting, "Share");
+            int tmp = -1;
+            #region Update Settings
+            tmp = setting.GetInt(IndexLastModifiedTimeStamp);
+            if (tmp != -1)
+                lastModifiedTimeStamp =tmp;
+            HashAllowDuplicate = setting.GetBool(IndexHashAllowDuplicate);
+            tmp = setting.GetInt(IndexHashAutoSaveCount);
+            if (tmp != -1)
+                HashAutoSaveCount = tmp;
+            tmp = setting.GetInt(IndexHashThreadCount);
+            if (tmp != -1)
+                HashThreadCount = tmp;
+            tmp = setting.GetInt(IndexHashThreadPriority);
+            if (tmp != -1)
+                HashThreadPriority = (System.Threading.ThreadPriority)tmp;
+            tmp = setting.GetInt(IndexHashThreadSleep);
+            if (tmp != -1)
+                HashThreadSleep = tmp;
+            #endregion
             #region Update Virtual Dirs
             // Update where Virtual dir list begins.
-            int tmp = setting.GetInt(IndexVirtualDirBegin);
+            tmp = setting.GetInt(IndexVirtualDirBegin);
             if (tmp != -1)
                 virtualDirBegin = tmp;
             // Update virtual dir count.
@@ -973,6 +997,15 @@ namespace FlowLib.Containers
             setting.Add(IndexVirtualDirCount, new SettingItem(virtualDirs.Count, -1));
             setting.Add(IndexShareBegin, new SettingItem(shareBegin, -1));
             setting.Add(IndexShareCount, new SettingItem(share.Count, -1));
+            setting.Add(IndexLastModifiedTimeStamp, new SettingItem(LastModified, -1));
+            setting.Add(IndexHashAllowDuplicate, new SettingItem(HashAllowDuplicate, false));
+            setting.Add(IndexHashAutoSaveCount, new SettingItem(HashAutoSaveCount, 10));
+            setting.Add(IndexHashThreadCount, new SettingItem(HashThreadCount, 4));
+            setting.Add(IndexHashThreadPriority, new SettingItem((int)HashThreadPriority, (int)System.Threading.ThreadPriority.Lowest));
+            setting.Add(IndexHashThreadSleep, new SettingItem(HashThreadSleep, 0));
+            setting.Add(IndexPort, new SettingItem(Port, -1));
+
+
             // Stores Virtual dirs
             int tmpVirtualDirBegin = virtualDirBegin;
             foreach (KeyValuePair<string, VirtualDir> item in virtualDirs)
