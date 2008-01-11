@@ -85,7 +85,7 @@ namespace FlowLib.Protocols.Adc
             if (raw == null)
                 return;
 
-            bool hasId = true;
+            bool hasId = false;
             bool hasId2 = false;
             param = new System.Collections.Generic.List<string>(raw.Split(' '));
             if (param.Count >= 1 && param[0].Length == 4)
@@ -96,18 +96,16 @@ namespace FlowLib.Protocols.Adc
                     case "B":       // Broadcast Message
                         hasId = true;
                         break;
-                    case "C":       // Client Message
+                    case "U":       // UDP Message
                         hasId = true;
-                        break;
-                    case "I":
-                        hasId = false;
                         break;
                     case "D":       // Direct message
                         hasId = true;
                         hasId2 = true;
                         break;
-                    case "U":       // UDP Message
-                        hasId = true;
+                    case "C":       // Client Message
+                        break;
+                    case "I":
                         break;
                 }
 

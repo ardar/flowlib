@@ -36,12 +36,18 @@ namespace FlowLib.Protocols
     /// </summary>
     public class HubNmdcProtocol : IProtocolHub
     {
+        #region Events
+        /// <summary>
+        /// Events have happen in this hub and we want to tell others.
+        /// Mainmessages, private messages and more.
+        /// </summary>
+        public event FmdcEventHandler Update;
+        public event FmdcEventHandler MessageReceived;
+        public event FmdcEventHandler MessageToSend;
+        #endregion
         #region Variables
         protected Hub hub = null;
         protected string recieved = "";
-
-        public event FmdcEventHandler MessageReceived;
-        public event FmdcEventHandler MessageToSend;
         #endregion
         #region Properties
         public string Name
@@ -71,8 +77,31 @@ namespace FlowLib.Protocols
         public HubNmdcProtocol(Hub hub)
         {
             this.hub = hub;
+            hub.ConnectionStatusChange += new FmdcEventHandler(hub_ConnectionStatusChange);
             MessageReceived = new FmdcEventHandler(OnMessageReceived);
             MessageToSend = new FmdcEventHandler(OnMessageToSend);
+        }
+
+        void hub_ConnectionStatusChange(object sender, FmdcEventArgs e)
+        {
+            HubStatus h;
+            switch (e.Action)
+            {
+                case TcpConnection.Disconnected:
+                    if (e.Data is System.Exception)
+                        h = new HubStatus(HubStatus.Codes.Disconnected, (System.Exception)e.Data);
+                    else
+                        h = new HubStatus(HubStatus.Codes.Disconnected);
+                    break;
+                case TcpConnection.Connected:
+                    h = new HubStatus(HubStatus.Codes.Connected);
+                    break;
+                case TcpConnection.Connecting:
+                default:
+                    h = new HubStatus(HubStatus.Codes.Connecting);
+                    break;
+            }
+            Update(this, new FmdcEventArgs(Actions.StatusChange, h));
         }
         #endregion
 
@@ -111,7 +140,7 @@ namespace FlowLib.Protocols
             // If wrong Protocol type has been set. change it to ADC
             if (hub.RegMode == -1 && raw.StartsWith("ISUP")) 
             {   // Setting hubtype to ADC
-                hub.Protocol = new HubAdcProtocol(hub);
+                hub.Protocol = new AdcProtocol(hub);
                 hub.HubSetting.Protocol = hub.Protocol.Name;
                 hub.Reconnect();
             }
@@ -207,19 +236,19 @@ namespace FlowLib.Protocols
             {
                 MainChat main = (MainChat)message;
                 MainMessage msg = new MainMessage(main.From, main.Content);
-                hub.FireUpdate(Actions.MainMessage, msg);
+                Update(this, new FmdcEventArgs(Actions.MainMessage, msg));
             }
             else if (message is To)
             {
                 To to = (To)message;
                 PrivateMessage pm = new PrivateMessage(to.To, to.From, to.Content);
-                hub.FireUpdate(Actions.PrivateMessage, pm);
+                Update(this, new FmdcEventArgs(Actions.PrivateMessage, pm));
             }
             else if (message is SR)
             {
                 SR searchResult = (SR)message;
                 SearchResultInfo srinfo = new SearchResultInfo(searchResult.Info, searchResult.From);
-                hub.FireUpdate(Actions.SearchResult, srinfo);
+                Update(this, new FmdcEventArgs(Actions.SearchResult, srinfo));
             }
             else if (message is Search)
             {
@@ -342,7 +371,7 @@ namespace FlowLib.Protocols
                     name = new Containers.HubName(hubname.Name, hubname.Topic);
                 else
                     name = new Containers.HubName(hubname.Content);
-                hub.FireUpdate(Actions.Name, name);
+                Update(this, new FmdcEventArgs(Actions.Name, name));
             }
             else if (message is NickList)
             {
@@ -352,7 +381,7 @@ namespace FlowLib.Protocols
                     UserInfo userInfo = new UserInfo();
                     userInfo.DisplayName = userid;
                     if (hub.GetUserById(userid) == null)
-                        hub.FireUpdate(Actions.UserOnline, userInfo);
+                        Update(this, new FmdcEventArgs(Actions.UserOnline, userInfo));
                 }
             }
             else if (message is OpList)
@@ -365,11 +394,11 @@ namespace FlowLib.Protocols
                     userInfo.IsOperator = true;
                     User usr = null;
                     if ((usr = hub.GetUserById(userid)) == null)
-                        hub.FireUpdate(Actions.UserOnline, userInfo);
+                        Update(this, new FmdcEventArgs(Actions.UserOnline, userInfo));
                     else
                     {
                         usr.UserInfo = userInfo;
-                        hub.FireUpdate(Actions.UserInfoChange, usr.UserInfo);
+                        Update(this, new FmdcEventArgs(Actions.UserInfoChange, usr.UserInfo));
                     }
                 }
             }
@@ -378,17 +407,17 @@ namespace FlowLib.Protocols
                 Quit quit = (Quit)message;
                 User usr = null;
                 if ((usr = hub.GetUserById(quit.From)) != null)
-                    hub.FireUpdate(Actions.UserOffline, usr.UserInfo);
+                    Update(this, new FmdcEventArgs(Actions.UserOffline, usr.UserInfo));
             }
             else if (message is LogedIn)
                 hub.RegMode = 2;
             else if (message is ValidateDenide)
-                hub.FireUpdate(Actions.StatusChange, new HubStatus(HubStatus.Codes.Disconnected));
+                Update(this, new FmdcEventArgs(Actions.StatusChange, new HubStatus(HubStatus.Codes.Disconnected)));
             else if (message is GetPass)
             {
                 hub.RegMode = 1;
                 if (hub.HubSetting.Password.Length == 0)
-                    hub.FireUpdate(Actions.Password, message);
+                    Update(this, new FmdcEventArgs(Actions.Password, null));
                 else
                     hub.Send(new MyPass(hub));
             }
@@ -397,14 +426,14 @@ namespace FlowLib.Protocols
                 MyINFO myinfo = (MyINFO)message;
                 User usr = null;
                 if ((usr = hub.GetUserById(message.From)) == null)
-                    hub.FireUpdate(Actions.UserOnline, myinfo.UserInfo);
+                    Update(this, new FmdcEventArgs(Actions.UserOnline, myinfo.UserInfo));
                 else
                 {
                     usr.UserInfo = myinfo.UserInfo;
-                    hub.FireUpdate(Actions.UserInfoChange, usr.UserInfo);
+                    Update(this, new FmdcEventArgs(Actions.UserInfoChange, usr.UserInfo));
                 }
                 if (hub.RegMode < 0 && message.From == hub.Me.ID)
-                    hub.FireUpdate(Actions.RegMode, 0);
+                    Update(this, new FmdcEventArgs(Actions.RegMode, 0));
             }
             else if (message is Hello)
             {
@@ -424,7 +453,7 @@ namespace FlowLib.Protocols
                 trans.Me = hub.Me;
                 // Protocol has to be set last.
                 trans.Protocol = new TransferNmdcProtocol(trans);
-                hub.FireUpdate(Actions.TransferStarted, trans);
+                Update(this, new FmdcEventArgs(Actions.TransferStarted, trans));
             }
             else if (message is RevConnectToMe)
             {
@@ -447,7 +476,7 @@ namespace FlowLib.Protocols
                 {
                     if (usr != null)
                     {
-                        hub.FireUpdate(Actions.TransferRequest, new TransferRequest(usr.ID, hub, usr.UserInfo));
+                        Update(this, new FmdcEventArgs(Actions.TransferRequest, new TransferRequest(usr.ID, hub, usr.UserInfo)));
                         hub.Send(new ConnectToMe(usr.ID, hub.Share.Port, hub));
                     }
                 }
@@ -456,7 +485,7 @@ namespace FlowLib.Protocols
             {
                 ForceMove forceMove = (ForceMove)message;
                 hub.Disconnect();
-                hub.FireUpdate(Actions.Redirect, new RedirectInfo(forceMove.Address));
+                Update(this, new FmdcEventArgs(Actions.Redirect, new RedirectInfo(forceMove.Address)));
             }
         }
 
@@ -474,7 +503,7 @@ namespace FlowLib.Protocols
             }
             else if (e.Action.Equals(Actions.Password))
             {
-                hub.Send(new MyPass(hub, hub.HubSetting.Password));
+                hub.Send(new MyPass(hub, e.Data.ToString()));
             }
             else if (e.Action.Equals(Actions.Search))
             {
@@ -490,7 +519,7 @@ namespace FlowLib.Protocols
                     case ConnectionTypes.Direct:
                     case ConnectionTypes.UPnP:
                     case ConnectionTypes.Forward:
-                        hub.FireUpdate(Actions.TransferRequest, new TransferRequest(usr.ID, hub, usr.UserInfo));
+                        Update(this, new FmdcEventArgs(Actions.TransferRequest, new TransferRequest(usr.ID, hub, usr.UserInfo)));
                         hub.Send(new ConnectToMe(usr.ID, hub.Share.Port, hub));
                         break;
                     case ConnectionTypes.Passive:

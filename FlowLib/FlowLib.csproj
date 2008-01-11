@@ -104,11 +104,10 @@
     <Compile Include="Protocols\AdcProtocol.cs" />
     <Compile Include="Protocols\Adc\adcbasemessage.cs" />
     <Compile Include="Protocols\Adc\adcmessages.cs" />
-    <Compile Include="Protocols\hubadcprotocol.cs" />
+    <Compile Include="Protocols\BaseProtocol.cs" />
     <Compile Include="Protocols\hubnmdcprotocol.cs" />
     <Compile Include="Protocols\Nmdc\hubnmdcmessages.cs" />
     <Compile Include="Protocols\Nmdc\transfernmdcmessages.cs" />
-    <Compile Include="Protocols\transferadcprotocol.cs" />
     <Compile Include="Protocols\transfernmdcprotocol.cs" />
     <Compile Include="Protocols\UdpNmdcProtocol.cs" />
     <Compile Include="Utils\Compression\Bz2.cs" />

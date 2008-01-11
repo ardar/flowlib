@@ -29,6 +29,12 @@ namespace FlowLib.Containers
         UserInfo user = null;
         Hub hub = null;
         string key = null;
+        int meDownload = -1;      // Not set (We dont know who is going to download)
+
+        public bool Download
+        {
+            get { return (meDownload != 0); }
+        }
 
         public string Key
         {
@@ -62,6 +68,28 @@ namespace FlowLib.Containers
             }
         }
 
+        /// <summary>
+        /// Creates a Transfer request
+        /// </summary>
+        /// <param name="pKey">Unique key that identifies this request</param>
+        /// <param name="pHub">Hub where request came from</param>
+        /// <param name="pUser">User that transfer request is for</param>
+        /// <param name="download">telling if we know that _we_ will download</param>
+        public TransferRequest(string pKey, Hub pHub, UserInfo pUser, bool download)
+            : this(pKey, pHub, pUser)
+        {
+            if (download)
+                meDownload = 1;
+            else
+                meDownload = 0;
+        }
+
+        /// <summary>
+        /// Creates a Transfer request
+        /// </summary>
+        /// <param name="pKey">Unique key that identifies this request</param>
+        /// <param name="pHub">Hub where request came from</param>
+        /// <param name="pUser">User that transfer request is for</param>
         public TransferRequest(string pKey, Hub pHub, UserInfo pUser)
         {
             key = pKey;
