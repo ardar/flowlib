@@ -221,9 +221,8 @@ namespace FlowLib.Connections
 
         void Hub_ProtocolChange(object sender, FmdcEventArgs e)
         {
-            IProtocol prot = e.Data as IProtocol;
-            if (prot != null)
-                prot.Update +=new FmdcEventHandler(OnProtocolUpdate);
+            if (Protocol != null)
+                this.Protocol.Update += new FmdcEventHandler(OnProtocolUpdate);
         }
 
         /// <summary>
