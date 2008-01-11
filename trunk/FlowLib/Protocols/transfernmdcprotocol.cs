@@ -719,10 +719,10 @@ namespace FlowLib.Protocols
                         }
                         break;
                 }
+                trans.CurrentSegment = new SegmentInfo(-1, adcget.Start, adcget.Length);
+                bool firstTime = true;
                 try
                 {
-                    trans.CurrentSegment = new SegmentInfo(-1, adcget.Start, adcget.Length);
-                    bool firstTime = true;
                     // TODO : ZLib compression here doesnt work as we want. It takes much memory and much cpu
                     //Util.Compression.ZLib zlib = null;
                     //if (adcget.ZL1)
@@ -757,14 +757,15 @@ namespace FlowLib.Protocols
                     // If we compressing data with zlib. We need to send ending bytes too.
                     //if (zlib != null && connectionStatus != Connection.Disconnected)
                     //    trans.Send(new ConMessage(trans, zlib.close()));
-                    if (firstTime)
-                    {
-                        // We should not get here if file is in share.
-                        trans.Send(new Error("File Not Available", trans));
-                        trans.Disconnect();
-                    }
                 }
                 catch (System.Exception e) { System.Console.WriteLine("ERROR:" + e); }
+                trans.Content = null;
+                if (firstTime)
+                {
+                    // We should not get here if file is in share.
+                    trans.Send(new Error("File Not Available", trans));
+                    trans.Disconnect();
+                }
             }
             else if (message is MaxedOut)
             {

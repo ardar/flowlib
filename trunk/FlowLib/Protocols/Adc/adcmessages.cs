@@ -1051,9 +1051,9 @@ namespace FlowLib.Protocols.Adc
         }
 
         public STA(IConnection con, string code, string description, string param)
-            : this(con, null, code, description, param) { }
+            : this(con, null, null, code, description, param) { }
 
-        public STA(IConnection con, string userId, string code, string description, string param)
+        public STA(IConnection con, string userId, string meId, string code, string description, string param)
             : base(con, null)
         {
             if (param != null)
@@ -1061,7 +1061,7 @@ namespace FlowLib.Protocols.Adc
             else
                 param = string.Empty;
             if (!string.IsNullOrEmpty(userId))
-                Raw = string.Format("DSTA {0} {1} DE{2}{3}\n", userId, code, AdcProtocol.ConvertOutgoing(description), param);
+                Raw = string.Format("DSTA {0} {1} {2} DE{3}{4}\n", userId, meId, code, AdcProtocol.ConvertOutgoing(description), param);
             else
                 Raw = string.Format("CSTA {0} DE{1}{2}\n", code, AdcProtocol.ConvertOutgoing(description), param);
         }
