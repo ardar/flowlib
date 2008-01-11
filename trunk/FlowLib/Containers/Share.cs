@@ -875,6 +875,9 @@ namespace FlowLib.Containers
             tmp = setting.GetInt(IndexHashThreadSleep);
             if (tmp != -1)
                 HashThreadSleep = tmp;
+            tmp = setting.GetInt(IndexPort);
+            if (tmp != -1)
+                Port = tmp;
             #endregion
             #region Update Virtual Dirs
             // Update where Virtual dir list begins.
