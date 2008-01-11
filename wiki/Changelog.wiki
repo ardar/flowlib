@@ -38,7 +38,7 @@
   * ADD		- Adc 1.0 extension BZIP
   * CHANGE	- Update event has been moved from Hub object to IProtocol.
   * ADD		- Share now save/load port and other public properties.
-
+  * CHANGE	- e.Data is now the old protocol(this can be null) on ProtocolChange. This is so you can unlisten on old protocols.
 
 
 
