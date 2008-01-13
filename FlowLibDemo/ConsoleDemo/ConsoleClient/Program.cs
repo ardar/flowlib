@@ -33,10 +33,11 @@ namespace ConsoleDemo.ConsoleClient
 
         static void Main(string[] args)
         {
-            TextField t = new TextField(3, 3, "Address:", 20);
+            TextArea t = new TextArea(3, 3, 21, 20, 80);
             //Label t = new Label(0, 0, "Testar\nPiP");
             t.BgColor = ConsoleColor.DarkMagenta;
             t.Show();
+            t.ReadOnly = false;
             System.Threading.Thread.Sleep(1 * 2000);
             t.Focus();
             Console.Read();

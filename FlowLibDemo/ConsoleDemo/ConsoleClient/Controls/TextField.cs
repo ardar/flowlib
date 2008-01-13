@@ -63,7 +63,7 @@ namespace ConsoleDemo.ConsoleClient.Controls
                     case ConsoleKey.Escape:
                         input = "";
                         Show();
-                        Console.CursorLeft = X;
+                        Console.CursorLeft = X + Text.Length;
                         break;
                     case ConsoleKey.Tab:
                         value = 1;
