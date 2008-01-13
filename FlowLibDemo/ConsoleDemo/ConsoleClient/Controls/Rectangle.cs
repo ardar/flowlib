@@ -20,14 +20,14 @@
  */
 
 using System;
+using ConsoleDemo.ConsoleClient.Controls.Interfaces;
 
 namespace ConsoleDemo.ConsoleClient.Controls
 {
-    public class Rectangle
+    public class Rectangle : Control
     {
         protected int posX, posY;
         protected int width, height;
-        protected bool hidden = true;
         protected ConsoleColor bgcolor = Console.BackgroundColor;
         protected ConsoleColor fgcolor = Console.ForegroundColor;
 
@@ -46,10 +46,6 @@ namespace ConsoleDemo.ConsoleClient.Controls
         public int Height
         {
             get { return height; }
-        }
-        public bool Hidden
-        {
-            get { return hidden; }
         }
         public ConsoleColor FgColor
         {
@@ -74,13 +70,13 @@ namespace ConsoleDemo.ConsoleClient.Controls
             fgcolor = fg;
         }
 
-        public virtual void Show()
+        public override void Show()
         {
             Draw(this.fgcolor, this.bgcolor);
-            hidden = false;
+            base.Show();
         }
 
-        public virtual void Hide()
+        public override void Hide()
         {
             Clear();
         }
@@ -88,7 +84,7 @@ namespace ConsoleDemo.ConsoleClient.Controls
         public virtual void Clear()
         {
             Draw(Console.ForegroundColor, Console.BackgroundColor);
-            hidden = true;
+            base.Show();
         }
 
         protected virtual void Draw(ConsoleColor fgcolor, ConsoleColor bgcolor)
