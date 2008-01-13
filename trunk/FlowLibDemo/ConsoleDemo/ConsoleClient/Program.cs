@@ -28,155 +28,61 @@ namespace ConsoleDemo.ConsoleClient
 {
     class Program : Window
     {
-        Setting setting = new Setting();
         Window activeWindow = null;
         System.Collections.Generic.List<Window> windows = new System.Collections.Generic.List<Window>();
+        bool shouldExit = false;
+
+        Button exit = new Button(0, 0, "Exit");
+        Button settings = new Button(5, 0, "Settings");
+        //Button exit = new Button(14, 0, "Exit");
+
 
 
         static void Main(string[] args)
         {
-            System.Collections.Generic.List<IFocusable> controls = new System.Collections.Generic.List<IFocusable>();
-
-            TextArea t = new TextArea(3, 3, 21, 20, 80);
-            //Label t = new Label(0, 0, "Testar\nPiP");
-            t.BgColor = ConsoleColor.DarkMagenta;
-            t.Show();
-            controls.Add(t);
-
-            Label a = new Label(3, 1, "Scroll List:");
-            a.BgColor = ConsoleColor.DarkBlue;
-            a.FgColor = ConsoleColor.Yellow;
-            a.Show();
-
-            TextField f = new TextField(26, 3, 10);
-            f.BgColor = ConsoleColor.White;
-            f.FgColor = ConsoleColor.DarkGray;
-            f.Show();
-            controls.Add(f);
-
-            TextField g = new TextField(26, 6, "Name:", 10);
-            g.BgColor = ConsoleColor.White;
-            g.FgColor = ConsoleColor.DarkGray;
-            g.Show();
-            controls.Add(g);
-
-            int i = 0;
-            while (controls.Count > 0)
-            {
-                controls[i].Focus();
-                if (controls.Count <= ++i)
-                    i = 0;
-            }
-            //new Program();
+            new Program();
         }
 
         public Program()
         {
-            string command = null;
-            bool shouldExit = false;
-
+            MakeGui();
             activeWindow = this;
             activeWindow.Show();
-
-            ConsoleKeyInfo key;
-            do
-            {
-                key = Console.ReadKey(true);
-
-                switch (key.Key)
-                {
-                    case ConsoleKey.OemMinus:
-                        int cmdStartPos = Console.CursorLeft;
-                        Console.Write(key.KeyChar);
-                        do
-                        {
-                            ConsoleKeyInfo cmdKey = Console.ReadKey(true);
-                            switch (cmdKey.Key)
-                            {
-                                case ConsoleKey.Escape:
-                                    command = null;
-                                    int tmp = Console.CursorLeft;
-                                    Console.CursorLeft = cmdStartPos;
-                                    while (Console.CursorLeft < tmp)
-                                        Console.Write(" ");
-                                    Console.CursorLeft = cmdStartPos;
-                                    break;
-                                default:
-                                    command += cmdKey.KeyChar;
-                                    switch (command.ToLower())
-                                    {
-                                        case "exit":
-                                            command = null;
-                                            shouldExit = true;
-                                            break;
-                                        case "close":
-                                            command = null;
-                                            activeWindow.Hide();
-                                            activeWindow = this;
-                                            activeWindow.Show();
-                                            break;
-                                        default:
-                                            Console.Write(cmdKey.KeyChar);
-                                            int cursorTop = Console.CursorTop;
-                                            int cursorLeft = Console.CursorLeft;
-
-                                            if (activeWindow.Command(cmdKey, command))
-                                            {
-                                                command = null;
-                                            }
-                                            break;
-                                    }
-                                    break;
-                            }
-                        } while (command != null);
-                        break;
-                    default:
-                        activeWindow.Input(key);
-                        break;
-                }
-
-            } while (!shouldExit);
         }
 
-        public override void Show()
+        void MakeGui()
         {
-            Console.CursorLeft = 0;
-            Console.CursorTop = 1;
-            Console.WriteLine("################ WELCOME TO FLOWLIB - CONSOLE EXAMPLE ################");
-            Console.WriteLine(" Below is commands that are available.");
-            Console.WriteLine(" Remember that you can always exit program using -exit.");
-            Console.WriteLine(" -setting        -   Open settings window");
-            Console.WriteLine(" -hub         -   Open hub window");
-            Console.WriteLine(" -exit           -   closes application");
-            Console.WriteLine(" -help           -   Open this window");
-            Console.WriteLine(" esc button      -   clears input window");
-            Console.WriteLine("");
-            Console.WriteLine(" -welcome        -   Open this window");
-            Console.WriteLine(" -help           -   Open this window");
-            Console.WriteLine("################ WELCOME TO FLOWLIB - CONSOLE EXAMPLE ################");
-            base.Show();
+            Rectangle menu = new Rectangle(0, 0, Console.WindowWidth, 1);
+            menu.BgColor = ConsoleColor.DarkBlue;
+            Controls.Add(menu);
+
+            exit.OnSelect += new EventHandler(exit_OnSelect);
+            exit.BgColor = ConsoleColor.Blue;
+            Controls.Add(exit);
+
+            settings.OnSelect += new EventHandler(settings_OnSelect);
+            settings.BgColor = ConsoleColor.Blue;
+            Controls.Add(settings);
         }
 
-        public override bool Command(ConsoleKeyInfo keyInfo, string cmd)
+        void settings_OnSelect(object sender, EventArgs e)
         {
-            switch (cmd)
-            {
-                case "setting":
-                    activeWindow.Hide();
-                    activeWindow = setting;
-                    activeWindow.Show();
-                    return true;
-                case "hub":
-                    activeWindow.Hide();
-                    activeWindow = new Hub();
-                    activeWindow.Show();
-                    return true;
-                default:
-                    //activeWindow.Command(keyInfo, cmd);
-                    break;
-            }
 
-            return false;
         }
+
+        void exit_OnSelect(object sender, EventArgs e)
+        {
+            shouldExit = true;
+            activeWindow.Hide();
+        }
+
+        //public override void Hide()
+        //{
+        //    base.Hide();
+        //    foreach (Control var in Controls)
+        //    {
+        //        var.Hide();
+        //    }
+        //}
     }
 }

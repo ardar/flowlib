@@ -20,14 +20,25 @@
  */
 
 using System;
+using System.Collections.Generic;
+using ConsoleDemo.ConsoleClient.Controls;
+using ConsoleDemo.ConsoleClient.Controls.Interfaces;
 
 namespace ConsoleDemo.ConsoleClient
 {
-    public class Window
+    public class Window : Control
     {
+        protected int controlIndex = 0;
+        protected List<Control> controls = new List<Control>();
+
         protected bool showed = false;
         protected int defaultTop = 0;
         protected int defaultLeft = 0;
+
+        public List<Control> Controls
+        {
+            get { return controls; }
+        }
 
         public bool IsShowing
         {
@@ -46,13 +57,57 @@ namespace ConsoleDemo.ConsoleClient
                         Console.Write(" ");
                     Console.CursorLeft = defaultLeft;
                     break;
+                case ConsoleKey.Tab:
+                    if (controls.Count > 0)
+                    {
+                        int i = 0;
+                        foreach (IFocusable var in controls)
+                        {
+                            if (i >= controlIndex)
+                            {
+                                var.Focus();
+                            }
+                            i++;
+                        }
+                        if (controls.Count == ++controlIndex)
+                            controlIndex = 0;
+                    }
+                    break;
                 default:
                    Console.Write(keyInfo.KeyChar);
                     break;
             }
         }
         public virtual bool Command(ConsoleKeyInfo keyInfo, string cmd) { return false; }
-        public virtual void Show() { showed = true; Console.CursorLeft = defaultLeft; Console.CursorTop = defaultTop; }
-        public virtual void Hide() { showed = false; Console.Clear(); }
+        public override void Show()
+        {
+            base.Show();
+            Console.CursorLeft = defaultLeft;
+            Console.CursorTop = defaultTop;
+            foreach (Control var in Controls)
+            {
+                var.Show();
+            }
+            do
+            {
+                foreach (Control var in Controls)
+                {
+                    if (var is IFocusable && !var.Hidden)
+                    {
+                        ((IFocusable)var).Focus();
+                    }
+                    if (Hidden)
+                        break;
+                }
+            } while (!Hidden);
+        }
+        public override void Hide()
+        {
+            base.Hide();
+            foreach (Control var in Controls)
+            {
+                var.Hide();
+            }
+        }
     }
 }
