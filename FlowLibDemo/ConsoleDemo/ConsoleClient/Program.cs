@@ -21,6 +21,8 @@
 
 using System;
 using ConsoleDemo.ConsoleClient.Controls;
+using ConsoleDemo.ConsoleClient.Controls.Interfaces;
+
 
 namespace ConsoleDemo.ConsoleClient
 {
@@ -29,18 +31,42 @@ namespace ConsoleDemo.ConsoleClient
         Setting setting = new Setting();
         Window activeWindow = null;
         System.Collections.Generic.List<Window> windows = new System.Collections.Generic.List<Window>();
-        
+
 
         static void Main(string[] args)
         {
+            System.Collections.Generic.List<IFocusable> controls = new System.Collections.Generic.List<IFocusable>();
+
             TextArea t = new TextArea(3, 3, 21, 20, 80);
             //Label t = new Label(0, 0, "Testar\nPiP");
             t.BgColor = ConsoleColor.DarkMagenta;
             t.Show();
-            t.ReadOnly = false;
-            System.Threading.Thread.Sleep(1 * 2000);
-            t.Focus();
-            Console.Read();
+            controls.Add(t);
+
+            Label a = new Label(3, 1, "Scroll List:");
+            a.BgColor = ConsoleColor.DarkBlue;
+            a.FgColor = ConsoleColor.Yellow;
+            a.Show();
+
+            TextField f = new TextField(26, 3, 10);
+            f.BgColor = ConsoleColor.White;
+            f.FgColor = ConsoleColor.DarkGray;
+            f.Show();
+            controls.Add(f);
+
+            TextField g = new TextField(26, 6, "Name:", 10);
+            g.BgColor = ConsoleColor.White;
+            g.FgColor = ConsoleColor.DarkGray;
+            g.Show();
+            controls.Add(g);
+
+            int i = 0;
+            while (controls.Count > 0)
+            {
+                controls[i].Focus();
+                if (controls.Count <= ++i)
+                    i = 0;
+            }
             //new Program();
         }
 

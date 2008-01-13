@@ -20,10 +20,11 @@
  */
 
 using System;
+using ConsoleDemo.ConsoleClient.Controls.Interfaces;
 
 namespace ConsoleDemo.ConsoleClient.Controls
 {
-    public class TextField : Label
+    public class TextField : Label, IFocusable
     {
         string input = "";
         int inputMax = 0;
