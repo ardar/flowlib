@@ -28,43 +28,31 @@ namespace ConsoleDemo.ConsoleClient
     public class Setting : Window
     {
         protected string externalIp = "";
-        Label help = null;
 
+        // Controls
+        Button buttonExit = new Button(0, 0, "Exit");
+        Button buttonSetting = new Button(5, 0, "Setting");
 
         public Setting()
         {
-            StringBuilder sb = new StringBuilder();
-            sb.Append("################ HELP ################\n");
-            sb.Append(" -close      -   Closes this window\n");
-            sb.Append("################ HELP ################");
+            Rectangle menu = new Rectangle(0, 0, Console.WindowWidth, 1);
+            menu.BgColor = ConsoleColor.DarkBlue;
+            Controls.Add(menu);
 
-            help = new Label(0, 2, sb.ToString());
-        }
+            buttonExit.OnSelect += new EventHandler(exit_OnSelect);
+            buttonExit.BgColor = ConsoleColor.DarkBlue;
+            Controls.Add(buttonExit);
 
-        public override bool Command(ConsoleKeyInfo keyInfo, string cmd)
-        {
-            switch (cmd)
-            {
-                case "help":
-                    Console.CursorLeft = 0;
-                    Console.CursorTop = 1;
-                    help.Show();
-                    return true;
-                default:
-                    if (!help.Hidden)
-                        help.Clear();
-                    return false;
-            }
+            buttonSetting.BgColor = ConsoleColor.Black;
+            Controls.Add(buttonSetting);
+
 
 
         }
 
-        public override void Show()
+        void exit_OnSelect(object sender, EventArgs e)
         {
-            Console.CursorLeft = 0;
-            Console.CursorTop = 1;
-            Console.WriteLine("################ SETTING ################");
-            base.Show();
+            this.Hide();
         }
     }
 }

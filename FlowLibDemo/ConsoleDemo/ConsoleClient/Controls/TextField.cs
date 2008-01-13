@@ -44,10 +44,23 @@ namespace ConsoleDemo.ConsoleClient.Controls
             inputMax = inputSize;
         }
 
+        public override void Show()
+        {
+            base.Show();
+            Console.CursorLeft = X + Text.Length;
+            Console.Write(input);
+        }
+
         public int Focus()
         {
             ConsoleColor fg = Console.ForegroundColor;
             ConsoleColor bg = Console.BackgroundColor;
+
+            ConsoleColor fgTmp = fgcolor;
+            ConsoleColor bgTmp = bgcolor;
+            fgcolor = bgTmp;
+            bgcolor = fgTmp;
+            Show();
 
             Console.CursorLeft = X + Text.Length;
             Console.CursorTop = Y;
@@ -92,6 +105,9 @@ namespace ConsoleDemo.ConsoleClient.Controls
                         break;
                 }
             } while (value == -1);
+            fgcolor = fgTmp;
+            bgcolor = bgTmp;
+            Show();
             Console.ForegroundColor = fg;
             Console.BackgroundColor = bg;
             return value;

@@ -28,19 +28,14 @@ using FlowLib.Events;
 using FlowLib.Interfaces;
 using FlowLib.Managers;
 using FlowLib.Utils.FileLists;
+using ConsoleDemo.ConsoleClient.Controls;
+
 
 namespace ConsoleDemo.ConsoleClient
 {
     public class Hub : Window, IBaseUpdater
     {
         public event FmdcEventHandler UpdateBase;
-
-        // TITLE
-        int titleL = 21;
-        int titleT = 1;
-        // Status
-        int statusL = 0;
-        int statusT = -1;   // This will place it in bottom
 
         HubSetting setting = new HubSetting();
         System.Timers.Timer updateTimer = new System.Timers.Timer();
@@ -50,15 +45,10 @@ namespace ConsoleDemo.ConsoleClient
         bool updating = false;
         int connectionStatus = -1;
 
-        /// <summary>
-        /// 0 = Main messages
-        /// 1 = Private Messages
-        /// 2 = Passwords
-        /// 3 = Address
-        /// 4 = Port
-        /// </summary>
-        int messageType = -1;
-        string message = "";
+        // Controls
+        TextArea mainchat = new TextArea(0, 2, Console.WindowWidth - 21, Console.WindowHeight - 4);
+        ListBox userlist = new ListBox(Console.WindowWidth - 20, 2, 20, Console.WindowHeight - 4);
+        TextField input = new TextField(0, Console.WindowHeight - 1, Console.WindowWidth);
 
         public Hub()
         {
@@ -69,11 +59,24 @@ namespace ConsoleDemo.ConsoleClient
             setting.DisplayName = "FlowLibConsole";
             setting.Protocol = "Auto";
             setting.Port = -1;
+
+            // Controls
+            mainchat.BgColor = ConsoleColor.Gray;
+            mainchat.FgColor = ConsoleColor.Black;
+            Controls.Add(mainchat);
+
+            userlist.BgColor = ConsoleColor.Gray;
+            userlist.FgColor = ConsoleColor.Blue;
+            Controls.Add(userlist);
+
+            input.BgColor = ConsoleColor.White;
+            input.FgColor = ConsoleColor.Black;
+            Controls.Add(input);
         }
 
         void updateTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            if (base.showed)
+            if (!Hidden)
                 Update();
         }
 
@@ -82,157 +85,95 @@ namespace ConsoleDemo.ConsoleClient
             connectionStatus = e.Action;
         }
 
-        public override void Input(ConsoleKeyInfo keyInfo)
-        {
-            switch (keyInfo.Key)
-            {
-                case ConsoleKey.Enter:
-                    switch (messageType)
-                    {
-                        case 0:
-                        case 1:
-                        case 2:
-                        case 3:
-                            setting.Address = message; break;
-                        case 4:
-                            try{
-                                setting.Port = int.Parse(message);
-                            }catch{}
-                            if (setting.Port > 65535 || setting.Port < 1)
-                                setting.Port = -1;
-                            hub = new FlowLib.Connections.Hub(setting, this);
-                            hub.ConnectionStatusChange -= hub_ConnectionStatusChange;
-                            hub.ConnectionStatusChange += new FmdcEventHandler(hub_ConnectionStatusChange);
-                            try
-                            {
-                                hub.Connect();
-                            }
-                            catch
-                            {
-                                setting.Address = "";
-                            }
-                            break;
-                    }
-                    UpdateField();
-                    message = "";
-                    return;
-                default:
-                    message += keyInfo.KeyChar;
-                    Console.Write(keyInfo.KeyChar);
-                    return;
-                case ConsoleKey.Escape:
-                    base.Input(keyInfo);
-                    UpdateField();
-                    return;
-            }
-        }
-
-        public override bool Command(ConsoleKeyInfo keyInfo, string cmd)
-        {
-            switch (cmd)
-            {
-                default:
-                    break;
-            }
-
-            return false;
-        }
-
-
         public override void Show()
         {
-            Console.CursorLeft = 0;
-            Console.CursorTop = 1;
-            Console.WriteLine("################ Hub ################");
+            int width = 20;
+            int height = 5;
+            int px = (Console.WindowWidth / 2) - width;
+            int py = (Console.WindowHeight / 2) - height;
 
-            Update();
-            UpdateField();
+            Rectangle popup = new Rectangle(px, py, width * 2, height * 2, ConsoleColor.Gray, ConsoleColor.DarkBlue);
+            popup.Show();
+
+            Label popupTitle = new Label(px, py, "Connection Setting", width * 2);
+            popupTitle.BgColor = ConsoleColor.Blue;
+            popupTitle.FgColor = ConsoleColor.DarkBlue;
+            popupTitle.Show();
+
+            TextField address = new TextField(px + 1, py + 2, "IP/DNS:", 31);
+            address.BgColor = ConsoleColor.DarkBlue;
+            address.FgColor = ConsoleColor.Gray;
+            address.Show();
+
+            TextField port = new TextField(px + 1, py + 4, "Port:", 33);
+            port.BgColor = ConsoleColor.DarkBlue;
+            port.FgColor = ConsoleColor.Gray;
+            port.Show();
+
+            TextField nick = new TextField(px + 1, py + 6, "DisplayName:", 26);
+            nick.BgColor = ConsoleColor.DarkBlue;
+            nick.FgColor = ConsoleColor.Gray;
+            nick.Show();
+
+            Button buttonConnect = new Button(px + 1, py + 8, "Connect");
+            buttonConnect.OnSelect += new EventHandler(buttonConnect_OnSelect);
+            buttonConnect.BgColor = ConsoleColor.DarkBlue;
+            buttonConnect.FgColor = ConsoleColor.Gray;
+            buttonConnect.Show();
+
+            // Select one at a time
+            System.Net.IPAddress ip = null;
+            do
+            {
+                address.Focus();
+                if (!string.IsNullOrEmpty(address.Input))
+                {
+                    try
+                    {
+                        ip = System.Net.Dns.GetHostEntry(address.Input).AddressList[0];
+                    }
+                    catch (System.Exception)
+                    {
+                        // We are not going to try to catch this as developer that used this class made something wrong if this has to be thrown.
+                        try
+                        {
+                            ip = System.Net.IPAddress.Parse(address.Input);
+                        }
+                        catch { }
+                    }
+                }
+            } while (ip == null);
+            int p = 0;
+            // Port
+            do
+            {
+                port.Focus();
+                try
+                {
+                    p = int.Parse(port.Input);
+                }
+                catch { }
+            } while (p <= 0 && p > 65535);
+
+
+            do
+            {
+                nick.Focus();
+            } while (string.IsNullOrEmpty(nick.Input));
+
+            buttonConnect.Focus();
+
             base.Show();
         }
 
-        protected void UpdateField()
+        void buttonConnect_OnSelect(object sender, EventArgs e)
         {
-            string msg = "";
-            // Set message text
-            if (setting.Address.Length == 0)
-            {
-                messageType = 3;
-                msg = "IP/DNS:" + msg;
-            }
-            else if (setting.Port == -1)
-            {
-                messageType = 4;
-                msg = "Port:" + msg;
-            }
-            else if (connectionStatus == Con.TcpConnection.Connected)
-            {
-                messageType = 0;
-                msg = "MainMessage:" + msg;
-            }
-            else
-            {
-            }
-
-            Console.CursorLeft = 0;
-            Console.CursorTop = 0;
-            Console.Write(msg);
-            // Clear input field
-            string tmp = "";
-            while (message.Length +1 >= tmp.Length)
-                tmp += " ";
-            Console.Write(tmp);
-
-            defaultLeft = msg.Length;
-            Console.CursorLeft = defaultLeft;
+            // TODO : Do connect here
         }
 
         protected void Update()
         {
-            if (updating)
-                return;
-            updating = true;
 
-            int tmpL = 0;
-            int tmpT = 0;
-
-            int posL = Console.CursorLeft;
-            int posT = Console.CursorTop;
-            Console.CursorVisible = false;
-            #region Title
-            Console.CursorTop = titleT;
-            Console.CursorLeft = titleL;
-            #endregion
-            #region Connection Status
-            if (statusT == -1)
-            {
-                tmpT = Console.WindowHeight - 1;
-            }
-            else
-            {
-                tmpT = statusT;
-            }
-            Console.CursorTop = tmpT;
-            Console.CursorLeft = statusL;
-            switch (connectionStatus)
-            {
-                case -1:
-                    Console.Write("# Need more info"); break;
-                case Con.TcpConnection.Connected:
-                    Console.Write("# Connected"); break;
-                case Con.TcpConnection.Connecting:
-                    Console.Write("# Connecting"); break;
-                case Con.TcpConnection.Disconnected:
-                    Console.Write("# Disconnected"); break;
-                default:
-                    break;
-            }
-            #endregion
-
-            // restore pos
-            Console.CursorVisible = true;
-            Console.CursorLeft = posL;
-            Console.CursorTop = posT;
-            updating = false;
         }
     }
 }

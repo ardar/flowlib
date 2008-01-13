@@ -31,75 +31,35 @@ namespace ConsoleDemo.ConsoleClient
         protected int controlIndex = 0;
         protected List<Control> controls = new List<Control>();
 
-        protected bool showed = false;
-        protected int defaultTop = 0;
-        protected int defaultLeft = 0;
-
         public List<Control> Controls
         {
             get { return controls; }
         }
 
-        public bool IsShowing
-        {
-            get { return showed; }
-            set { showed = value; }
-        }
-
-        public virtual void Input(ConsoleKeyInfo keyInfo)
-        {
-            switch (keyInfo.Key)
-            {
-                case ConsoleKey.Escape:
-                    int curLef = Console.CursorLeft;
-                    Console.CursorLeft = defaultLeft;
-                    while (Console.CursorLeft < curLef)
-                        Console.Write(" ");
-                    Console.CursorLeft = defaultLeft;
-                    break;
-                case ConsoleKey.Tab:
-                    if (controls.Count > 0)
-                    {
-                        int i = 0;
-                        foreach (IFocusable var in controls)
-                        {
-                            if (i >= controlIndex)
-                            {
-                                var.Focus();
-                            }
-                            i++;
-                        }
-                        if (controls.Count == ++controlIndex)
-                            controlIndex = 0;
-                    }
-                    break;
-                default:
-                   Console.Write(keyInfo.KeyChar);
-                    break;
-            }
-        }
-        public virtual bool Command(ConsoleKeyInfo keyInfo, string cmd) { return false; }
         public override void Show()
         {
             base.Show();
-            Console.CursorLeft = defaultLeft;
-            Console.CursorTop = defaultTop;
+            Console.Clear();
+
             foreach (Control var in Controls)
             {
                 var.Show();
             }
+            bool haveFocusControl = false;
             do
             {
                 foreach (Control var in Controls)
                 {
                     if (var is IFocusable && !var.Hidden)
                     {
+                        haveFocusControl = true;
                         ((IFocusable)var).Focus();
                     }
                     if (Hidden)
                         break;
+
                 }
-            } while (!Hidden);
+            } while (haveFocusControl && !Hidden);
         }
         public override void Hide()
         {

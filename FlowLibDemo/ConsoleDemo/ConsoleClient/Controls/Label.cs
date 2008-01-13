@@ -37,9 +37,10 @@ namespace ConsoleDemo.ConsoleClient.Controls
                     Show();
             }
         }
-
         public Label(int x, int y, string str)
-            : base(x,y, -1, 1)
+            : this(x, y, str, -1) { }
+        public Label(int x, int y, string str, int width)
+            : base(x,y, width, 1)
         {
             text = str;
             if (text.Contains("\n"))
@@ -54,9 +55,9 @@ namespace ConsoleDemo.ConsoleClient.Controls
                         width = rows[i].Length;
                 }
             }
-            else
+            else if (width == -1)
             {
-                width = text.Length;
+                this.width = text.Length;
             }
         }
 

@@ -33,13 +33,10 @@ namespace ConsoleDemo.ConsoleClient
 {
     public class Welcome : Window
     {
-        Setting setting = null;
-        Window activeWindow = null;
-
-        public Welcome(Setting setting)
+        public Welcome()
         {
-            this.setting = setting;
         }
+
         public override void Show()
         {
             Console.CursorLeft = 0;
@@ -57,28 +54,6 @@ namespace ConsoleDemo.ConsoleClient
             Console.WriteLine(" -help           -   Open this window");
             Console.WriteLine("################ WELCOME TO FLOWLIB - CONSOLE EXAMPLE ################");
             base.Show();
-        }
-
-        public override bool Command(ConsoleKeyInfo keyInfo, string cmd)
-        {
-            switch (cmd)
-            {
-                case "setting":
-                    activeWindow.Hide();
-                    activeWindow = setting;
-                    activeWindow.Show();
-                    return true;
-                case "hub":
-                    activeWindow.Hide();
-                    activeWindow = new Hub();
-                    activeWindow.Show();
-                    return true;
-                default:
-                    activeWindow.Command(keyInfo, cmd);
-                    break;
-            }
-
-            return false;
         }
     }
 }
