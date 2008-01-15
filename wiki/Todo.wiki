@@ -11,13 +11,13 @@ _Note that just because it is on this list it is not a promise that it will be d
 
   * ~~Search for content (Nmdc)~~
   * ~~Receive search result (Nmdc)~~
-  * Verify downloaded content
   * ~~Adc Support (to 1.0)~~
-    # Full TIGR extention support
     # Transfer handling (~~SND~~,GFI,~~GET~~)
   * Add Valid flag to transfer messages and search messages.
 
 = Release A =
+  * Verify downloaded content
+    # Full TIGR extention support
   * UPnP Support
   * Converting settings (hub favorites, share, and maybe more or less) from/to other clients
 
