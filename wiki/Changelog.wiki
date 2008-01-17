@@ -39,6 +39,10 @@
   * CHANGE	- Update event has been moved from Hub object to IProtocol.
   * ADD		- Share now save/load port and other public properties.
   * CHANGE	- e.Data is now the old protocol(this can be null) on ProtocolChange. This is so you can unlisten on old protocols.
+  * FIX		- HashContentInfo event now has ContentInfo as data.
+  * ADD		- Download/Upload in ADC (Both 1.0 and 0.10)
+
+
 
 
 
