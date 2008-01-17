@@ -19,12 +19,33 @@
  *
  */
 
+using FlowLib.Containers;
+
 namespace FlowLib.Interfaces
 {
 
     // TODO : Add this for enabling many hashing algorithms in Share.
     public interface IHash
     {
-
+        /// <summary>
+        /// Generate Hash Id and Hash Validation data
+        /// </summary>
+        /// <param name="info">ContentInfo to generate has for</param>
+        void Generate(ContentInfo info);
+        /// <summary>
+        /// Validate Hash Validation data against hash id.
+        /// Validation data will be added if match.
+        /// </summary>
+        /// <param name="info">ContentInfo that contains Hash id</param>
+        /// <param name="str">Hash validation data. This will be added to ContentInfo if verify succeeds.</param>
+        /// <returns>If validation data and id matches it will return true, else false.</returns>
+        bool VerifyData(ref ContentInfo info, string str);
+        /// <summary>
+        /// Verify downloaded segment against hash
+        /// </summary>
+        /// <param name="info">ContentInfo telling us where to find content</param>
+        /// <param name="seg">SegmentInfo telling us what part of file we want to verify</param>
+        /// <returns>returns true if byte[] in segment interval matches validation data</returns>
+        bool verifySegment(ref ContentInfo info, SegmentInfo seg);
     }
 }

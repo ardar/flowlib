@@ -25,7 +25,7 @@ using FlowLib.Containers;
 
 namespace FlowLib.Protocols.TransferNmdc
 {
-    public class MyNick : TransferMessage
+    public class MyNick : StrMessage
     {
         protected UserInfo info = null;
         /// <summary>
@@ -60,7 +60,7 @@ namespace FlowLib.Protocols.TransferNmdc
             con.Disconnect("Handshake was failing.");
         }
     }
-    public class Supports : TransferMessage
+    public class Supports : StrMessage
     {
         /********
          * SUPPORTS:
@@ -211,12 +211,14 @@ namespace FlowLib.Protocols.TransferNmdc
             adcGet = true;
             zlig = false;
             tthf = true;
-            tthl = false;
+            tthl = true;
             miniSlots = false;
             bzList = true;
 
             // TODO : Remove this when we have enabled ZLib compression
             getZBlock = false;
+            // TODO : Remove this when TTHL works
+            tthl = false;
             SetValuesToRaw();
         }
         /// <summary>
@@ -248,6 +250,7 @@ namespace FlowLib.Protocols.TransferNmdc
             if (ADCGet) tmp += " ADCGet";
             if (ZLIG) tmp += " ZLIG";
             if (TTHF) tmp += " TTHF";
+            if (TTHL) tmp += " TTHL";
             if (MiniSlots) tmp += " MiniSlots";
             tmp += "|";
             Raw = tmp;
@@ -284,7 +287,7 @@ namespace FlowLib.Protocols.TransferNmdc
         }
 
     }
-    public class Direction : TransferMessage
+    public class Direction : StrMessage
     {
         protected bool download = true;
         protected int number = 0;
@@ -349,7 +352,7 @@ namespace FlowLib.Protocols.TransferNmdc
             }
         }
     }
-    public class Lock : TransferMessage
+    public class Lock : StrMessage
     {
         protected bool extended = false;
         protected string pk = string.Empty;
@@ -470,7 +473,7 @@ namespace FlowLib.Protocols.TransferNmdc
             return (System.Text.Encoding.Default.GetChars(new byte[] { src })[0]);
         }
     }
-    public class Key : TransferMessage
+    public class Key : StrMessage
     {
         protected string value = string.Empty;
         /// <summary>
@@ -499,7 +502,7 @@ namespace FlowLib.Protocols.TransferNmdc
             }
         }
     }
-    public class FileLength : TransferMessage
+    public class FileLength : StrMessage
     {
         protected long length = 0;
         public long Length
@@ -530,7 +533,7 @@ namespace FlowLib.Protocols.TransferNmdc
             }
         }
     }
-    public class Error : TransferMessage
+    public class Error : StrMessage
     {
         protected string message = string.Empty;
         public string Message
@@ -557,7 +560,7 @@ namespace FlowLib.Protocols.TransferNmdc
             Raw = "$Error "+message+"|";
         }
     }
-    public class GetListLen : TransferMessage
+    public class GetListLen : StrMessage
     {
         public GetListLen(IConnection con, string raw)
             : base(con, raw)
@@ -570,7 +573,7 @@ namespace FlowLib.Protocols.TransferNmdc
             Raw = "$GetListLen|";
         }
     }
-    public class MaxedOut : TransferMessage
+    public class MaxedOut : StrMessage
     {
         public MaxedOut(IConnection con, string raw)
             : base(con, raw)
@@ -583,7 +586,7 @@ namespace FlowLib.Protocols.TransferNmdc
             Raw = "$MaxedOut|";
         }
     }
-    public class Failed : TransferMessage
+    public class Failed : StrMessage
     {
         protected string message = string.Empty;
         public string Message
@@ -610,7 +613,7 @@ namespace FlowLib.Protocols.TransferNmdc
     }
 
     #region Get Content
-    public class Get : TransferMessage
+    public class Get : StrMessage
     {
         protected string file = string.Empty;
         protected long start = 0;
@@ -663,7 +666,7 @@ namespace FlowLib.Protocols.TransferNmdc
             }
         }
     }
-    public class ADCSND : TransferMessage
+    public class ADCSND : StrMessage
     {
         #region protected variables
         protected string type = string.Empty;
@@ -780,12 +783,12 @@ namespace FlowLib.Protocols.TransferNmdc
 
         public void Check()
         {
-            Raw = string.Format("$ADCSND {0} {1} {2} {3} {4}|", type, content, start, length, (zlib ? "ZL1" : ""));
+            Raw = string.Format("$ADCSND {0} {1} {2} {3}{4}|", type, content, start, length, (zlib ? " ZL1" : ""));
         }
 
     }
 
-    public class ADCGET : TransferMessage
+    public class ADCGET : StrMessage
     {
         #region protected variables
         protected string type = string.Empty;
@@ -938,7 +941,7 @@ namespace FlowLib.Protocols.TransferNmdc
     /// This is not a NMDC command.
     /// It is a class used to parse $GetZBlock, $UGetBlock and $UGetZBlock in one place.
     /// </summary>
-    public class GetBlocks : TransferMessage
+    public class GetBlocks : StrMessage
     {
         protected long start = 0;
         protected long length = -1;
@@ -1078,7 +1081,7 @@ namespace FlowLib.Protocols.TransferNmdc
     }
     #endregion
     #region Send Content
-    public class Send : TransferMessage
+    public class Send : StrMessage
     {
         public Send(IConnection con)
             : base(con, null)
@@ -1092,7 +1095,7 @@ namespace FlowLib.Protocols.TransferNmdc
 
         }
     }
-    public class Sending : TransferMessage
+    public class Sending : StrMessage
     {
         protected long length = -1;
 

@@ -286,7 +286,7 @@ namespace FlowLib.Connections
                 {
                     // Determin Protocol to use here.
                     //if (Protocol != null && sock.Connected && first)
-                    if (Protocol != null && first)
+                    if (Protocol != null && first && !importedSocket)
                     {
                         first = false;
                         if (Protocol.FirstCommand != null)

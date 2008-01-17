@@ -37,7 +37,7 @@ namespace ConsoleDemo.ConsoleClient
         Button buttonSetting = new Button(5, 0, "Setting");
         Button buttonHub = new Button(14, 0, "Hub");
 
-        TextArea txtWelcome = new TextArea(1, 2, Console.WindowWidth - 1, Console.WindowHeight - 1);
+        TextArea txtWelcome = new TextArea(1, 2, Console.WindowWidth - 1, Console.WindowHeight - 2);
 
         // Windows
         Setting windowSetting = new Setting();
@@ -45,7 +45,13 @@ namespace ConsoleDemo.ConsoleClient
 
         static void Main(string[] args)
         {
+            ConsoleColor fg = Console.ForegroundColor;
+            ConsoleColor bg = Console.BackgroundColor;
+
             new Program();
+
+            Console.ForegroundColor = fg;
+            Console.BackgroundColor = bg;
         }
 
         public Program()
@@ -72,6 +78,12 @@ namespace ConsoleDemo.ConsoleClient
             buttonHub.OnSelect += new EventHandler(buttonHub_OnSelect);
             buttonHub.BgColor = ConsoleColor.DarkBlue;
             Controls.Add(buttonHub);
+
+            Console.WriteLine("WindowWith" + Console.WindowWidth);
+            Console.WriteLine("WindowHeight" + Console.WindowHeight);
+
+            Console.WriteLine("BufferWith" + Console.BufferWidth);
+            Console.WriteLine("BufferHeight" + Console.BufferHeight);
 
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("Welcome to this example on how to use FlowLib.");
@@ -102,6 +114,7 @@ namespace ConsoleDemo.ConsoleClient
         void exit_OnSelect(object sender, EventArgs e)
         {
             this.Hide();
+            Console.Clear();
         }
     }
 }

@@ -39,6 +39,7 @@ namespace FlowLib.Containers
     {
         public const string ID = "id";
         public const string TTH = "tth";
+        public const string TTHL = "tthl";
         /// <summary>
         /// Virtual path in your/others share
         /// </summary>

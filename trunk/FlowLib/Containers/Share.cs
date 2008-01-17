@@ -665,18 +665,18 @@ namespace FlowLib.Containers
                                 tmp.IsHashing = true;
 
                                 // Ask if someone else want to hash this contentinfo
-                                FmdcEventArgs e = new FmdcEventArgs(0, item);
+                                //ContentInfo info = item.Value;
+                                FmdcEventArgs e = new FmdcEventArgs(0, item.Value);
                                 HashContentInfo(this, e);
-
+                                //info = e.Data as ContentInfo;
                                 if (!e.Handled)
                                 {
-
-                                    TthThreaded tth = new TthThreaded(item.Value.Get(ContentInfo.STORAGEPATH));
-                                    tth.ThreadPriority = this.hashPriority;
-                                    tth.ThreadCount = this.hashThreadCount;
-                                    byte[] bytes = tth.GetTTH_Value();
-                                    item.Value.Set(ContentInfo.TTH, Base32.Encode(bytes));
+                                    Hashing.HashTth tth = new FlowLib.Hashing.HashTth();
+                                    tth.Priority = HashThreadPriority;
+                                    tth.ThreadCount = HashThreadCount;
+                                    tth.Generate(item.Value);
                                 }
+
                                 // If file was hashed. Add info
                                 if (item.Value.IsHashed)
                                 {
