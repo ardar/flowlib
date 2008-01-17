@@ -42,12 +42,17 @@ namespace FlowLib.Protocols
         protected UserInfo info = new UserInfo();     // Hub/User Info (Name and description and so on).
         protected IConnection con = null;       // Current Connection where this protocol is used
         protected Hub hub = null;               // Current hub where this protocol is used
-        protected string recieved = "";
+        protected string received = "";
         protected bool download = true;
         protected int connectionStatus = -1;
+        protected bool firstMsg = true;
+        protected bool rawData = false;
 
-        //protected static string yoursupports = "ADBAS0 ADBASE ADTIGR";
-        protected static string yoursupports = "ADBASE RMBAS0 ADTIGR";
+
+
+        protected static string yourtranssupports = "ADBAS0 ADBASE";
+        protected static string yoursupports = "ADBAS0 ADBASE ADTIGR";
+        //protected static string yoursupports = "ADBASE RMBAS0 ADTIGR";
 
         public event FmdcEventHandler MessageReceived;
         public event FmdcEventHandler MessageToSend;
@@ -63,6 +68,12 @@ namespace FlowLib.Protocols
             get { return info; }
             set { info = value; }
         }
+
+        public static string TransferSupport
+        {
+            get { return yourtranssupports; }
+        }
+
         public static string Support
         {
             get { return yoursupports; }
@@ -105,7 +116,7 @@ namespace FlowLib.Protocols
             : this((ITransfer)trans)
         {
             this.trans = trans;
-            con.ConnectionStatusChange += new FmdcEventHandler(trans_ConnectionStatusChange);
+            this.trans.ConnectionStatusChange += new FmdcEventHandler(trans_ConnectionStatusChange);
         }
 
         public AdcProtocol(Hub hub)
@@ -201,7 +212,104 @@ namespace FlowLib.Protocols
         #region Parse
         public void ParseRaw(byte[] b, int length)
         {
-            ParseRaw(Encoding.GetString(b, 0, length));
+            if (rawData)
+            {
+                if (length < 0)
+                    throw new System.ArgumentOutOfRangeException("length has to be above zero");
+
+                // Do we have content left that we need to convert?
+                if (this.received.Length > 0)
+                {
+                    byte[] old = this.Encoding.GetBytes(this.received);
+                    long size = (long)length + old.LongLength;
+
+                    byte[] tmp = new byte[size];
+                    System.Array.Copy(old, 0, tmp, 0, old.LongLength);
+                    if (b != null)
+                        System.Array.Copy(b, 0, tmp, old.LongLength, (long)length);
+                    b = tmp;
+                    length += old.Length;
+                    received = string.Empty;
+                }
+
+                // Do we have a working byte array?
+                if (b != null && length != 0)
+                {
+                    BinaryMessage conMsg = new BinaryMessage(trans, b, length);
+                    // Plugin handling here
+                    FmdcEventArgs e = new FmdcEventArgs(Actions.CommandIncomming, conMsg);
+                    MessageReceived(trans, e);
+                    if (!e.Handled)
+                    {
+                        if (this.download)
+                        {
+                            if (trans.DownloadItem != null && trans.CurrentSegment.Index != -1)
+                            {
+                                if (trans.CurrentSegment.Length < length)
+                                {
+                                    trans.Disconnect("You are sending more then i want.. Why?!");
+                                    return;
+                                }
+
+                                if (trans.CurrentSegment.Position == 0 && !Utils.FileOperations.PathExists(trans.DownloadItem.ContentInfo.Get(ContentInfo.STORAGEPATH)))
+                                {
+                                    Utils.FileOperations.AllocateFile(trans.DownloadItem.ContentInfo.Get(ContentInfo.STORAGEPATH), trans.DownloadItem.ContentInfo.Size);
+                                }
+
+                                // Create the file.
+                                using (System.IO.FileStream fs = System.IO.File.OpenWrite(trans.DownloadItem.ContentInfo.Get(ContentInfo.STORAGEPATH)))
+                                {
+                                    try
+                                    {
+                                        // Lock this segment of file
+                                        fs.Lock(trans.CurrentSegment.Start, trans.CurrentSegment.Length);
+                                        // Set position
+                                        fs.Position = trans.CurrentSegment.Start + trans.CurrentSegment.Position;
+                                        // Write this byte array to file
+                                        fs.Write(b, 0, length);
+                                        trans.CurrentSegment.Position += length;
+                                    }
+                                    catch (System.Exception exp)
+                                    {
+                                        System.Console.WriteLine("E:" + exp);
+                                        trans.DownloadItem.Cancel(trans.CurrentSegment.Index);
+                                    }
+                                    finally
+                                    {
+                                        // Saves and unlocks file
+                                        fs.Flush();
+                                        fs.Unlock(trans.CurrentSegment.Start, trans.CurrentSegment.Length);
+                                        fs.Dispose();
+                                        fs.Close();
+                                    }
+                                    if (trans.CurrentSegment.Position >= trans.CurrentSegment.Length)
+                                    {
+                                        trans.DownloadItem.Finished(trans.CurrentSegment.Index);
+                                        //// Searches for a download item and a segment id
+                                        GetDownloadItem();
+                                        // Request new segment from user. IF we have found one. ELSE disconnect.
+                                        if (trans.DownloadItem != null && (trans.CurrentSegment = trans.DownloadItem.GetAvailable()).Index != -1)
+                                        {
+                                            OnDownload();
+                                        }
+                                        else
+                                            trans.Disconnect("All content downloaded");
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            trans.Disconnect("I dont want to download from you. Fuck off!");
+                        }
+                    }
+                }
+
+            }
+            else
+            {
+                ParseRaw(Encoding.GetString(b, 0, length));
+            }
         }
         public void ParseRaw(string raw)
         {
@@ -210,20 +318,40 @@ namespace FlowLib.Protocols
                 return;
 
             // Should we read buffer?
-            if (recieved.Length > 0)
+            if (received.Length > 0)
             {
-                raw = recieved + raw;
-                recieved = string.Empty;
+                raw = received + raw;
+                received = string.Empty;
             }
             int pos;
 
+
             // If wrong Protocol type has been set. change it to Nmdc
-            if (hub != null && hub.RegMode == -1 && raw.Length > 5 && raw.StartsWith("$"))
-            {   // Setting hubtype to NMDC
-                hub.Protocol = new HubNmdcProtocol(hub);
-                hub.HubSetting.Protocol = hub.Protocol.Name;
-                hub.Reconnect();
+            if (firstMsg && raw.StartsWith("$"))
+            {
+                if (trans != null)
+                {
+                    trans.Protocol = new TransferNmdcProtocol(trans);
+                    byte[] b = trans.Protocol.Encoding.GetBytes(raw);
+                    trans.Protocol.ParseRaw(b,b.Length);
+                    return;
+                }
+                else if (hub != null)
+                {
+                    hub.Protocol = new HubNmdcProtocol(hub);
+                    hub.Reconnect();
+                }
+                //return
             }
+            firstMsg = false;
+
+            // If wrong Protocol type has been set. change it to Nmdc
+            //if (hub != null && hub.RegMode == -1 && raw.Length > 5 && raw.StartsWith("$"))
+            //{   // Setting hubtype to NMDC
+            //    hub.Protocol = new HubNmdcProtocol(hub);
+            //    hub.HubSetting.Protocol = hub.Protocol.Name;
+            //    hub.Reconnect();
+            //}
 
             // Loop through Commands.
             while ((pos = raw.IndexOf(Seperator)) > 0)
@@ -239,7 +367,7 @@ namespace FlowLib.Protocols
             }
             // If Something is still left. Save it to buffer for later use.
             if (raw.Length > 0)
-                recieved = raw;
+                received = raw;
         }
         protected StrMessage ParseMessage(string raw)
         {
@@ -331,7 +459,7 @@ namespace FlowLib.Protocols
                         trans.User = req.User;
                         info = trans.User;
                         trans.Share = req.Share;
-                        this.download = req.Download;
+                        download = req.Download;
                     }
                     else if (trans.Me == null)
                     {
@@ -345,6 +473,17 @@ namespace FlowLib.Protocols
                         trans.User = info;
                     }
                     con.Send(new INF(con, trans.Me));
+                    if (download)
+                    {
+                        GetDownloadItem();
+                        // Request new segment from user. IF we have found one. ELSE disconnect.
+                        if (trans.DownloadItem != null && (trans.CurrentSegment = trans.DownloadItem.GetAvailable()).Index != -1)
+                        {
+                            OnDownload();
+                        }
+                        else
+                            trans.Disconnect("All content downloaded");
+                    }
                 }
                 else if (hub != null)
                 {
@@ -450,7 +589,7 @@ namespace FlowLib.Protocols
                 }
                 supports = (SUP)message;
                 // TODO : We should really care about what hub support.
-                if (!supports.Param.Contains("ADBASE") && !supports.Param.Contains("ADBAS0") /* !hubsupports.Param.Contains("ADTIGR")*/)
+                if (!supports.BASE && !supports.TIGR)
                 {
                     // We will just simply disconnect if hub doesnt support this right now
                     con.Disconnect("Connection doesnt support BASE or BAS0");
@@ -487,6 +626,11 @@ namespace FlowLib.Protocols
             else if (message is CTM && hub != null)
             {
                 CTM ctm = (CTM)message;
+
+                // We really hate buggy hubsofts. Only reason we will get this message is because hubsoft dont know diffrent between E and D messages.
+                if (ctm.Id == hub.Me.ID)
+                    return;
+
                 User usr = null;
                 string addr = null;
 
@@ -502,7 +646,7 @@ namespace FlowLib.Protocols
                 }
                 if (version > 1.0)
                 {
-                    hub.Send(new STA(hub, ctm.Id, hub.Me.ID, "241", "Protocol is not supported. I only support ADC 1.0", "TO" + ctm.Token + " PR" + ctm.Protocol));
+                    hub.Send(new STA(hub, ctm.Id, hub.Me.ID, "241", "Protocol is not supported. I only support ADC 1.0 and prior", "TO" + ctm.Token + " PR" + ctm.Protocol));
                     return;
                 }
 
@@ -515,7 +659,12 @@ namespace FlowLib.Protocols
                     // We are doing this because we want to filter out PID and so on.
                     trans.Me = me.UserInfo;
                     trans.Protocol = new AdcProtocol(trans);
-                    Update(con, new FmdcEventArgs(Actions.TransferRequest, new TransferRequest(ctm.Token, hub, usr.UserInfo,false)));
+                    // Support for prior versions of adc then 1.0
+                    string token = ctm.Token;
+                    if (version < 1.0 && ctm.Token.StartsWith("TO"))
+                        token = ctm.Token.Substring(2);
+
+                    Update(con, new FmdcEventArgs(Actions.TransferRequest, new TransferRequest(token, hub, usr.UserInfo,false)));
                     Update(con, new FmdcEventArgs(Actions.TransferStarted, trans));
                 }
             }
@@ -524,12 +673,16 @@ namespace FlowLib.Protocols
             else if (message is RCM && hub != null)
             {
                 RCM rcm = (RCM)message;
+
+                // We really hate buggy hubsofts. Only reason we will get this message is because hubsoft dont know diffrent between E and D messages.
+                if (rcm.Id == hub.Me.ID)
+                    return;
+
                if (hub.Me.Mode != FlowLib.Enums.ConnectionTypes.Passive && hub.Share != null)
                 {
                     User usr = null;
                     if ((usr = hub.GetUserById(rcm.Id)) != null)
                     {
-                        Update(con, new FmdcEventArgs(Actions.TransferRequest, new TransferRequest(rcm.Token, hub, usr.UserInfo,false)));
                         // Do we support same protocol?
                         double version = 0.0;
                         if (rcm.Protocol != null && rcm.Protocol.StartsWith("ADC/"))
@@ -539,15 +692,20 @@ namespace FlowLib.Protocols
                                 version = double.Parse(rcm.Protocol.Substring(4).Replace(".", ","));
                             }
                             catch { }
-                            //if (version <= 1.0)
-                            if (version == 1.0)
+                            if (version <= 1.0)
                             {
-                                //hub.Send(new CTM(hub, rcm.Id, rcm.IDTwo, hub.Share.Port, rcm.Token));
-                                hub.Send(new CTM(hub, rcm.Id, rcm.IDTwo, rcm.Protocol, hub.Share.Port, rcm.Token));
+                                // Support for prior versions of adc then 1.0
+                                string token = rcm.Token;
+                                if (version < 1.0 && rcm.Token.StartsWith("TO"))
+                                    token = rcm.Token.Substring(2);
+
+                                Update(con, new FmdcEventArgs(Actions.TransferRequest, new TransferRequest(token, hub, usr.UserInfo, false)));
+
+                                hub.Send(new CTM(hub, rcm.Id, rcm.IDTwo, rcm.Protocol, hub.Share.Port, token));
                             }
                             else
                             {
-                                hub.Send(new STA(hub, rcm.Id, hub.Me.ID, "241", "Protocol is not supported. I only support ADC 1.0", "TO" + rcm.Token + " PR" + rcm.Protocol));
+                                hub.Send(new STA(hub, rcm.Id, hub.Me.ID, "241", "Protocol is not supported. I only support ADC 1.0 and prior", "TO" + rcm.Token + " PR" + rcm.Protocol));
                                 return;
                             }
                         }
@@ -603,32 +761,19 @@ namespace FlowLib.Protocols
                                 trans.Content.Set(ContentInfo.TTH, get.Identifier.Substring(4));
 
                                 ContentInfo tmp = trans.Content;
-                                if (con.Share != null && con.Share.ContainsContent(ref tmp) && tmp.ContainsKey(ContentInfo.STORAGEPATH))
+                                if (con.Share != null && con.Share.ContainsContent(ref tmp) && tmp.ContainsKey(ContentInfo.TTHL))
                                 {
-                                    try
-                                    {
-                                        FlowLib.Utils.Hash.TthThreaded t = new FlowLib.Utils.Hash.TthThreaded(tmp.Get(ContentInfo.STORAGEPATH));
-                                        byte[][][] tree = null;
-                                        // TODO : what are the possible TTH Tree values? 
-                                        if ((tree = t.GetTTH_Tree()) != null && tree.Length > 0)
-                                        {
-                                            System.IO.MemoryStream ms = new System.IO.MemoryStream();
-                                            for (int i = 0; i < tree[0].Length; i++)
-                                            {
-                                                ms.Write(tree[0][i], 0, tree[0][i].Length);
-                                            }
-                                            // Update current segment
-                                            trans.CurrentSegment = new SegmentInfo(-1, 0, ms.Length);
+                                    byte[] bytes = Utils.Convert.Base32.Decode(tmp.Get(ContentInfo.TTHL));
+                                    trans.CurrentSegment = new SegmentInfo(-1, 0, bytes.LongLength);
 
-                                            con.Send(new SND(trans, get.ContentType, get.Identifier, new SegmentInfo(-1, get.SegmentInfo.Start, trans.CurrentSegment.Length)));
-                                            // Send content to user
-                                            byte[] bytes = ms.ToArray();
-                                            con.Send(new BinaryMessage(con, bytes, bytes.Length));
-                                            //System.Console.WriteLine("TTH Leaves:" + FlowLib.Utils.Convert.Base32.Encode(bytes));
-                                            firstTime = true;
-                                        }
-                                    }
-                                    catch (System.Exception e) { }
+                                    con.Send(new SND(trans, get.ContentType, get.Identifier, new SegmentInfo(-1, trans.CurrentSegment.Start, trans.CurrentSegment.Length)));
+                                    // Send content to user
+                                    System.IO.MemoryStream ms = new System.IO.MemoryStream(bytes);
+                                    ms.Flush();
+                                    bytes = ms.ToArray();
+                                    con.Send(new BinaryMessage(con, bytes, bytes.Length));
+                                    System.Console.WriteLine("TTH Leaves:" + FlowLib.Utils.Convert.Base32.Encode(bytes));
+                                    firstTime = true;
                                 }
                             }
                             if (!firstTime)
@@ -684,6 +829,29 @@ namespace FlowLib.Protocols
                     con.Send(new STA(con, "251", "File not available", null));
                     con.Disconnect();
                 }
+            }
+            #endregion
+            #region SND
+            else if (message is SND)
+            {
+                SND snd = (SND)message;
+                if (!trans.Content.Get(ContentInfo.REQUEST).Equals(snd.Identifier))
+                {
+                    trans.Disconnect("I want my bytes..");
+                    return;
+                }
+                if (trans.DownloadItem.ContentInfo.Size == -1)
+                {
+                    trans.DownloadItem.ContentInfo.Size = snd.SegmentInfo.Length;
+                    trans.DownloadItem.SegmentSize = snd.SegmentInfo.Length;
+                    trans.CurrentSegment = trans.DownloadItem.GetAvailable();
+                }
+                else if (trans.CurrentSegment.Length != snd.SegmentInfo.Length)
+                {
+                    trans.Disconnect("Why would i want to get a diffrent length of bytes then i asked for?");
+                    return;
+                }
+                this.rawData = true;
             }
             #endregion
         }
@@ -824,39 +992,49 @@ namespace FlowLib.Protocols
             else if (e.Action.Equals(Actions.StartTransfer) && hub != null)
             {
                 User usr = e.Data as User;
-                if (usr == null)
+                if (usr == null || hub.Share == null)
                     return;
                 // Do user support connecting?
-                if (
-                    usr.UserInfo.ContainsKey(UserInfo.UDPPORT)
-                    && usr.UserInfo.ContainsKey("SU")
-                    && usr.UserInfo.ContainsKey(UserInfo.IP)
-                    && (usr.UserInfo.Get("SU").Contains("UDP4") || usr.UserInfo.Get("SU").Contains("UDP6"))
-                    )
+                if (usr.UserInfo.ContainsKey(UserInfo.IP))
                 {
                     switch (hub.Me.Mode)
                     {
                         case ConnectionTypes.Direct:
                         case ConnectionTypes.UPnP:
                         case ConnectionTypes.Forward:
-                            Update(con, new FmdcEventArgs(Actions.TransferRequest, new TransferRequest(usr.ID, hub, usr.UserInfo)));
+                            // We are active and they are active. Let them connect to us
+                            // TODO : We should really use something else as token
+                            Update(con, new FmdcEventArgs(Actions.TransferRequest, new TransferRequest(usr.ID, hub, usr.UserInfo,true)));
                             hub.Send(new CTM(hub, usr.ID, hub.Me.ID, hub.Share.Port, usr.ID));
                             break;
                         case ConnectionTypes.Passive:
                         case ConnectionTypes.Socket5:
                         case ConnectionTypes.Unknown:
                         default:
+                            // We are passive and they are active. Let us connect to them
                             if (usr.UserInfo.Mode == ConnectionTypes.Passive)
                             {
                                 break;
                             }
-                            hub.Send(new RCM(usr.ID, hub));
+                            // TODO : We should really use something else as token
+                            Update(con, new FmdcEventArgs(Actions.TransferRequest, new TransferRequest(usr.ID, hub, usr.UserInfo, true)));
+                            hub.Send(new RCM(usr.ID, hub, hub.Me.ID, usr.ID));
                             break;
                     }
                 }
                 else
                 {
-                    return;
+                    // Other user doesnt support active connections (We have no ip to connect to)
+                    switch (hub.Me.Mode)
+                    {
+                        case ConnectionTypes.Direct:
+                        case ConnectionTypes.UPnP:
+                        case ConnectionTypes.Forward:
+                            // TODO : We should realy use something else as token
+                            Update(con, new FmdcEventArgs(Actions.TransferRequest, new TransferRequest(usr.ID, hub, usr.UserInfo, true)));
+                            hub.Send(new CTM(hub, usr.ID, hub.Me.ID, hub.Share.Port, usr.ID));
+                            break;
+                    }
                 }
             }
         }
@@ -878,12 +1056,74 @@ namespace FlowLib.Protocols
 
         public void OnDownload()
         {
-            throw new System.Exception("The method or operation is not implemented.");
+            if (trans == null || trans.User == null || trans.Share == null || trans.Me == null)
+                return;
+            if (download)
+            {
+                // We won battle. Start download.
+                if (trans.DownloadItem != null && trans.CurrentSegment.Index != -1)
+                {
+                    // Set right content string
+                    trans.Content = new ContentInfo(ContentInfo.REQUEST, trans.DownloadItem.ContentInfo.Get(ContentInfo.VIRTUAL));
+                    if (trans.DownloadItem.ContentInfo.IsFilelist)
+                    {
+                        if (supports != null && supports.BZIP)
+                        {
+                            trans.Content.Set(ContentInfo.REQUEST, "files.xml.bz2");
+                            trans.DownloadItem.ContentInfo.Set(ContentInfo.FILELIST, Utils.FileLists.BaseFilelist.XMLBZ);
+                        }
+                        else
+                        {
+                            trans.Content.Set(ContentInfo.REQUEST, "files.xml");
+                            trans.DownloadItem.ContentInfo.Set(ContentInfo.FILELIST, Utils.FileLists.BaseFilelist.XML);
+                        }
+                    }
+
+                    // Set that we are actually downloading stuff
+                    if (trans.CurrentSegment.Index >= 0)
+                    {
+                        trans.DownloadItem.Start(trans.CurrentSegment.Index);
+                    }
+                    rawData = false;
+
+                    /// $UGetZBlock needs both SupportGetZBlock and SupportXmlBZList.
+                    /// $UGetBlock needs SupportXmlBZList.
+                    /// $GetZBlock needs SupportGetZBlock.
+                    /// $ADCGET needs SupportADCGet.
+                    /// $Get needs nothing
+                    if (supports != null && supports.TIGR)
+                    {
+                        if (trans.DownloadItem.ContentInfo.ContainsKey(ContentInfo.TTH))
+                            trans.Content.Set(ContentInfo.REQUEST, "TTH/" + trans.DownloadItem.ContentInfo.Get(ContentInfo.TTH));
+
+                        trans.Send(new GET(trans, trans.Content, trans.CurrentSegment));
+                    }
+                    else
+                    {
+                        trans.Send(new GET(trans, trans.Content, trans.CurrentSegment));
+                    }
+                }
+            }
         }
+        
 
         public void GetDownloadItem()
         {
-            throw new System.Exception("The method or operation is not implemented.");
+            // Get content
+            trans.DownloadItem = null;
+            DownloadItem dwnItem = null;
+            UserInfo usrInfo = trans.User;
+            if (usrInfo != null)
+            {
+                FmdcEventArgs eArgs = new FmdcEventArgs(0, dwnItem);
+                ChangeDownloadItem(trans, eArgs);
+
+                trans.DownloadItem = eArgs.Data as DownloadItem;
+                if (trans.DownloadItem != null && (trans.CurrentSegment = trans.DownloadItem.GetAvailable()).Index != -1)
+                    download = true;
+                else
+                    download = false;
+            }
         }
 
         #endregion

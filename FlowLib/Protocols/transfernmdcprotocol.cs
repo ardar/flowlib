@@ -287,7 +287,7 @@ namespace FlowLib.Protocols
                     break;
 
                 pos++;
-                TransferMessage msg = ParseMessage(raw.Substring(0, pos));
+                StrMessage msg = ParseMessage(raw.Substring(0, pos));
                 raw = raw.Remove(0, pos);
                 // Plugin handling here
                 FmdcEventArgs e = new FmdcEventArgs(Actions.CommandIncomming, msg);
@@ -305,10 +305,10 @@ namespace FlowLib.Protocols
                 ParseRaw(null, 0);
 
         }
-        protected TransferMessage ParseMessage(string raw)
+        protected StrMessage ParseMessage(string raw)
         {
             raw = raw.Replace(this.Seperator, "");
-            TransferMessage msg = new TransferMessage(trans, raw);
+            StrMessage msg = new StrMessage(trans, raw);
             switch (raw[0])
             {
                 case '$':
@@ -486,7 +486,7 @@ namespace FlowLib.Protocols
 
         public void ActOnInMessage(IConMessage conMsg)
         {
-            TransferMessage message = (TransferMessage)conMsg;
+            StrMessage message = (StrMessage)conMsg;
             if (message is Lock)
             {
                 Lock lk = (Lock)message;
@@ -718,6 +718,34 @@ namespace FlowLib.Protocols
                             }
                         }
                         break;
+                    case "tthl":
+                        // TTH/DQSGG2MYKKLXX4N2P7TBPKSC5HVBO3ISYZPLMWA
+                        if (adcget.Content.StartsWith("TTH/"))
+                        {
+                            trans.Content.Set(ContentInfo.TTH, adcget.Content.Substring(4));
+
+                            ContentInfo tmp = trans.Content;
+                            if (trans.Share != null && trans.Share.ContainsContent(ref tmp) && tmp.ContainsKey(ContentInfo.TTHL))
+                            {
+                                byte[] bytes = Utils.Convert.Base32.Decode(tmp.Get(ContentInfo.TTHL));
+                                trans.CurrentSegment = new SegmentInfo(-1, 0, bytes.LongLength);
+
+                                ADCSND adcsend = new ADCSND(trans);
+                                adcsend.Type = adcget.Type;
+                                adcsend.Content = adcget.Content;
+                                adcsend.Start = trans.CurrentSegment.Start;
+                                adcsend.Length = trans.CurrentSegment.Length;
+                                adcsend.ZL1 = adcget.ZL1;
+                                trans.Send(adcsend);
+                                // Send content to user
+                                trans.Send(new BinaryMessage(trans, bytes, bytes.Length));
+                                //System.Console.WriteLine("TTH Leaves:" + FlowLib.Utils.Convert.Base32.Encode(bytes));
+                                trans.Content = null;
+                                //trans.Disconnect();
+                                return;
+                            }
+                        }
+                        break;
                 }
                 trans.CurrentSegment = new SegmentInfo(-1, adcget.Start, adcget.Length);
                 bool firstTime = true;
@@ -824,9 +852,9 @@ namespace FlowLib.Protocols
         protected void OnMessageToSend(object sender, FmdcEventArgs e)
         {
             trans.LastEventTimeStamp = System.DateTime.Now.Ticks;
-            if (e.Data is TransferMessage)
+            if (e.Data is StrMessage)
             {
-                TransferMessage msg = (TransferMessage)e.Data;
+                StrMessage msg = (StrMessage)e.Data;
                 if (e.Data is Lock)
                 {
                     // As we can just set one cmd to be sent as first command,

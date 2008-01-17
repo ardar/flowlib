@@ -42,7 +42,7 @@ namespace FlowLib.Containers
         /// <summary>
         /// raw message
         /// </summary>
-        public string Raw
+        public virtual string Raw
         {
             get { return raw; }
             set

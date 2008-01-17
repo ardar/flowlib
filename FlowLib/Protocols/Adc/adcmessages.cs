@@ -33,6 +33,19 @@ namespace FlowLib.Protocols.Adc
         protected string identifier = null;
         protected SegmentInfo segment = null;
 
+        public string ContentType
+        {
+            get { return contentType; }
+        }
+        public string Identifier
+        {
+            get { return identifier; }
+        }
+        public SegmentInfo SegmentInfo
+        {
+            get { return segment; }
+        }
+
         public SND(IConnection con, string contentType, string identifier, SegmentInfo info)
             : base(con, null)
         {
@@ -59,6 +72,7 @@ namespace FlowLib.Protocols.Adc
                 }
                 catch { }
             }
+
         }
     }
     public class GFI : AdcBaseMessage
@@ -167,14 +181,14 @@ namespace FlowLib.Protocols.Adc
             }
         }
 
-        public RCM(string token, IConnection con)
-            : this(token, con, "ADC/1.0") { }
-        public RCM(string token, IConnection con, string protocol)
+        public RCM(string token, IConnection con, string meid, string userid)
+            : this(token, con, "ADC/1.0", meid, userid) { }
+        public RCM(string token, IConnection con, string protocol, string meid, string userid)
             : base(con, null)
         {
             this.protocol = protocol;
             this.token = token;
-            Raw = string.Format("DRCM {0} {1}\n", protocol, token);
+            Raw = string.Format("DRCM {0} {1} {2} {3}\n", meid, userid, protocol, token);
         }
     }
     public class CTM : AdcBaseMessage
@@ -588,6 +602,25 @@ namespace FlowLib.Protocols.Adc
     }
     public class SUP : AdcBaseMessage
     {
+        protected bool bas = false;
+        protected bool bzip = false;
+        protected bool tigr = false;
+
+        public bool BASE
+        {
+            get { return bas; }
+        }
+
+        public bool BZIP
+        {
+            get { return bzip; }
+        }
+
+        public bool TIGR
+        {
+            get { return tigr; }
+        }
+
         /// <summary>
         /// Sending Support to hub
         /// </summary>
@@ -595,15 +628,40 @@ namespace FlowLib.Protocols.Adc
             : base(con, null)
         {
             if (con is Hub)
+            {
                 Raw = "HSUP " + AdcProtocol.Support + "\n";
+            }
             else
-                Raw = "CSUP " + AdcProtocol.Support + "\n";
+            {
+                Raw = "CSUP " + AdcProtocol.TransferSupport + "\n";
+            }
+            ParseRaw();
         }
 
         public SUP(IConnection con, string raw)
             : base(con, raw)
         {
+            ParseRaw();
+        }
 
+        protected void ParseRaw()
+        {
+            foreach (string sup in param)
+            {
+                // We hate old DC++ clients with stupid support
+                if (sup.Equals("ADBAS0"))
+                {
+                    bas = true;
+                    bzip = true;
+                    tigr = true;
+                }
+                if (sup.Equals("ADTIGR"))
+                    tigr = true;
+                if (sup.Equals("ADBZIP"))
+                    bzip = true;
+                if (sup.Equals("ADBASE"))
+                    bas = true;
+            }
         }
     }
     public class INF : AdcBaseMessage
@@ -1061,9 +1119,9 @@ namespace FlowLib.Protocols.Adc
             else
                 param = string.Empty;
             if (!string.IsNullOrEmpty(userId))
-                Raw = string.Format("DSTA {0} {1} {2} DE{3}{4}\n", userId, meId, code, AdcProtocol.ConvertOutgoing(description), param);
+                Raw = string.Format("DSTA {0} {1} {2} {3}{4}\n", meId,userId, code, AdcProtocol.ConvertOutgoing(description), param);
             else
-                Raw = string.Format("CSTA {0} DE{1}{2}\n", code, AdcProtocol.ConvertOutgoing(description), param);
+                Raw = string.Format("CSTA {0} {1}{2}\n", code, AdcProtocol.ConvertOutgoing(description), param);
         }
     }
     public class GPA : AdcBaseMessage

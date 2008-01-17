@@ -79,50 +79,101 @@ namespace FlowLib.Protocols.Adc
             get { return idtwo; }
         }
 
+        public override string Raw
+        {
+            get { return base.Raw; }
+            set 
+            {
+                base.Raw = value;
+                if (raw == null)
+                    return;
+
+                bool hasId = false;
+                bool hasId2 = false;
+                param = new System.Collections.Generic.List<string>(raw.Split(' '));
+                if (param.Count >= 1 && param[0].Length == 4)
+                {
+                    type = param[0].Substring(0, 1);
+                    switch (type)
+                    {
+                        case "B":       // Broadcast Message
+                            hasId = true;
+                            break;
+                        case "U":       // UDP Message
+                            hasId = true;
+                            break;
+                        case "D":       // Direct message
+                            hasId = true;
+                            hasId2 = true;
+                            break;
+                        case "C":       // Client Message
+                            break;
+                        case "I":
+                            break;
+                    }
+
+                    action = param[0].Substring(1, 3);
+                    param.RemoveAt(0);
+                }
+
+                if (hasId && param.Count >= 1)
+                {
+                    id = param[0];
+                    param.RemoveAt(0);
+                }
+                if (hasId2 && param.Count >= 1)
+                {
+                    idtwo = param[0];
+                    param.RemoveAt(0);
+                }
+
+            }
+        }
+
         public AdcBaseMessage(IConnection con, string raw)
             : base(con, raw)
         {
-            if (raw == null)
-                return;
+            //if (raw == null)
+            //    return;
 
-            bool hasId = false;
-            bool hasId2 = false;
-            param = new System.Collections.Generic.List<string>(raw.Split(' '));
-            if (param.Count >= 1 && param[0].Length == 4)
-            {
-                type = param[0].Substring(0, 1);
-                switch (type)
-                {
-                    case "B":       // Broadcast Message
-                        hasId = true;
-                        break;
-                    case "U":       // UDP Message
-                        hasId = true;
-                        break;
-                    case "D":       // Direct message
-                        hasId = true;
-                        hasId2 = true;
-                        break;
-                    case "C":       // Client Message
-                        break;
-                    case "I":
-                        break;
-                }
+            //bool hasId = false;
+            //bool hasId2 = false;
+            //param = new System.Collections.Generic.List<string>(raw.Split(' '));
+            //if (param.Count >= 1 && param[0].Length == 4)
+            //{
+            //    type = param[0].Substring(0, 1);
+            //    switch (type)
+            //    {
+            //        case "B":       // Broadcast Message
+            //            hasId = true;
+            //            break;
+            //        case "U":       // UDP Message
+            //            hasId = true;
+            //            break;
+            //        case "D":       // Direct message
+            //            hasId = true;
+            //            hasId2 = true;
+            //            break;
+            //        case "C":       // Client Message
+            //            break;
+            //        case "I":
+            //            break;
+            //    }
 
-                action = param[0].Substring(1, 3);
-                param.RemoveAt(0);
-            }
+            //    action = param[0].Substring(1, 3);
+            //    param.RemoveAt(0);
+            //}
 
-            if (hasId && param.Count >= 1)
-            {
-                id = param[0];
-                param.RemoveAt(0);
-            }
-            if (hasId2 && param.Count >= 1)
-            {
-                idtwo = param[0];
-                param.RemoveAt(0);
-            }
+            //if (hasId && param.Count >= 1)
+            //{
+            //    id = param[0];
+            //    param.RemoveAt(0);
+            //}
+            //if (hasId2 && param.Count >= 1)
+            //{
+            //    idtwo = param[0];
+            //    param.RemoveAt(0);
+            //}
         }
     }
 }

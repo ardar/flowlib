@@ -75,7 +75,6 @@
     <Compile Include="Containers\Share.cs" />
     <Compile Include="Containers\Source.cs" />
     <Compile Include="Containers\TagInfo.cs" />
-    <Compile Include="Containers\TransferMessage.cs" />
     <Compile Include="Containers\TransferRequest.cs" />
     <Compile Include="Containers\User.cs" />
     <Compile Include="Containers\UserInfo.cs" />
@@ -83,6 +82,7 @@
     <Compile Include="Enums\Enums.cs" />
     <Compile Include="Events\Actions.cs" />
     <Compile Include="Events\FmdcEventArg.cs" />
+    <Compile Include="Hashing\HashTth.cs" />
     <Compile Include="Interfaces\IConMessage.cs" />
     <Compile Include="Interfaces\IConnection.cs" />
     <Compile Include="Interfaces\IErrorReporting.cs" />

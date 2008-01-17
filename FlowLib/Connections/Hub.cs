@@ -73,8 +73,9 @@ namespace FlowLib.Connections
         {
             get { return interval; }
             set {
-                interval = (value == 0) ? Timeout.Infinite : (interval * 1000);
-                keepAliveTimer.Change(interval, interval);
+                interval = value;
+                long tmp = ((interval == 0) ? Timeout.Infinite : (interval * 1000));
+                keepAliveTimer.Change(tmp, tmp);
             }
         }
 
