@@ -235,13 +235,13 @@ namespace FlowLib.Protocols
                 // Do we have a working byte array?
                 if (b != null && length != 0)
                 {
-                    BinaryMessage conMsg = new BinaryMessage(trans, b, length);
+                    BinaryMessage conMsg = new BinaryMessage(con, b, length);
                     // Plugin handling here
                     FmdcEventArgs e = new FmdcEventArgs(Actions.CommandIncomming, conMsg);
-                    MessageReceived(trans, e);
+                    MessageReceived(con, e);
                     if (!e.Handled)
                     {
-                        if (this.download)
+                        if (this.download && trans != null)
                         {
                             if (trans.DownloadItem != null && trans.CurrentSegment.Index != -1)
                             {
@@ -345,14 +345,6 @@ namespace FlowLib.Protocols
             }
             firstMsg = false;
 
-            // If wrong Protocol type has been set. change it to Nmdc
-            //if (hub != null && hub.RegMode == -1 && raw.Length > 5 && raw.StartsWith("$"))
-            //{   // Setting hubtype to NMDC
-            //    hub.Protocol = new HubNmdcProtocol(hub);
-            //    hub.HubSetting.Protocol = hub.Protocol.Name;
-            //    hub.Reconnect();
-            //}
-
             // Loop through Commands.
             while ((pos = raw.IndexOf(Seperator)) > 0)
             {
@@ -362,7 +354,7 @@ namespace FlowLib.Protocols
                 // Plugin handling here
                 FmdcEventArgs e = new FmdcEventArgs(Actions.CommandIncomming, msg);
                 MessageReceived(con, e);
-                if (!e.Handled)
+                if (!e.Handled && msg.IsValid)
                     ActOnInMessage(msg);
             }
             // If Something is still left. Save it to buffer for later use.
