@@ -392,7 +392,6 @@ namespace FlowLib.Protocols.Adc
         {
             get { return address; }
         }
-
         public ContentInfo Info
         {
             get
@@ -404,12 +403,10 @@ namespace FlowLib.Protocols.Adc
                 info = value;
             }
         }
-
         public string Token
         {
             get { return token; }
         }
-
         public long Slots
         {
             get { return slots; }
@@ -536,7 +533,6 @@ namespace FlowLib.Protocols.Adc
             {
                 from = id;
                 content = param[0];
-                valid = true;
             }
             // Param
             for (int i = 1; i < param.Count; i++)
@@ -560,6 +556,7 @@ namespace FlowLib.Protocols.Adc
             if (content != null)
             {
                 content = AdcProtocol.ConvertIncomming(content);
+                valid = true;
             }
         }
         /// <summary>
@@ -662,11 +659,15 @@ namespace FlowLib.Protocols.Adc
                 if (sup.Equals("ADBASE"))
                     bas = true;
             }
+
+            if (bas && tigr)
+                valid = true;
         }
     }
     public class INF : AdcBaseMessage
     {
         protected UserInfo info = new UserInfo();
+        protected string token = null;
         public UserInfo UserInfo
         {
             get { return info; }
@@ -676,6 +677,12 @@ namespace FlowLib.Protocols.Adc
                 CreateRaw();
             }
         }
+
+        public string Token
+        {
+            get { return token; }
+        }
+
         // Receiving
         public INF(IConnection con, string raw)
             : base(con, raw)
@@ -684,6 +691,9 @@ namespace FlowLib.Protocols.Adc
                 return;
             info.TagInfo.GenerateTag = true;
             info.Set(UserInfo.SID, id);
+            if (id != null)
+                valid = true;
+
             // IINF is from hub. all other should be from user =)
             // NIDCDev\sPublic HU1 HI1 DEThe\spublic\sDirect\sConnect\sdevelopment\shub VEADCH++\sv2.0.0-Release
             // TUOD SF0 SL1 SS0 SUTCP4,UDP4 DEPASIV HN4 HO0 HR0 I489.38.33.162 U41090 IDARJQDWZKC4MMC7PLQNOYSPHVI7V62QPS4IRF5KA EMLIVIUANDREI70@YAHOO.COM US104857600 VE++\s0.698 NI[RO][B][QUICK-NET]LIVIU
@@ -766,8 +776,9 @@ namespace FlowLib.Protocols.Adc
                             info.TagInfo.OP = 0;
                         }
                         break;
-                    //case "TO":
-                    //    break;
+                    case "TO":
+                        token = value;
+                        break;
                     case "OP":      // Before ADC 1.0
                         info.IsOperator = (value == "1");
                         break;
@@ -898,7 +909,6 @@ namespace FlowLib.Protocols.Adc
         public PAS(IConnection con, string raw)
             : base(con, raw)
         {
-
         }
 
         public PAS(IConnection con, string randomdata, string password)
@@ -986,6 +996,7 @@ namespace FlowLib.Protocols.Adc
             {
                 id = param[0];
                 param.RemoveAt(0);
+                valid = true;
             }
             for (int i = 0; i < param.Count; i++)
             {
@@ -1076,6 +1087,7 @@ namespace FlowLib.Protocols.Adc
                 severity = param[0].Substring(0, 1);
                 code = param[0].Substring(1);
                 content = AdcProtocol.ConvertIncomming(param[1]);
+                valid = true;
             }
 
             for (int i = 2; i < param.Count; i++)
