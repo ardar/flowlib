@@ -292,7 +292,7 @@ namespace FlowLib.Protocols
                 // Plugin handling here
                 FmdcEventArgs e = new FmdcEventArgs(Actions.CommandIncomming, msg);
                 MessageReceived(trans, e);
-                if (!e.Handled)
+                if (!e.Handled && msg.IsValid)
                     ActOnInMessage(msg);
                 pos++;
             }

@@ -54,6 +54,7 @@ namespace FlowLib.Protocols.TransferNmdc
                 pos++;
                 info = new UserInfo();
                 info.DisplayName = raw.Substring(pos);
+                valid = true;
                 // TODO : Check against Usernames in hub should be done here.
                 return;
             }
@@ -235,6 +236,7 @@ namespace FlowLib.Protocols.TransferNmdc
                 pos++;
                 string tmp = raw.Substring(pos);
                 Support = tmp.Split(' ');
+                valid = true;
                 return;
             }
         }
@@ -346,6 +348,7 @@ namespace FlowLib.Protocols.TransferNmdc
                     try
                     {
                         number = int.Parse(tmp.Substring(++pos));
+                        valid = true;
                     }
                     catch { }
                 }
@@ -422,6 +425,7 @@ namespace FlowLib.Protocols.TransferNmdc
             {
                 pos += 3;
                 pk = raw.Substring(pos);
+                valid = true;
             }
 
             // TODO : Now we have the below code on 2 diffrent places. Use the one in hubnmdcmessages
@@ -499,6 +503,7 @@ namespace FlowLib.Protocols.TransferNmdc
             {
                 pos++;
                 value = raw.Substring(pos);
+                valid = true;
             }
         }
     }
@@ -528,6 +533,7 @@ namespace FlowLib.Protocols.TransferNmdc
                 try
                 {
                     length = long.Parse(raw.Substring(pos));
+                    valid = true;
                 }
                 catch { }
             }
@@ -550,6 +556,7 @@ namespace FlowLib.Protocols.TransferNmdc
             {
                 pos++;
                 message = raw.Substring(pos);
+                valid = true;
             }
         }
 
@@ -578,7 +585,7 @@ namespace FlowLib.Protocols.TransferNmdc
         public MaxedOut(IConnection con, string raw)
             : base(con, raw)
         {
-
+            valid = true;
         }
         public MaxedOut(IConnection con)
             : base(con, null)
@@ -602,6 +609,7 @@ namespace FlowLib.Protocols.TransferNmdc
             {
                 pos++;
                 message = raw.Substring(pos);
+                valid = true;
             }
         }
         public Failed(string message, IConnection con)
@@ -657,6 +665,7 @@ namespace FlowLib.Protocols.TransferNmdc
                 try
                 {
                     start = long.Parse(tmp);
+                    valid = true;
                 }
                 catch { }
                     if (start > 0)
@@ -764,6 +773,7 @@ namespace FlowLib.Protocols.TransferNmdc
                         try
                         {
                             length = long.Parse(sections[i]);
+                            valid = true;
                         }
                         catch { }
                         break;
@@ -901,6 +911,7 @@ namespace FlowLib.Protocols.TransferNmdc
                             try
                             {
                                 length = long.Parse(sections[i]);
+                                valid = true;
                             }
                             catch { }
                             break;
@@ -1024,6 +1035,7 @@ namespace FlowLib.Protocols.TransferNmdc
                                 filename = sec[i];
                             else
                                 filename += " " +sec[i];
+                            valid = true;
                             break;
                     }
                     if (!System.Text.Encoding.ASCII.Equals(encoding))
@@ -1045,6 +1057,7 @@ namespace FlowLib.Protocols.TransferNmdc
             : base(con, raw)
         {
             ZLibCompression = true;
+            valid = true;
         }
     }
     public class UGetBlock : GetBlocks
@@ -1060,6 +1073,7 @@ namespace FlowLib.Protocols.TransferNmdc
             : base(con, raw)
         {
             Encoding = System.Text.Encoding.UTF8;
+            valid = true;
         }
     }
     public class UGetZBlock : GetBlocks
@@ -1077,6 +1091,7 @@ namespace FlowLib.Protocols.TransferNmdc
         {
             ZLibCompression = true;
             Encoding = System.Text.Encoding.UTF8;
+            valid = true;
         }
     }
     #endregion
@@ -1092,7 +1107,7 @@ namespace FlowLib.Protocols.TransferNmdc
         public Send(IConnection con, string raw)
             : base(con, raw)
         {
-
+            valid = true;
         }
     }
     public class Sending : StrMessage
@@ -1123,6 +1138,7 @@ namespace FlowLib.Protocols.TransferNmdc
                 try
                 {
                     length = long.Parse(raw.Substring(pos));
+                    valid = true;
                 }
                 catch { }
             }
