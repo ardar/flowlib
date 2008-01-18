@@ -80,6 +80,15 @@ namespace FlowLib.Protocols.Adc
         protected string contentType = null;
         protected string identifier = null;
 
+        public string ContentType
+        {
+            get { return contentType; }
+        }
+        public string Identifier
+        {
+            get { return identifier; }
+        }
+
         public GFI(IConnection con, string raw)
             : base(con, raw)
         {
@@ -473,9 +482,13 @@ namespace FlowLib.Protocols.Adc
                 }
                 catch { }
             }
-            else
+            else if (con is Hub)
             {
                 type = "D";
+            }
+            else
+            {
+                type = "C";
             }
 
             System.Text.StringBuilder sb = new System.Text.StringBuilder();

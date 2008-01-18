@@ -49,10 +49,13 @@ namespace FlowLib.Protocols
         protected bool rawData = false;
 
 
-
-        protected static string yourtranssupports = "ADBAS0 ADBASE";
+        protected static string yourtranssupports = "ADBAS0 ADBASE BZIP";
         protected static string yoursupports = "ADBAS0 ADBASE ADTIGR";
         //protected static string yoursupports = "ADBASE RMBAS0 ADTIGR";
+
+        public event FmdcEventHandler ChangeDownloadItem;
+        public event FmdcEventHandler RequestTransfer;
+        public event FmdcEventHandler Error;
 
         public event FmdcEventHandler MessageReceived;
         public event FmdcEventHandler MessageToSend;
@@ -104,7 +107,14 @@ namespace FlowLib.Protocols
             MessageReceived = new FmdcEventHandler(OnMessageReceived);
             MessageToSend = new FmdcEventHandler(OnMessageToSend);
             Update = new FmdcEventHandler(OnUpdate);
+            ChangeDownloadItem = new FmdcEventHandler(AdcProtocol_ChangeDownloadItem);
+            RequestTransfer = new FmdcEventHandler(AdcProtocol_RequestTransfer);
+            Error = new FmdcEventHandler(AdcProtocol_Error);
         }
+
+        void AdcProtocol_Error(object sender, FmdcEventArgs e) { }
+        void AdcProtocol_RequestTransfer(object sender, FmdcEventArgs e){ }
+        void AdcProtocol_ChangeDownloadItem(object sender, FmdcEventArgs e) { }
 
         protected AdcProtocol(IConnection con)
             :this()
@@ -709,8 +719,50 @@ namespace FlowLib.Protocols
                 }
             }
             #endregion
+            #region GFI
+            else if (message is GFI && this.trans != null)
+            {
+                GFI gfi = (GFI)message;
+                if (gfi.Identifier != null)
+                {
+                    trans.Content = new ContentInfo();
+                    switch (gfi.ContentType)
+                    {
+                        case "file":        // Requesting file
+                            // This is because we have support for old DC++ client and mods like (DCDM who has ASCII encoding)
+                            if (gfi.Identifier.Equals("files.xml.bz2"))
+                            {
+                                trans.Content.Set(ContentInfo.FILELIST, Utils.FileLists.BaseFilelist.XMLBZ);
+                                trans.Content.Set(ContentInfo.VIRTUAL, System.Text.Encoding.UTF8.WebName + gfi.Identifier);
+                            }
+                            else if (gfi.Identifier.StartsWith("TTH/"))
+                            {
+                                trans.Content.Set(ContentInfo.TTH, gfi.Identifier.Substring(4));
+                            }
+                            else
+                            {
+                                trans.Content.Set(ContentInfo.VIRTUAL, gfi.Identifier);
+                            }
+                            break;
+                        case "list":        // TODO : We dont care about what subdirectoy user whats list for
+                            trans.Content.Set(ContentInfo.FILELIST, Utils.FileLists.BaseFilelist.XML);
+                            trans.Content.Set(ContentInfo.VIRTUAL, System.Text.Encoding.UTF8.WebName + "files.xml");
+                            break;
+                        default:            // We are not supporting type. Disconnect
+                            con.Send(new STA(con, "251", "Type not known:" + gfi.ContentType, null));
+                            con.Disconnect();
+                            return;
+                    }
+                    SearchInfo si = new SearchInfo();
+                    if (trans.Content.ContainsKey(ContentInfo.TTH))
+                        si.Set(SearchInfo.TYPE, trans.Content.Get(ContentInfo.TTH));
+                    si.Set(SearchInfo.SEARCH, trans.Content.Get(ContentInfo.VIRTUAL));
+                    SendRES(si, trans.User);
+                }
+            }
+            #endregion
             #region GET
-            else if (message is GET)
+            else if (message is GET && trans != null)
             {
                 GET get = (GET)message;
                 // If we are supposed to download and other client tries to download. Disconnect.
@@ -776,7 +828,7 @@ namespace FlowLib.Protocols
                             }
                             return;
                         default:            // We are not supporting type. Disconnect
-                            con.Send(new STA(con, "251", "Type now known:" + get.ContentType, null));
+                            con.Send(new STA(con, "251", "Type not known:" + get.ContentType, null));
                             con.Disconnect();
                             return;
                     }
@@ -788,7 +840,7 @@ namespace FlowLib.Protocols
                         //Util.Compression.ZLib zlib = null;
                         //if (adcget.ZL1)
                         //    zlib = new Fmdc.Util.Compression.ZLib();
-                        while (connectionStatus != TcpConnection.Disconnected && (bytesToSend = GetContent(System.Text.Encoding.UTF8, trans.CurrentSegment.Position, trans.CurrentSegment.Length -trans.CurrentSegment.Position)) != null)
+                        while (connectionStatus != TcpConnection.Disconnected && (bytesToSend = GetContent(System.Text.Encoding.UTF8, trans.CurrentSegment.Position, trans.CurrentSegment.Length - trans.CurrentSegment.Position)) != null)
                         {
                             if (firstTime)
                             {
@@ -814,6 +866,7 @@ namespace FlowLib.Protocols
                     }
                     catch (System.Exception e) { System.Console.WriteLine("ERROR:" + e); }
                 }
+                trans.CurrentSegment = new SegmentInfo(-1);
                 trans.Content = null;
                 if (firstTime)
                 {
@@ -850,8 +903,19 @@ namespace FlowLib.Protocols
 
         protected void SendRES(SearchInfo info, UserInfo usr)
         {
-            if (hub.Share == null || usr == null)
+            Share share = null;
+            if (hub != null || hub.Share != null || usr != null)
+            {
+                share = hub.Share;
+            }
+            else if (trans != null || trans.Share != null || usr != null)
+            {
+                share = trans.Share;
+            }
+            else
+            {
                 return;
+            }
 
             int maxReturns = 10;
             string token = null;
@@ -860,9 +924,9 @@ namespace FlowLib.Protocols
 
             System.Collections.Generic.List<ContentInfo> ret = new System.Collections.Generic.List<ContentInfo>(maxReturns);
             // TODO : This lookup can be done nicer
-            lock (hub.Share)
+            lock (share)
             {
-                foreach (System.Collections.Generic.KeyValuePair<string, Containers.ContentInfo> var in hub.Share)
+                foreach (System.Collections.Generic.KeyValuePair<string, Containers.ContentInfo> var in share)
                 {
                     if (var.Value == null)
                         continue;
@@ -957,8 +1021,15 @@ namespace FlowLib.Protocols
                     {
                         if (5 > x++)
                         {
-                            // Send through hub
-                            hub.Send(res);
+                            if (hub != null)
+                            {
+                                // Send through hub
+                                hub.Send(res);
+                            }
+                            else if (trans != null)
+                            {
+                                trans.Send(res);
+                            }
                         }
                     }
                 }
@@ -1039,13 +1110,6 @@ namespace FlowLib.Protocols
         #endregion
 
         #region IProtocolTransfer Members
-
-        public event FmdcEventHandler ChangeDownloadItem;
-
-        public event FmdcEventHandler RequestTransfer;
-
-        public event FmdcEventHandler Error;
-
         public void OnDownload()
         {
             if (trans == null || trans.User == null || trans.Share == null || trans.Me == null)

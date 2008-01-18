@@ -683,6 +683,8 @@ namespace FlowLib.Protocols
                 }
                 if (firstTime)
                     trans.Send(new Failed("File Not Available", trans));
+                trans.CurrentSegment = new SegmentInfo(-1);
+                trans.Content = null;
             }
             else if (message is ADCGET)
             {
@@ -787,6 +789,7 @@ namespace FlowLib.Protocols
                     //    trans.Send(new ConMessage(trans, zlib.close()));
                 }
                 catch (System.Exception e) { System.Console.WriteLine("ERROR:" + e); }
+                trans.CurrentSegment = new SegmentInfo(-1);
                 trans.Content = null;
                 if (firstTime)
                 {
