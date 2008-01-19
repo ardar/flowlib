@@ -8,9 +8,9 @@
 = 20080119 =
 
   * *Changes from TODO:*
-    # Search for content (Nmdc)
-    # Receive search result (Nmdc)
-    # Adc Support (to 1.0)
+    # Search for content
+    # Receive search result
+    # Adc Support
     # Add Valid flag to transfer messages and search messages. 
 
   * *All changes:*
