@@ -31,10 +31,10 @@ namespace ConsoleDemo.Examples
             HubSetting settings = new HubSetting();
             settings.Address = "127.0.0.1";
             settings.Port = 411;
-            settings.DisplayName = "FlowLibNick";
+            settings.DisplayName = "FlowLib";
+            settings.Protocol = "Auto";
 
             Hub hubConnection = new Hub(settings, this);
-            hubConnection.Protocol = new FlowLib.Protocols.HubNmdcProtocol(hubConnection);
             hubConnection.Connect();
             // YOU should really listen for regmode change here.
             // Im not doing it here to make example more easy to understand.
@@ -51,7 +51,6 @@ namespace ConsoleDemo.Examples
 
             // message will here be converted to right format and then be sent.
             UpdateBase(this, new FlowLib.Events.FmdcEventArgs(FlowLib.Events.Actions.PrivateMessage, privMsg));
-
         }
 
         void SendMainChatOrPMToHub_UpdateBase(object sender, FlowLib.Events.FmdcEventArgs e) {}
