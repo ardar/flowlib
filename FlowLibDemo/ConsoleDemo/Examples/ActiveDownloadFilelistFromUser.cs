@@ -29,8 +29,10 @@ using FlowLib.Utils.FileLists;
 
 namespace ConsoleDemo.Examples
 {
-    public class ActiveEmptySharing
+    public class ActiveDownloadFilelistFromUser : IBaseUpdater
     {
+        public event FmdcEventHandler UpdateBase;
+
         TransferManager transferManager = new TransferManager();
         DownloadManager downloadManager = new DownloadManager();
         TcpConnectionListener incomingConnectionListener = null;
@@ -38,45 +40,37 @@ namespace ConsoleDemo.Examples
         //string currentDir = @"C:\Temp\";
         string currentDir = System.AppDomain.CurrentDomain.BaseDirectory;
 
-        public ActiveEmptySharing()
+        public ActiveDownloadFilelistFromUser()
         {
+            UpdateBase = new FmdcEventHandler(PassiveConnectToUser_UpdateBase);
+
             // Creates a empty share
             Share share = new Share("Testing");
             // Port to listen for incomming connections on
             share.Port = 12345;
-            AddFilelistsToShare(share);
 
             incomingConnectionListener = new TcpConnectionListener(share.Port);
             incomingConnectionListener.Update += new FmdcEventHandler(Connection_Update);
             incomingConnectionListener.Start();
-            
+
+            // Adds common filelist to share
+            AddFilelistsToShare(share);
+
             HubSetting setting = new HubSetting();
             setting.Address = "127.0.0.1";
             setting.Port = 411;
             setting.DisplayName = "FlowLib";
             setting.Protocol = "Auto";
 
-            Hub hubConnection = new Hub(setting);
+            Hub hubConnection = new Hub(setting, this);
             hubConnection.ProtocolChange += new FmdcEventHandler(hubConnection_ProtocolChange);
+            // Adds share to hub
             hubConnection.Share = share;
             hubConnection.Me.Mode = FlowLib.Enums.ConnectionTypes.Direct;
             hubConnection.Connect();
-        }
 
-        void hubConnection_ProtocolChange(object sender, FmdcEventArgs e)
-        {
-            Hub hubConnection = sender as Hub;
-            IProtocol prot = e.Data as IProtocol;
-            if (prot != null)
-            {
-                prot.Update -= hubConnection_Update;
-            }
-            hubConnection.Protocol.Update += new FmdcEventHandler(hubConnection_Update);
-        }
+            hubConnection.ConnectionStatusChange += new FmdcEventHandler(hubConnection_ConnectionStatusChange);
 
-        void AddFilelistsToShare(Share s)
-        {
-            General.AddCommonFilelistsToShare(s, currentDir + @"MyFileLists\");
         }
 
         void Connection_Update(object sender, FlowLib.Events.FmdcEventArgs e)
@@ -117,17 +111,53 @@ namespace ConsoleDemo.Examples
             trans.Protocol.RequestTransfer += new FmdcEventHandler(Protocol_RequestTransfer);
         }
 
+        void hubConnection_ConnectionStatusChange(object sender, FmdcEventArgs e)
+        {
+            Hub hubConnection = sender as Hub;
+            if (hubConnection == null)
+                return;
+
+            if (e.Action == TcpConnection.Connected)
+            {
+                // Do a user name Flow84 exist in hub?
+                User usr = hubConnection.GetUserByNick("Flow84");
+                if (usr != null)
+                {
+                    // Adding filelist of unknown type to download manager.
+                    // to the user Flow84
+                    ContentInfo info = new ContentInfo(ContentInfo.FILELIST, BaseFilelist.UNKNOWN);
+                    info.Set(ContentInfo.STORAGEPATH, currentDir + @"Filelists\" + usr.ID + ".filelist");
+                    downloadManager.AddDownload(new DownloadItem(info), new Source(null, usr.ID));
+                    // Start transfer to user
+                    UpdateBase(this, new FmdcEventArgs(Actions.StartTransfer, usr));
+                }
+            }
+        }
+
+        void PassiveConnectToUser_UpdateBase(object sender, FmdcEventArgs e) { }
+
+        void hubConnection_ProtocolChange(object sender, FmdcEventArgs e)
+        {
+            Hub hubConnection = sender as Hub;
+            IProtocol prot = e.Data as IProtocol;
+            if (prot != null)
+            {
+                prot.Update -= hubConnection_Update;
+            }
+            hubConnection.Protocol.Update += new FmdcEventHandler(hubConnection_Update);
+        }
+
+        void AddFilelistsToShare(Share s)
+        {
+            // This will add common filelists to share and save them in directory specified.
+            General.AddCommonFilelistsToShare(s, currentDir + @"MyFileLists\");
+        }
+
         void hubConnection_Update(object sender, FmdcEventArgs e)
         {
+            Hub hub = (Hub)sender;
             switch (e.Action)
             {
-                case Actions.TransferRequest:
-                    if (e.Data is TransferRequest)
-                    {
-                        TransferRequest req = (TransferRequest)e.Data;
-                        transferManager.AddTransferReq(req);
-                    }
-                    break;
                 case Actions.TransferStarted:
                     Transfer trans = e.Data as Transfer;
                     if (trans != null)

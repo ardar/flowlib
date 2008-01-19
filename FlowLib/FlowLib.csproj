@@ -110,6 +110,7 @@
     <Compile Include="Protocols\Nmdc\transfernmdcmessages.cs" />
     <Compile Include="Protocols\transfernmdcprotocol.cs" />
     <Compile Include="Protocols\UdpNmdcProtocol.cs" />
+    <Compile Include="Protocols\UdpProtocol.cs" />
     <Compile Include="Utils\Compression\Bz2.cs" />
     <Compile Include="Utils\Compression\Bz2SubMethods\BZip2Constants.cs" />
     <Compile Include="Utils\Compression\Bz2SubMethods\BZip2Exception.cs" />

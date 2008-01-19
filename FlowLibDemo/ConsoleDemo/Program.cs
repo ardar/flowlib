@@ -8,9 +8,7 @@ namespace ConsoleDemo
     {
         static void Main(string[] args)
         {
-            new AdcSpecV1();
-            //new ActiveSearchTest();
-            //new Testing();
+            new ConnectToHub();
             Console.Read();
         }
 
