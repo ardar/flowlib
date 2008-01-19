@@ -1,14 +1,3 @@
-#summary Passive Searching
-
-= Description =
-
-_[CodeExamplesConnectToHub To learn on how to connect to hub click here.]_
-
-
-
-= Code = 
-
-{{{
 using FlowLib.Containers;
 using FlowLib.Connections;
 using FlowLib.Interfaces;
@@ -31,14 +20,14 @@ namespace ConsoleDemo.Examples
             HubSetting settings = new HubSetting();
             settings.Address = "127.0.0.1";
             settings.Port = 411;
-            settings.DisplayName = "FlowLibNick";
-            settings.Protocol = "Nmdc";
+            settings.DisplayName = "FlowLib";
+            settings.Protocol = "Auto";
 
             Hub hubConnection = new Hub(settings,this);
-            hubConnection.Update += new FlowLib.Events.FmdcEventHandler(hubConnection_Update);
+            hubConnection.ProtocolChange += new FmdcEventHandler(hubConnection_ProtocolChange);
             hubConnection.Connect();
 
-            // Wait 5 seconds
+            // Wait 5 seconds (We should really listen on ConnectionStatusChange instead.
             System.Threading.Thread.Sleep(5 * 1000);
 
             // Send Search
@@ -46,6 +35,18 @@ namespace ConsoleDemo.Examples
             searchInfo.Set(SearchInfo.SEARCH, "Ecma-334");
 
             UpdateBase(this, new FlowLib.Events.FmdcEventArgs(Actions.Search, searchInfo));
+        }
+
+        void hubConnection_ProtocolChange(object sender, FmdcEventArgs e)
+        {
+            Hub hubConnection = sender as Hub;
+            IProtocol prot = e.Data as IProtocol;
+            if (prot != null)
+            {
+                prot.Update -= hubConnection_Update;
+            }
+            hubConnection.Protocol.Update += new FmdcEventHandler(hubConnection_Update);
+            hubConnection.Protocol.Update += new FlowLib.Events.FmdcEventHandler(hubConnection_Update);
         }
 
         void PassiveSearch_UpdateBase(object sender, FlowLib.Events.FmdcEventArgs e) { }
@@ -65,4 +66,3 @@ namespace ConsoleDemo.Examples
         }
     }
 }
-}}}
