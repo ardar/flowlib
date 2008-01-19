@@ -1,3 +1,14 @@
+#summary Passive Searching
+
+= Description =
+
+_[CodeExamplesConnectToHub To learn on how to connect to hub click here.]_
+
+
+
+= Code = 
+
+{{{
 using FlowLib.Containers;
 using FlowLib.Connections;
 using FlowLib.Interfaces;
@@ -66,3 +77,5 @@ namespace ConsoleDemo.Examples
         }
     }
 }
+
+}}}
