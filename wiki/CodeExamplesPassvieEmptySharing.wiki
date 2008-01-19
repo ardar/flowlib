@@ -28,6 +28,8 @@ namespace ConsoleDemo.Examples
     {
         TransferManager transferManager = new TransferManager();
         DownloadManager downloadManager = new DownloadManager();
+        //string currentDir = @"C:\Temp\";
+        string currentDir = System.AppDomain.CurrentDomain.BaseDirectory;
 
         public PassiveEmptySharing()
         {
@@ -40,19 +42,30 @@ namespace ConsoleDemo.Examples
             setting.Address = "127.0.0.1";
             setting.Port = 411;
             setting.DisplayName = "FlowLib";
+            setting.Protocol = "Auto";
 
             Hub hubConnection = new Hub(setting);
+            hubConnection.ProtocolChange += new FmdcEventHandler(hubConnection_ProtocolChange);
             // Adds share to hub
             hubConnection.Share = share;
-            hubConnection.Protocol = new HubNmdcProtocol(hubConnection);
-            hubConnection.Update += new FmdcEventHandler(hubConnection_Update);
             hubConnection.Connect();
+        }
+
+        void hubConnection_ProtocolChange(object sender, FmdcEventArgs e)
+        {
+            Hub hubConnection = sender as Hub;
+            IProtocol prot = e.Data as IProtocol;
+            if (prot != null)
+            {
+                prot.Update -= hubConnection_Update;
+            }
+            hubConnection.Protocol.Update += new FmdcEventHandler(hubConnection_Update);
         }
 
         void AddFilelistsToShare(Share s)
         {
             // This will add common filelists to share and save them in directory specified.
-            General.AddCommonFilelistsToShare(s, "C:\\Private\\FMDC\\PiP\\FlowLibDemo\\ConsoleDemo\\bin\\Debug\\MyFileLists\\");
+            General.AddCommonFilelistsToShare(s, currentDir + "MyFileLists\\");
         }
 
         void hubConnection_Update(object sender, FmdcEventArgs e)
