@@ -7,12 +7,11 @@
 
 = 20080119 =
 
-  **Main Changes:*
-
-# Search for content (Nmdc)
-# Receive search result (Nmdc)
-# Adc Support (to 1.0)
-# Add Valid flag to transfer messages and search messages. 
+  * *Main Changes:*
+  # Search for content (Nmdc)
+  # Receive search result (Nmdc)
+  # Adc Support (to 1.0)
+  # Add Valid flag to transfer messages and search messages. 
 
 
   * ADD		- Active and passive searching (Send/Receive). 
