@@ -5,7 +5,7 @@
 _[CodeExamplesConnectToHub To learn on how to connect to hub click here.]_
 
   # Start listening on MessageReceived and MessageToSend event.
-  # e.Data will contain a inherit class of HubMessage.
+  # e.Data will contain a inherit class of StrMessage.
 
 = Note =
 
@@ -30,26 +30,37 @@ namespace ConsoleDemo.Examples
             HubSetting settings = new HubSetting();
             settings.Address = "127.0.0.1";
             settings.Port = 411;
-            settings.DisplayName = "FlowLibNick";
+            settings.DisplayName = "FlowLib";
+            settings.Protocol = "Auto";
 
             Hub hubConnection = new Hub(settings);
-            hubConnection.Protocol = new FlowLib.Protocols.HubNmdcProtocol(hubConnection);
+            hubConnection.ProtocolChange += new FlowLib.Events.FmdcEventHandler(hubConnection_ProtocolChange);
+            hubConnection.Connect();
+        }
+
+        void hubConnection_ProtocolChange(object sender, FlowLib.Events.FmdcEventArgs e)
+        {
+            Hub hubConnection = sender as Hub;
+            IProtocol prot = e.Data as IProtocol;
+            if (prot != null)
+            {
+                prot.MessageReceived -= Protocol_MessageReceived;
+                prot.MessageToSend -= Protocol_MessageToSend;
+            }
             hubConnection.Protocol.MessageReceived += new FlowLib.Events.FmdcEventHandler(Protocol_MessageReceived);
             hubConnection.Protocol.MessageToSend += new FlowLib.Events.FmdcEventHandler(Protocol_MessageToSend);
-
-            hubConnection.Connect();
         }
 
         void Protocol_MessageToSend(object sender, FlowLib.Events.FmdcEventArgs e)
         {
-            HubMessage msg = e.Data as HubMessage;
+            StrMessage msg = e.Data as StrMessage;
             if (msg != null)
                 System.Console.WriteLine(string.Format("OUT: {0}", msg.Raw));
         }
 
         void Protocol_MessageReceived(object sender, FlowLib.Events.FmdcEventArgs e)
         {
-            HubMessage msg = e.Data as HubMessage;
+            StrMessage msg = e.Data as StrMessage;
             if (msg != null)
                System.Console.WriteLine(string.Format("IN: {0}", msg.Raw));
         }
