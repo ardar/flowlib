@@ -27,7 +27,7 @@ namespace ConsoleDemo.Examples
             // Connection mode in UserInfo. Direct/Passive/Socket5
             hubConnection.Me.Mode = FlowLib.Enums.ConnectionTypes.Direct;
             // Client/Bot name and version in UserInfo.
-            hubConnection.Me.TagInfo.Version = "SpeedBot V:2.0";
+            hubConnection.Me.TagInfo.Version = "SpeedBot V:1.0";
             // Connection in UserInfo
             hubConnection.Me.Connection = "104KiB/s";
             // User Description in UserInfo
