@@ -1,4 +1,4 @@
-#summary Start downloading of filelist from user (Passive)
+#summary Code Example - Downloading filelist from user (Passive)
 
 = Description =
 
