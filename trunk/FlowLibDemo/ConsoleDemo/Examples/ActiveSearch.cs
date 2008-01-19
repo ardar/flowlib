@@ -37,18 +37,13 @@ namespace ConsoleDemo.Examples
             UpdateBase = new FmdcEventHandler(ActiveSearch_UpdateBase);
 
             HubSetting settings = new HubSetting();
-            settings.Address = "flow84.no-ip.org";
-            settings.Port = 2876;
-            settings.DisplayName = "FlowLibNick";
-            //settings.Protocol = "Nmdc";
-            settings.Password = "1";
+            settings.Address = "127.0.0.1";
+            settings.Port = 411;
+            settings.DisplayName = "FlowLib";
+            settings.Protocol = "Auto";
 
             hubConnection = new Hub(settings, this);
-            hubConnection.Protocol = new FlowLib.Protocols.HubNmdcProtocol(hubConnection);
-            hubConnection.Protocol.MessageReceived += new FmdcEventHandler(Protocol_MessageReceived2);
-            hubConnection.Protocol.MessageToSend += new FmdcEventHandler(Protocol_MessageToSend);
-
-            hubConnection.Update += new FlowLib.Events.FmdcEventHandler(hubConnection_Update);
+            hubConnection.ProtocolChange += new FmdcEventHandler(hubConnection_ProtocolChange);
             hubConnection.Connect();
 
             Share share = new Share("Test");
@@ -64,16 +59,31 @@ namespace ConsoleDemo.Examples
             hubConnection.ConnectionStatusChange += new FmdcEventHandler(hubConnection_ConnectionStatusChange);
         }
 
+        void hubConnection_ProtocolChange(object sender, FmdcEventArgs e)
+        {
+            Hub hubConnection = sender as Hub;
+            IProtocol prot = e.Data as IProtocol;
+            if (prot != null)
+            {
+                prot.MessageReceived -= Protocol_MessageReceived;
+                prot.MessageToSend -= Protocol_MessageToSend;
+                prot.Update -= hubConnection_Update;
+            }
+            hubConnection.Protocol.MessageReceived += new FlowLib.Events.FmdcEventHandler(Protocol_MessageReceived);
+            hubConnection.Protocol.MessageToSend += new FlowLib.Events.FmdcEventHandler(Protocol_MessageToSend);
+            hubConnection.Protocol.Update += new FlowLib.Events.FmdcEventHandler(hubConnection_Update);
+        }
+
         void Protocol_MessageToSend(object sender, FmdcEventArgs e)
         {
-            HubMessage msg = e.Data as HubMessage;
+            StrMessage msg = e.Data as StrMessage;
             if (msg != null)
                 System.Console.WriteLine("OUT:" + msg.Raw);
         }
 
         void Protocol_MessageReceived2(object sender, FmdcEventArgs e)
         {
-            HubMessage msg = e.Data as HubMessage;
+            StrMessage msg = e.Data as StrMessage;
             if (msg != null)
                 System.Console.WriteLine("IN:" + msg.Raw);
         }

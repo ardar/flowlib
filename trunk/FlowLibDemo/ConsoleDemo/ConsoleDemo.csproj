@@ -48,15 +48,14 @@
     <Compile Include="ConsoleClient\Setting.cs" />
     <Compile Include="ConsoleClient\Welcome.cs" />
     <Compile Include="ConsoleClient\Window.cs" />
+    <Compile Include="Examples\ActiveDownloadFilelistFromUser.cs" />
     <Compile Include="Examples\ActiveEmptySharing.cs" />
     <Compile Include="Examples\ActiveSearch.cs" />
-    <Compile Include="Examples\ActiveSearchTest.cs" />
-    <Compile Include="Examples\AdcSpecV1.cs" />
-    <Compile Include="Examples\AdcTigr.cs" />
     <Compile Include="Examples\ChangeBotUserInfo.cs" />
     <Compile Include="Examples\ConnectToHub.cs" />
     <Compile Include="ConsoleClient\Hub.cs" />
     <Compile Include="Examples\DisplayRawMessages.cs" />
+    <Compile Include="Examples\PassiveDownloadFilelistFromUser.cs" />
     <Compile Include="Examples\PassiveEmptySharing.cs" />
     <Compile Include="Examples\PassiveSearch.cs" />
     <Compile Include="Examples\SendMainChatOrPMToHub.cs" />
