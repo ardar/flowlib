@@ -9,41 +9,43 @@ _[CodeExamplesConnectToHub To learn on how to connect to hub click here.]_
 = Code = 
 
 {{{
-using FlowLib.Connections;
 using FlowLib.Containers;
-using FlowLib.Protocols;
-using FlowLib.Events;
+using FlowLib.Connections;
 using FlowLib.Interfaces;
-using FlowLib.Managers;
-using FlowLib.Utils.FileLists;
+using FlowLib.Events;
+using Nmdc = FlowLib.Protocols.HubNmdc;
+using System.Net;
 
 namespace ConsoleDemo.Examples
 {
-    public class PassiveEmptySharing
+    public class PassiveSearch : IBaseUpdater
     {
-        TransferManager transferManager = new TransferManager();
-        DownloadManager downloadManager = new DownloadManager();
-        //string currentDir = @"C:\Temp\";
-        string currentDir = System.AppDomain.CurrentDomain.BaseDirectory;
+        #region IBaseUpdater Members
+        public event FlowLib.Events.FmdcEventHandler UpdateBase;
+        #endregion
 
-        public PassiveEmptySharing()
+        public PassiveSearch()
         {
-            // Creates a empty share
-            Share share = new Share("Testing");
-            // Adds common filelist to share
-            AddFilelistsToShare(share);
+            UpdateBase = new FlowLib.Events.FmdcEventHandler(PassiveSearch_UpdateBase);
 
-            HubSetting setting = new HubSetting();
-            setting.Address = "127.0.0.1";
-            setting.Port = 411;
-            setting.DisplayName = "FlowLib";
-            setting.Protocol = "Auto";
+            HubSetting settings = new HubSetting();
+            settings.Address = "127.0.0.1";
+            settings.Port = 411;
+            settings.DisplayName = "FlowLib";
+            settings.Protocol = "Auto";
 
-            Hub hubConnection = new Hub(setting);
+            Hub hubConnection = new Hub(settings,this);
             hubConnection.ProtocolChange += new FmdcEventHandler(hubConnection_ProtocolChange);
-            // Adds share to hub
-            hubConnection.Share = share;
             hubConnection.Connect();
+
+            // Wait 5 seconds (We should really listen on ConnectionStatusChange instead.
+            System.Threading.Thread.Sleep(5 * 1000);
+
+            // Send Search
+            SearchInfo searchInfo = new SearchInfo();
+            searchInfo.Set(SearchInfo.SEARCH, "Ecma-334");
+
+            UpdateBase(this, new FlowLib.Events.FmdcEventArgs(Actions.Search, searchInfo));
         }
 
         void hubConnection_ProtocolChange(object sender, FmdcEventArgs e)
@@ -55,27 +57,23 @@ namespace ConsoleDemo.Examples
                 prot.Update -= hubConnection_Update;
             }
             hubConnection.Protocol.Update += new FmdcEventHandler(hubConnection_Update);
+            hubConnection.Protocol.Update += new FlowLib.Events.FmdcEventHandler(hubConnection_Update);
         }
 
-        void AddFilelistsToShare(Share s)
-        {
-            // This will add common filelists to share and save them in directory specified.
-            General.AddCommonFilelistsToShare(s, currentDir + "MyFileLists\\");
-        }
+        void PassiveSearch_UpdateBase(object sender, FlowLib.Events.FmdcEventArgs e) { }
 
-        void hubConnection_Update(object sender, FmdcEventArgs e)
+        void hubConnection_Update(object sender, FlowLib.Events.FmdcEventArgs e)
         {
-            Hub hub = (Hub)sender;
             switch (e.Action)
             {
-                case Actions.TransferStarted:
-                    Transfer trans = e.Data as Transfer;
-                    if (trans != null)
+                case Actions.SearchResult:
+                    if (e.Data is SearchResultInfo)
                     {
-                        transferManager.StartTransfer(trans);
+                        SearchResultInfo srInfo = (SearchResultInfo)e.Data;
                     }
                     break;
             }
+
         }
     }
 }
