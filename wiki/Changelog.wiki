@@ -5,6 +5,8 @@
 
   _[Todo See Todo for changes still remaining before release]_
 
+= 20080119 =
+
   * ADD		- Active and passive searching (Send/Receive). 
     # FlowLib will not respond with a directory if user is not just searching for directories.
   * FIX		- User Tag parsing. Hub count was always -1. (Thanks GhOstFaCE for reporting)
@@ -41,10 +43,6 @@
   * CHANGE	- e.Data is now the old protocol(this can be null) on ProtocolChange. This is so you can unlisten on old protocols.
   * FIX		- HashContentInfo event now has ContentInfo as data.
   * ADD		- Download/Upload in ADC (Both 1.0 and 0.10)
-
-
-
-
 
 = 20071222 =
 
