@@ -1,4 +1,4 @@
-#summary Passive Searching
+#summary Code Example - Passive Searching
 
 = Description =
 
