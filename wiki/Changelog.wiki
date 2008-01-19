@@ -7,12 +7,13 @@
 
 = 20080119 =
 
-  * *Main Changes:*
-  # Search for content (Nmdc)
-  # Receive search result (Nmdc)
-  # Adc Support (to 1.0)
-  # Add Valid flag to transfer messages and search messages. 
+  * *Changes from TODO:*
+    # Search for content (Nmdc)
+    # Receive search result (Nmdc)
+    # Adc Support (to 1.0)
+    # Add Valid flag to transfer messages and search messages. 
 
+  * *All changes:*
 
   * ADD		- Active and passive searching (Send/Receive). 
     # FlowLib will not respond with a directory if user is not just searching for directories.
