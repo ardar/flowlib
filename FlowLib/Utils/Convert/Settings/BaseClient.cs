@@ -33,6 +33,7 @@ namespace FlowLib.Utils.Convert.Settings
         public List<HubSetting> Hubs
         {
             get { return hubs; }
+            set { hubs = new List<HubSetting>(value); }
         }
 
         public bool Read(string path)
@@ -48,6 +49,13 @@ namespace FlowLib.Utils.Convert.Settings
             return false;
         }
 
+        public void Write(string path)
+        {
+            FlowLib.Utils.FileOperations.PathExists(path);
+            File.WriteAllBytes(path, Write());
+        }
+
+        public abstract byte[] Write();
         public abstract bool Read(byte[] data);
     }
 }

@@ -23,25 +23,7 @@ using System.Text;
 
 namespace FlowLib.Utils.Convert.Settings
 {
-    public class LDC : DCpp
+    public class LDC : BaseClientPasswordBase64
     {
-        public override void NodeInfo(string nodeName, string attrName, string attrValue)
-        {
-            bool handled = false;
-            switch (nodeName)
-            {
-                case "Hub":
-                    switch (attrName)
-                    {
-                        case "UserPassword":
-                            current.Password = Encoding.UTF8.GetString(System.Convert.FromBase64String(attrValue));
-                            handled = true;
-                            break;
-                    }
-                    break;
-            }
-            if (!handled)
-                base.NodeInfo(nodeName, attrName, attrValue);
-        }
     }
 }

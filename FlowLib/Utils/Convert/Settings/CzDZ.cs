@@ -19,27 +19,13 @@
  *
  */
 
-using FlowLib.Utils.Convert.Settings;
-using FlowLib.Utils.Convert;
-
-using System.Xml;
-
-
-namespace ConsoleDemo.Examples
+namespace FlowLib.Utils.Convert.Settings
 {
-    public class ConvertSettings
+    /// <summary>
+    /// CzDZ
+    /// </summary>
+    public class CzDZ : BaseClientPasswordBase64
     {
-        public ConvertSettings()
-        {
-            // Reads DCpp xml
-            BaseClient client = null;
-            client = new DCpp();
-            client.Read(@"C:\Private\Code\FlowLib\trunk\Settings\Hub\Fdm-and-DC.Favorites.xml");
 
-            // Writes to LDC xml
-            BaseClient client2 = new LDC();
-            client2.Hubs = client.Hubs;
-            client2.Write(@"C:\Private\Code\FlowLib\trunk\Settings\FlowLib.xml");
-        }
     }
 }

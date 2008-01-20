@@ -155,7 +155,9 @@
     <Compile Include="Utils\Convert\Environment.cs" />
     <Compile Include="Utils\Convert\General.cs" />
     <Compile Include="Utils\Convert\Setting.cs" />
+    <Compile Include="Utils\Convert\Settings\BaseClientPasswordBase64.cs" />
     <Compile Include="Utils\Convert\Settings\BaseClient.cs" />
+    <Compile Include="Utils\Convert\Settings\CzDZ.cs" />
     <Compile Include="Utils\Convert\Settings\DCDM.cs" />
     <Compile Include="Utils\Convert\Settings\DCpp0_403.cs" />
     <Compile Include="Utils\Convert\Settings\DCpp.cs" />

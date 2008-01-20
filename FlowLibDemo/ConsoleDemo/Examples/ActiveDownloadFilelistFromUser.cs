@@ -85,6 +85,7 @@ namespace ConsoleDemo.Examples
                         {
                             trans.Protocol = new FlowLib.Protocols.AdcProtocol(trans);
                             trans.Listen();
+                            transferManager.AddTransfer(trans);
                         }
 
                         trans.Protocol.ChangeDownloadItem += new FmdcEventHandler(Protocol_ChangeDownloadItem);

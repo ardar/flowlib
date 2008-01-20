@@ -30,120 +30,96 @@ namespace FlowLib.Utils.Convert.Settings
     /// </summary>
     public class DCpp : XmlClient
     {
-
         public DCpp()
         {
-            Nodes.Clear();
-            Nodes.Add("Hub");
+            System.Collections.Generic.List<string> hubAttr = new System.Collections.Generic.List<string>();
+
+            hubAttr.Add("Name");
+            hubAttr.Add("Connect");
+            hubAttr.Add("Description");
+            hubAttr.Add("Nick");
+            hubAttr.Add("Password");
+            hubAttr.Add("Server");
+            hubAttr.Add("UserDescription");
+            hubAttr.Add("Bottom");
+            hubAttr.Add("Top");
+            hubAttr.Add("Right");
+            hubAttr.Add("Left");
+
+            Nodes.Add("Hub", hubAttr);
         }
 
-        public override void NewNode(string nodeName)
+        public override void NewNode(string nodeName, bool read)
         {
-            switch (nodeName)
+            if (read)
             {
-                case "Hub":
-                    current = new HubSetting();
-                    break;
-            }
-        }
-        public override void NodeInfo(string nodeName, string attrName, string attrValue)
-        {
-            switch (nodeName)
-            {
-                case "Hub":
-                    switch (attrName)
-                    {
-                        case "Name":
-                            current.Name = attrValue;
-                            break;
-                        case "Description":
-                            current.Description = attrValue;
-                            break;
-                        case "Nick":
-                            current.DisplayName = attrValue;
-                            break;
-                        case "Password":
-                            current.Password = attrValue;
-                            break;
-                        case "Server":
-                            FromAddress(attrValue);
-                            break;
-                        case "UserDescription":
-                            current.UserDescription = attrValue;
-                            break;
-                        default:
-                            // We dont have this value in FlowLib. But other clients may have so we will still save it.
-                            current.Set(attrName, attrValue);
-                            break;
-                    }
-                    break;
-            }
-        }
-        public override void EndNode(string nodeName)
-        {
-            switch (nodeName)
-            {
-                case "Hub":
-                    hubs.Add(current);
-                    break;
-            }
-        }
-
-        public void FromAddress(string address)
-        {
-            int pos;
-            string protocol = "Nmdc";
-            if ((pos = address.IndexOf("://")) != -1)
-            {
-                switch (address.Substring(0, pos))
+                switch (nodeName)
                 {
-                    case "adc":
-                        protocol = "Adc";
-                        break;
-                    case "adcs":
-                        protocol = "AdcSecure";
-                        break;
-                    case "dchub":
-                        protocol = "Nmdc";
+                    case "Hub":
+                        current = new HubSetting();
                         break;
                 }
-                pos += 3;
-                address = address.Remove(0, pos);
             }
-            current.Protocol = protocol;
-
-            int port = 411;
-            if ((pos = address.IndexOf(":")) != -1)
+            else
             {
-                current.Address = address.Substring(0, pos);
-                pos++;
-                try
-                {
-                    port = int.Parse(address.Substring(pos));
-                }
-                catch { port = 411; }
+                base.NewNode(nodeName, read);
             }
-            current.Port = port;
         }
-        public string ToAddress()
+        public override void NodeInfo(string nodeName, string attrName, string attrValue, bool read)
         {
-            string protocol = string.Empty;
-            switch (current.Protocol)
+            if (read)
             {
-                case "Nmdc":
-                    protocol = "dchub://";
-                    break;
-                case "Nmdcs":
-                    protocol = "dchubs://";
-                    break;
-                case "Adc":
-                    protocol = "adc://";
-                    break;
-                case "AdcSecure":
-                    protocol = "adcs://";
-                    break;
+                switch (nodeName)
+                {
+                    case "Hub":
+                        switch (attrName)
+                        {
+                            case "Name":
+                                current.Name = attrValue;
+                                break;
+                            case "Description":
+                                current.Description = attrValue;
+                                break;
+                            case "Nick":
+                                current.DisplayName = attrValue;
+                                break;
+                            case "Password":
+                                current.Password = attrValue;
+                                break;
+                            case "Server":
+                                FromAddress(attrValue);
+                                break;
+                            case "UserDescription":
+                                current.UserDescription = attrValue;
+                                break;
+                            default:
+                                // We dont have this value in FlowLib. But other clients may have so we will still save it.
+                                current.Set(attrName, attrValue);
+                                break;
+                        }
+                        break;
+                }
             }
-            return string.Format("{0}{1}:{2}", protocol, current.Address, current.Port.ToString());
+            else
+            {
+                base.NodeInfo(nodeName, attrName, attrValue, read);
+            }
+        }
+        public override void EndNode(string nodeName, bool read)
+        {
+            if (read)
+            {
+                switch (nodeName)
+                {
+                    case "Hub":
+                        hubs.Add(current);
+                        break;
+                }
+            }
+            else
+            {
+                base.EndNode(nodeName, read);
+            }
         }
     }
 }
