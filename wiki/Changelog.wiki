@@ -6,7 +6,10 @@
   _[Todo See Todo for changes still remaining before release]_
 
   * *Changes from TODO:*
-    # None
+    # Converting settings
+      * DC++ (From)
+      * DCDM (From)
+      * LDC (From)
 
   * *All changes:*
 
