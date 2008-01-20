@@ -192,37 +192,37 @@ namespace FlowLib.Containers
             return new SegmentInfo(-2);
         }
 
-        public void Cancel(int pos)
+        public void Cancel(int pos, UserInfo usr)
         {
             if (segmentsInProgress != null && segmentsInProgress.Get(pos))
             {
                 segmentsInProgress.Set(pos, false);
-                SegmentCanceled(this, new FmdcEventArgs(pos));
+                SegmentCanceled(this, new FmdcEventArgs(pos, usr));
             }
         }
 
-        public bool Start(int pos)
+        public bool Start(int pos, UserInfo usr)
         {
             bool value = (!segmentsDownloaded.Get(pos) && !segmentsInProgress.Get(pos));
             if (value)
             {
                 segmentsDownloaded.Set(pos, true);
-                SegmentStarted(this, new FmdcEventArgs(pos));
+                SegmentStarted(this, new FmdcEventArgs(pos, usr));
             }
             return value;
         }
-        public void Finished(int pos)
+        public void Finished(int pos, UserInfo usr)
         {
             segmentsDownloaded.Set(pos, true);
             segmentsInProgress.Set(pos, false);
             segmentDoneCount++;
             // Tell everyone that one segment is finished
-            SegmentCompleted(this, new FmdcEventArgs(pos));
+            SegmentCompleted(this, new FmdcEventArgs(pos, usr));
 
             // Tell everyone that this downloadItem is finished
             if (segmentDoneCount == segmentsDownloaded.Count)
             {
-                DownloadCompleted(this, new FmdcEventArgs(0));
+                DownloadCompleted(this, new FmdcEventArgs(0, usr));
             }
         }
 
