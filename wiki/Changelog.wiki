@@ -8,7 +8,7 @@
   * ADD		- Extendability for HubSetting
   * REMOVE	- IGuiHub and IGuiMain
   * CHANGE	- IProtocol and TcpConnectionListener now implements IUpdate
-
+  * REMOVE	- IssueReportingGoogleCode from project file (files was never included in svn)
 
 
 = 20080119 =
