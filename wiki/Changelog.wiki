@@ -12,7 +12,6 @@
       * LDC (From)
 
   * *Other changes:*
-
   * ADD		- Extendability for HubSetting
   * REMOVE	- IGuiHub and IGuiMain (Old stuff from FMDC)
   * CHANGE	- IProtocol and TcpConnectionListener now implements IUpdate
@@ -34,7 +33,6 @@
     # Add Valid flag to transfer messages and search messages. 
 
   * *Other changes:*
-
   * ADD		- Active and passive searching (Send/Receive). 
     # FlowLib will not respond with a directory if user is not just searching for directories.
   * FIX		- User Tag parsing. Hub count was always -1. (Thanks GhOstFaCE for reporting)
