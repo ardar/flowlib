@@ -24,7 +24,7 @@ namespace FlowLib.Containers
     /// <summary>
     /// Class repressenting hub setting
     /// </summary>
-    public class HubSetting
+    public class HubSetting : PropertyContainer<string, string>
     {
         protected string name = string.Empty;
         protected string address = string.Empty;

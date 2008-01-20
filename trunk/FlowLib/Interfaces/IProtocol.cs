@@ -41,7 +41,7 @@ namespace FlowLib.Interfaces
         /// Events have happen in this hub and we want to tell others.
         /// Uses Actions.X as action property for e.
         /// </summary>
-        event FmdcEventHandler Update;
+        //event FmdcEventHandler Update;
         /// <summary>
         /// If this isnt null. We will send this message to see if connection is still alive.
         /// </summary>
