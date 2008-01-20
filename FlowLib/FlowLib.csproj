@@ -156,7 +156,7 @@
     <Compile Include="Utils\Convert\General.cs" />
     <Compile Include="Utils\Convert\Setting.cs" />
     <Compile Include="Utils\Convert\Settings\BaseClient.cs" />
-    <Compile Include="Utils\Convert\Settings\DCDM.cs" />
+    <Compile Include="Utils\Convert\Settings\DCpp0_403.cs" />
     <Compile Include="Utils\Convert\Settings\DCpp.cs" />
     <Compile Include="Utils\Convert\Settings\LDC.cs" />
     <Compile Include="Utils\Convert\Settings\XmlClient.cs" />

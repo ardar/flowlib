@@ -28,6 +28,7 @@ namespace FlowLib.Utils.Convert.Settings
     public abstract class XmlClient : BaseClient
     {
         protected List<string> nodes = new List<string>();
+        protected XmlDocument document = null;
 
         public List<string> Nodes
         {
@@ -36,13 +37,14 @@ namespace FlowLib.Utils.Convert.Settings
 
         public override bool Read(byte[] data)
         {
-
-            MemoryStream ms = new MemoryStream(data);
-            StreamReader sr = new StreamReader(ms,true);
-            XmlDocument document = new XmlDocument();
+            //StreamReader sr = new StreamReader(ms,System.Text.Encoding.Default);
             //document.Load(ms);
-            document.Load(sr);
-
+            MemoryStream ms = new MemoryStream(data);
+            if (document == null)
+            {
+                document = new XmlDocument();
+                document.Load(ms);
+            }
 
             foreach (string node in nodes)
             {
