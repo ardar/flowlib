@@ -11,7 +11,7 @@
       * DCDM (From)
       * LDC (From)
 
-  * *All changes:*
+  * *Other changes:*
 
   * ADD		- Extendability for HubSetting
   * REMOVE	- IGuiHub and IGuiMain (Old stuff from FMDC)
@@ -20,7 +20,6 @@
   * CHANGE	- DownloadCompleted, SegmentCompleted, SegmentStarted and SegmentCanceled now have Source as data. This is so you can know who performed the event. Note that Source  for DownloadCompleted is for user who toke the last segment. This doesn't mean that you downloaded all content from this user (if you haven't disabled segment downloading)
   * ADD		- Source to ITransfer and TransferRequest. This is so you can return downloaditems easy.
   * ADD		- StoreID to UserInfo. This is so we can save Sources and continue downloading where we started.
-  * ADD		- Converting settings from (DC++, DCDM, LDC)
 
 
 
@@ -34,7 +33,7 @@
     # Adc Support
     # Add Valid flag to transfer messages and search messages. 
 
-  * *All changes:*
+  * *Other changes:*
 
   * ADD		- Active and passive searching (Send/Receive). 
     # FlowLib will not respond with a directory if user is not just searching for directories.
