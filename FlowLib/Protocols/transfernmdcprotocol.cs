@@ -154,7 +154,7 @@ namespace FlowLib.Protocols
                     if (trans.DownloadItem != null && trans.CurrentSegment !=null)
                     {
                         // Clean up here please :)
-                        trans.DownloadItem.Cancel(trans.CurrentSegment.Index);
+                        trans.DownloadItem.Cancel(trans.CurrentSegment.Index, trans.User);
                     }
 
                     if (e.Data is Utils.FmdcException)
@@ -228,7 +228,7 @@ namespace FlowLib.Protocols
                                     catch (System.Exception exp)
                                     {
                                         System.Console.WriteLine("E:" + exp);
-                                        trans.DownloadItem.Cancel(trans.CurrentSegment.Index);
+                                        trans.DownloadItem.Cancel(trans.CurrentSegment.Index, trans.User);
                                     }
                                     finally
                                     {
@@ -240,7 +240,7 @@ namespace FlowLib.Protocols
                                     }
                                     if (trans.CurrentSegment.Position >= trans.CurrentSegment.Length)
                                     {
-                                        trans.DownloadItem.Finished(trans.CurrentSegment.Index);
+                                        trans.DownloadItem.Finished(trans.CurrentSegment.Index, trans.User);
                                         //// Searches for a download item and a segment id
                                         GetDownloadItem();
                                         // Request new segment from user. IF we have found one. ELSE disconnect.
@@ -433,7 +433,7 @@ namespace FlowLib.Protocols
                         // Set that we are actually downloading stuff
                         if (trans.CurrentSegment.Index >= 0)
                         {
-                            trans.DownloadItem.Start(trans.CurrentSegment.Index);
+                            trans.DownloadItem.Start(trans.CurrentSegment.Index, trans.User);
                         }
                         rawData = false;
                         compressedZLib = false;
