@@ -6,7 +6,7 @@
   _[Todo See Todo for changes still remaining before release]_
 
   * *Changes from TODO:*
-  * None
+    # None
 
   * *All changes:*
 
