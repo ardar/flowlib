@@ -5,6 +5,11 @@
 
   _[Todo See Todo for changes still remaining before release]_
 
+  * *Changes from TODO:*
+  * None
+
+  * *All changes:*
+
   * ADD		- Extendability for HubSetting
   * REMOVE	- IGuiHub and IGuiMain
   * CHANGE	- IProtocol and TcpConnectionListener now implements IUpdate
