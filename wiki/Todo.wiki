@@ -26,7 +26,7 @@ _Note that just because it is on this list it is not a promise that it will be d
       * Zion Blue
       * zK
     # *To*
-      * DC++
+      * ~~DC++~~
       * DCDM
       * LDC
       * AirDC
