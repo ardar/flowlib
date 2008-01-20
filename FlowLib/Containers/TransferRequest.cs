@@ -47,6 +47,19 @@ namespace FlowLib.Containers
             get { return hub.Me; }
         }
 
+        public Source Source
+        {
+            get
+            {
+                string conId = null;
+                if (hub != null || hub.RemoteAddress != null)
+                {
+                    conId = hub.RemoteAddress.ToString();
+                }
+                return new Source(conId, user.StoreID);
+            }
+        }
+
         public UserInfo User
         {
             get { return user; }

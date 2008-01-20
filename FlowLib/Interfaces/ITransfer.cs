@@ -45,6 +45,15 @@ namespace FlowLib.Interfaces
         }
 
         /// <summary>
+        /// Source releated to this transfer
+        /// </summary>
+        Source Source
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Current ContentInfo for this connection.
         /// </summary>
         DownloadItem DownloadItem

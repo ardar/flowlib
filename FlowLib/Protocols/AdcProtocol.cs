@@ -461,6 +461,7 @@ namespace FlowLib.Protocols
                         trans.User = req.User;
                         info = trans.User;
                         trans.Share = req.Share;
+                        trans.Source = req.Source;
                         download = req.Download;
                     }
                     else if (trans.Me == null)

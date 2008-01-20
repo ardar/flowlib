@@ -49,6 +49,8 @@ namespace FlowLib.Containers
         /// </summary>
         public const string IP = "ip";
 
+        public const string STOREID = "storeid";
+
         public const int ACCOUNT_FLAG_USER = 0;
         public const int ACCOUNT_FLAG_BOT = 1;
         public const int ACCOUNT_FLAG_REGISTERED = 2;
@@ -96,6 +98,26 @@ namespace FlowLib.Containers
                     return DisplayName;
             }
         }
+
+        /// <summary>
+        /// Store Id (Used for Source)
+        /// If STOREID exist as key that will be returned.
+        /// Else If CID exist as key that will be returned.
+        /// Else ID will be returned
+        /// </summary>
+        public string StoreID
+        {
+            get
+            {
+                if (ContainsKey(STOREID))
+                    return Get(STOREID);
+                else if (ContainsKey(CID))
+                    return Get(CID);
+                else
+                    return ID;
+            }
+        }
+
         /// <summary>
         /// Display name for user
         /// </summary>
