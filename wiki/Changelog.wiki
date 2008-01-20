@@ -7,7 +7,7 @@
 
   * *Changes from TODO:*
     # Converting settings
-      * DC++ (From)
+      * DC++ (From/To)
       * DCDM (From)
       * LDC (From)
 
