@@ -1,4 +1,4 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -10,6 +10,11 @@
     <RootNamespace>FlowLib</RootNamespace>
     <AssemblyName>FlowLib</AssemblyName>
     <SignAssembly>false</SignAssembly>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -87,8 +92,6 @@
     <Compile Include="Interfaces\IConnection.cs" />
     <Compile Include="Interfaces\IErrorReporting.cs" />
     <Compile Include="Interfaces\IBaseUpdater.cs" />
-    <Compile Include="Interfaces\IGuiHub.cs" />
-    <Compile Include="Interfaces\IGuiMain.cs" />
     <Compile Include="Interfaces\IHash.cs" />
     <Compile Include="Interfaces\IHubMessage.cs" />
     <Compile Include="Interfaces\IProtocol.cs" />
@@ -96,6 +99,7 @@
     <Compile Include="Interfaces\IProtocolTransfer.cs" />
     <Compile Include="Interfaces\IProtocolUdp.cs" />
     <Compile Include="Interfaces\ITransfer.cs" />
+    <Compile Include="Interfaces\IUpdate.cs" />
     <Compile Include="Managers\DownloadManager.cs" />
     <Compile Include="Managers\EventManager.cs" />
     <Compile Include="Managers\ShareManager.cs" />
@@ -150,6 +154,10 @@
     <Compile Include="Utils\Convert\Base32.cs" />
     <Compile Include="Utils\Convert\Environment.cs" />
     <Compile Include="Utils\Convert\General.cs" />
+    <Compile Include="Utils\Convert\Setting.cs" />
+    <Compile Include="Utils\Convert\Settings\BaseClient.cs" />
+    <Compile Include="Utils\Convert\Settings\DCpp.cs" />
+    <Compile Include="Utils\Convert\Settings\XmlClient.cs" />
     <Compile Include="Utils\ErrorHandling\ErrorReporting.cs" />
     <Compile Include="Utils\ErrorHandling\IssueReportingGoogleCode.cs" />
     <Compile Include="Utils\FileLists\BaseFilelist.cs" />

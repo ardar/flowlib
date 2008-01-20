@@ -71,10 +71,23 @@ namespace FlowLib.Utils.FileLists
             #region Get shared files and sort them
             // This is ugly as hell. But _I_ dont know a better way todo it right now.
             SortedList<string, ContentInfo> vlist = new SortedList<string, ContentInfo>((int)share.TotalCount);
-            foreach (KeyValuePair<string, ContentInfo> item in share)
+            try
             {
-                if (item.Value != null)
-                    vlist.Add(item.Value.Get(ContentInfo.VIRTUAL), item.Value);
+                foreach (KeyValuePair<string, ContentInfo> item in share)
+                {
+                    if (item.Value != null)
+                        vlist.Add(item.Value.Get(ContentInfo.VIRTUAL), item.Value);
+                }
+            }
+            catch (Exception e)
+            {
+                System.Text.StringBuilder sb = new System.Text.StringBuilder();
+                foreach (KeyValuePair<string, ContentInfo> item in share)
+                {
+                    sb.AppendLine(string.Format("Key: {0}, Virtual: {1}", item.Key, item.Value.Get(ContentInfo.VIRTUAL)));
+                }
+                Exception en = new Exception(sb.ToString(), e);
+                throw en;
             }
             #endregion
             #region Add Content

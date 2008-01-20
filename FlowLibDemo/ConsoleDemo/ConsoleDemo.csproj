@@ -54,6 +54,7 @@
     <Compile Include="Examples\ChangeBotUserInfo.cs" />
     <Compile Include="Examples\ConnectToHub.cs" />
     <Compile Include="ConsoleClient\Hub.cs" />
+    <Compile Include="Examples\ConvertSettings.cs" />
     <Compile Include="Examples\DisplayRawMessages.cs" />
     <Compile Include="Examples\PassiveDownloadFilelistFromUser.cs" />
     <Compile Include="Examples\PassiveEmptySharing.cs" />
