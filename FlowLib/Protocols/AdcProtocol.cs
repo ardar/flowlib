@@ -149,7 +149,7 @@ namespace FlowLib.Protocols
                     if (trans.DownloadItem != null && trans.CurrentSegment != null)
                     {
                         // Clean up here please :)
-                        trans.DownloadItem.Cancel(trans.CurrentSegment.Index, trans.User);
+                        trans.DownloadItem.Cancel(trans.CurrentSegment.Index, trans.Source);
                     }
 
                     if (e.Data is Utils.FmdcException)
@@ -282,7 +282,7 @@ namespace FlowLib.Protocols
                                     catch (System.Exception exp)
                                     {
                                         System.Console.WriteLine("E:" + exp);
-                                        trans.DownloadItem.Cancel(trans.CurrentSegment.Index, trans.User);
+                                        trans.DownloadItem.Cancel(trans.CurrentSegment.Index, trans.Source);
                                     }
                                     finally
                                     {
@@ -294,7 +294,7 @@ namespace FlowLib.Protocols
                                     }
                                     if (trans.CurrentSegment.Position >= trans.CurrentSegment.Length)
                                     {
-                                        trans.DownloadItem.Finished(trans.CurrentSegment.Index, trans.User);
+                                        trans.DownloadItem.Finished(trans.CurrentSegment.Index, trans.Source);
                                         //// Searches for a download item and a segment id
                                         GetDownloadItem();
                                         // Request new segment from user. IF we have found one. ELSE disconnect.
@@ -1139,7 +1139,7 @@ namespace FlowLib.Protocols
                     // Set that we are actually downloading stuff
                     if (trans.CurrentSegment.Index >= 0)
                     {
-                        trans.DownloadItem.Start(trans.CurrentSegment.Index, trans.User);
+                        trans.DownloadItem.Start(trans.CurrentSegment.Index, trans.Source);
                     }
                     rawData = false;
 
