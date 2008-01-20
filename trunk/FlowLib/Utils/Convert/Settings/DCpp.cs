@@ -26,7 +26,7 @@ using FlowLib.Containers;
 namespace FlowLib.Utils.Convert.Settings
 {
     /// <summary>
-    /// DC++
+    /// DC++ from 0.4033 to 0.699
     /// </summary>
     public class DCpp : XmlClient
     {

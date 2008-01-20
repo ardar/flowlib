@@ -19,18 +19,22 @@
  *
  */
 
-using FlowLib.Utils.Convert.Settings;
-using FlowLib.Utils.Convert;
+using System.IO;
 
-namespace ConsoleDemo.Examples
+namespace FlowLib.Utils.Convert.Settings
 {
-    public class ConvertSettings
+    /// <summary>
+    /// DC++ to 0.4033
+    /// </summary>
+    public class DCpp0_403 :DCpp
     {
-        public ConvertSettings()
+        public override bool Read(byte[] data)
         {
-            BaseClient client = null;
-            client = new DCpp0_403();
-            client.Read(@"C:\Private\Code\FlowLib\trunk\Settings\Hub\DCDM-0.495.Favorites.xml");
+            MemoryStream ms = new MemoryStream(data);
+            StreamReader sr = new StreamReader(ms, System.Text.Encoding.Default);
+            document = new System.Xml.XmlDocument();
+            document.Load(sr);
+            return base.Read(data);
         }
     }
 }
