@@ -19,14 +19,18 @@
  *
  */
 
-namespace FlowLib.Interfaces
-{
-    /// <summary>
-    /// Dummy interface for the Hub Gui.
-    /// This is so if we in the feature wants diffrent behaivor it is doable.
-    /// </summary>
-    public interface IGuHub : IBaseUpdater
-    {
+using FlowLib.Utils.Convert.Settings;
+using FlowLib.Utils.Convert;
 
+namespace ConsoleDemo.Examples
+{
+    public class ConvertSettings
+    {
+        public ConvertSettings()
+        {
+            BaseClient client = null;
+            client = new DCpp();
+            client.Read(@"C:\Private\Code\FlowLib\trunk\Settings\Hub\Fdm-and-DC.Favorites.xml");
+        }
     }
 }

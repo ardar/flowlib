@@ -20,6 +20,7 @@
  */
 
 using FlowLib.Events;
+using FlowLib.Interfaces;
 
 using System.Net.Sockets;
 using System.Net;
@@ -27,7 +28,7 @@ using System;
 
 namespace FlowLib.Connections
 {
-    public class TcpConnectionListener
+    public class TcpConnectionListener : IUpdate
     {
         /// <summary>
         /// Events have happen in this hub and we want to tell others.

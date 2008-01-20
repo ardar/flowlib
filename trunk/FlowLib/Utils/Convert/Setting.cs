@@ -19,12 +19,41 @@
  *
  */
 
-namespace FlowLib.Interfaces
+namespace FlowLib.Utils.Convert
 {
-    public interface IGuiMain
+    public class Setting
     {
-        #region Functions
-        object ShowGui();
-        #endregion
+        public enum Types
+        {
+            All = 0,
+            Hub,
+            General,
+            Share
+        }
+
+        public enum Clients
+        {
+            AirDC_2_01,
+            Apex_0_40,
+            BCDC_0_699d,
+            CrZDC_Beta3,
+            CrZDC_0_699b,
+            DCDM_0_495,
+            DCpp_0_699,
+            fulDC_6_78,
+            IceDC_1_00a,
+            LDC_1_00v2a,
+            RSX_1_00,
+            StrongDC_2_1,
+            StrongDC_Lite_131,
+            ZionBlue_2_01,
+            ZionBlue_2_02,
+            ZionBlue_2_03,
+            ZionBlue_2_04,
+            ZionBlue_2_05,
+            zK_0_666,
+            zK_0_7,
+            zK_0_710
+        }
     }
 }
