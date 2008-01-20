@@ -46,7 +46,6 @@ namespace FlowLib.Utils.Convert.Settings
                     break;
             }
         }
-
         public override void NodeInfo(string nodeName, string attrName, string attrValue)
         {
             switch (nodeName)
@@ -56,9 +55,6 @@ namespace FlowLib.Utils.Convert.Settings
                     {
                         case "Name":
                             current.Name = attrValue;
-                            break;
-                        case "Connect":
-                            //current.Name = attrValue;
                             break;
                         case "Description":
                             current.Description = attrValue;
@@ -76,13 +72,13 @@ namespace FlowLib.Utils.Convert.Settings
                             current.UserDescription = attrValue;
                             break;
                         default:
-                            // TODO : Add values to hubsettings
+                            // We dont have this value in FlowLib. But other clients may have so we will still save it.
+                            current.Set(attrName, attrValue);
                             break;
                     }
                     break;
             }
         }
-
         public override void EndNode(string nodeName)
         {
             switch (nodeName)

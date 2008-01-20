@@ -36,9 +36,13 @@ namespace FlowLib.Utils.Convert.Settings
 
         public override bool Read(byte[] data)
         {
+
             MemoryStream ms = new MemoryStream(data);
+            StreamReader sr = new StreamReader(ms,true);
             XmlDocument document = new XmlDocument();
-            document.Load(ms);
+            //document.Load(ms);
+            document.Load(sr);
+
 
             foreach (string node in nodes)
             {
