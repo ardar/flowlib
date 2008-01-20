@@ -44,6 +44,13 @@ namespace FlowLib.Connections
         protected ContentInfo info = new ContentInfo();
         protected SegmentInfo currentSegment = new SegmentInfo(-1);
         protected long lastEventTimeStamp = 0;
+        protected Source source = null;
+
+        public Source Source
+        {
+            get { return source; }
+            set { source = value; }
+        }
 
         public long LastEventTimeStamp
         {

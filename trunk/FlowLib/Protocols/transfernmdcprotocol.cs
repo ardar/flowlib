@@ -525,6 +525,7 @@ namespace FlowLib.Protocols
                     trans.Me = req.Me;
                     trans.User = req.User;
                     trans.Share = req.Share;
+                    trans.Source = req.Source;
                 }
                 else
                 {
