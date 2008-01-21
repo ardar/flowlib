@@ -28,6 +28,8 @@ namespace FlowLib.Utils.Convert.Settings
     /// </summary>
     public class DCpp0_403 :DCpp
     {
+        public DCpp0_403() : base() { }
+
         public override bool Read(byte[] data)
         {
             MemoryStream ms = new MemoryStream(data);
