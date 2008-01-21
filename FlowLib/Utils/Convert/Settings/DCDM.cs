@@ -19,6 +19,8 @@
  *
  */
 
+using System.Text;
+
 namespace FlowLib.Utils.Convert.Settings
 {
     /// <summary>
@@ -26,5 +28,85 @@ namespace FlowLib.Utils.Convert.Settings
     /// </summary>
     public class DCDM : DCpp0_403
     {
+        public DCDM()
+            : base()
+        {
+            System.Collections.Generic.List<string> hubAttr = Nodes["Hub"];
+
+            hubAttr.Add("OpChat");
+            hubAttr.Add("UserIp");
+            hubAttr.Add("HideShare");
+            hubAttr.Add("Trigger");
+            hubAttr.Add("LogChat");
+            hubAttr.Add("HubMessage");
+            hubAttr.Add("DisableSearchSelect");
+            hubAttr.Add("RegStatus");
+            hubAttr.Add("DisableRaw");
+            hubAttr.Add("ProtectedUsers");
+            hubAttr.Add("ColumsOrder");
+            hubAttr.Add("ColumsWidth");
+            hubAttr.Add("ColumsVisible");
+            hubAttr.Add("UserProtected");
+            hubAttr.Add("HeaderOrder");
+            hubAttr.Add("HeaderWidths");
+            hubAttr.Add("HeaderVisible");
+
+            hubAttr.Add("WindowPosX");
+            hubAttr.Add("WindowPosY");
+            hubAttr.Add("WindowSizeX");
+            hubAttr.Add("WindowSizeY");
+            hubAttr.Add("WindowType");
+            hubAttr.Add("RawOne");
+            hubAttr.Add("RawTwo");
+            hubAttr.Add("RawThree");
+            hubAttr.Add("RawFour");
+            hubAttr.Add("RawFive");
+            hubAttr.Add("RawSix");
+            hubAttr.Add("RawSeven");
+            hubAttr.Add("RawEight");
+            hubAttr.Add("RawNine");
+            hubAttr.Add("RawTen");
+            hubAttr.Add("CheckClients");
+            hubAttr.Add("CheckFilelists");
+            hubAttr.Add("CheckOnConnect");
+            hubAttr.Add("UseMyinfoDetect");
+        }
+
+        public override void NodeInfo(string nodeName, string attrName, string attrValue, bool read)
+        {
+            bool handled = false;
+            if (read)
+            {
+                switch (nodeName)
+                {
+                    case "Hub":
+                        switch (attrName)
+                        {
+                            case "UserPassword":
+                                current.Password = Encoding.UTF8.GetString(System.Convert.FromBase64String(attrValue));
+                                handled = true;
+                                break;
+                        }
+                        break;
+                }
+            }
+            else
+            {
+                switch (nodeName)
+                {
+                    case "Hub":
+                        if (attrName.Equals("Password"))
+                        {
+                            base.NodeInfo(nodeName, attrName, System.Convert.ToBase64String(Encoding.UTF8.GetBytes(attrValue)), read);
+                            handled = true;
+                        }
+                        break;
+                }
+            }
+
+
+            if (!handled)
+                base.NodeInfo(nodeName, attrName, attrValue, read);
+        }
     }
 }

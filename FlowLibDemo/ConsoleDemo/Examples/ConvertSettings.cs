@@ -33,11 +33,11 @@ namespace ConsoleDemo.Examples
         {
             // Reads DCpp xml
             BaseClient client = null;
-            client = new DCpp();
-            client.Read(@"C:\Private\Code\FlowLib\trunk\Settings\Hub\Fdm-and-DC.Favorites.xml");
+            client = new DCDM();
+            client.Read(@"C:\Private\Code\FlowLib\trunk\Settings\Hub\DCDM-0.495.Favorites.xml");
 
             // Writes to LDC xml
-            BaseClient client2 = new LDC();
+            BaseClient client2 = new DCpp();
             client2.Hubs = client.Hubs;
             client2.Write(@"C:\Private\Code\FlowLib\trunk\Settings\FlowLib.xml");
         }
