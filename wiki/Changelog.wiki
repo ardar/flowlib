@@ -19,8 +19,8 @@
   * CHANGE	- DownloadCompleted, SegmentCompleted, SegmentStarted and SegmentCanceled now have Source as data. This is so you can know who performed the event. Note that Source  for DownloadCompleted is for user who toke the last segment. This doesn't mean that you downloaded all content from this user (if you haven't disabled segment downloading)
   * ADD		- Source to ITransfer and TransferRequest. This is so you can return downloaditems easy.
   * ADD		- StoreID to UserInfo. This is so we can save Sources and continue downloading where we started.
-
-
+  * FIX		- User Tag parsing. Hub count and slot was always -1. (Thanks GhOstFaCE for reporting)
+  * FIX		- Format Exception involved with user tag parsing.  (Thanks GhOstFaCE for reporting)
 
 
 
