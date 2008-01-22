@@ -399,7 +399,7 @@ namespace FlowLib.Connections
         /// <param name="raw">byte[] that will be sent to server</param>
         public virtual void Send(byte[] raw)
         {
-            if (!socket.Connected)
+            if (socket == null || !socket.Connected)
             {
                 return;
             }
@@ -430,6 +430,7 @@ namespace FlowLib.Connections
             {
                 int bytesSent = handler.EndSend(async);
             }
+            catch (ObjectDisposedException) { }
             catch (SocketException se)
             {
                 // Change Connection Status
