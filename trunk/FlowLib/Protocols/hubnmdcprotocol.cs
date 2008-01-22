@@ -48,7 +48,7 @@ namespace FlowLib.Protocols
         #region Variables
         protected Hub hub = null;
         protected string recieved = "";
-        protected long hubCountLastUpdated = 0;
+        protected long myInfoLastUpdated = 0;
         protected MyINFO lastMyInfo = null;
         #endregion
         #region Properties
@@ -107,14 +107,14 @@ namespace FlowLib.Protocols
         protected void UpdateMyInfo() { UpdateMyInfo(true); }
         protected virtual void UpdateMyInfo(bool firstTime)
         {
-            if (new System.DateTime(hubCountLastUpdated).AddMinutes(5) < System.DateTime.Now)
+            if (new System.DateTime(myInfoLastUpdated).AddMinutes(5) < System.DateTime.Now)
             {
                 MyINFO tmp = new MyINFO(hub);
                 if (lastMyInfo == null || (tmp.Raw != lastMyInfo.Raw))
                 {
                     lastMyInfo = tmp;
                     hub.Send(lastMyInfo);
-                    hubCountLastUpdated = System.DateTime.Now.Ticks;
+                    myInfoLastUpdated = System.DateTime.Now.Ticks;
                 }
             }
             else if (firstTime)
