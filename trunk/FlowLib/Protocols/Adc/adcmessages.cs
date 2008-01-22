@@ -704,7 +704,8 @@ namespace FlowLib.Protocols.Adc
                 return;
             info.TagInfo.GenerateTag = true;
             info.Set(UserInfo.SID, id);
-            if (id != null)
+
+            if (typeValid)
                 valid = true;
 
             // IINF is from hub. all other should be from user =)

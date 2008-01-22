@@ -32,6 +32,7 @@ namespace FlowLib.Protocols.Adc
     {
         protected string action = null;
         protected string type = null;
+        protected bool typeValid = false;
         protected List<string> param = null;
         protected string id = null;
         protected string idtwo = null;
@@ -130,6 +131,11 @@ namespace FlowLib.Protocols.Adc
                     param.RemoveAt(0);
                 }
 
+                if (
+                    (!hasId || (hasId && !string.IsNullOrEmpty(id))) ||
+                    (!hasId2 || (hasId2 && !string.IsNullOrEmpty(idtwo)))
+                    )
+                    typeValid = true;
             }
         }
 
