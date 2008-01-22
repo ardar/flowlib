@@ -48,6 +48,10 @@ namespace FlowLib.Protocols
         protected bool firstMsg = true;
         protected bool rawData = false;
 
+        // INF updating
+        protected long infLastUpdated = 0;
+        protected INF lastInf = null;
+
 
         protected static string yourtranssupports = "ADBAS0 ADBASE BZIP";
         protected static string yoursupports = "ADBAS0 ADBASE ADTIGR";
@@ -134,8 +138,55 @@ namespace FlowLib.Protocols
         {
             this.hub = hub;
             this.hub.ConnectionStatusChange += new FmdcEventHandler(hub_ConnectionStatusChange);
+            if (hub.Share != null)
+                hub.Share.LastModifiedChanged += new FmdcEventHandler(Share_LastModifiedChanged);
+            Hub.RegModeUpdated += new FmdcEventHandler(Hub_RegModeUpdated);
         }
         #endregion
+        void Share_LastModifiedChanged(object sender, FmdcEventArgs e)
+        {
+            if (!e.Handled)
+            {
+                UpdateInf();
+            }
+        }
+
+        void Hub_RegModeUpdated(object sender, FmdcEventArgs e)
+        {
+            if (sender != hub && !e.Handled)
+            {
+                UpdateInf();
+            }
+        }
+
+        protected void UpdateInf() { UpdateInf(true); }
+        protected virtual void UpdateInf(bool firstTime)
+        {
+            if (new System.DateTime(infLastUpdated).AddMinutes(5) < System.DateTime.Now)
+            {
+                INF tmp = new INF(hub, hub.Me);
+                if (lastInf == null || (tmp.Raw != lastInf.Raw))
+                {
+                    lastInf = tmp;
+                    hub.Send(lastInf);
+                    infLastUpdated = System.DateTime.Now.Ticks;
+                }
+            }
+            else if (firstTime)
+            {
+                System.Threading.Thread t = new System.Threading.Thread(new System.Threading.ThreadStart(OnInfPool));
+                t.Priority = System.Threading.ThreadPriority.Lowest;
+                t.Name = "Inf Pool";
+                t.Start();
+            }
+        }
+
+        protected virtual void OnInfPool()
+        {
+            System.Threading.Thread.Sleep(5 * 60 * 1000 + 10);
+            UpdateInf(false);
+        }
+
 
         void trans_ConnectionStatusChange(object sender, FmdcEventArgs e)
         {
@@ -170,6 +221,7 @@ namespace FlowLib.Protocols
                         h = new HubStatus(HubStatus.Codes.Disconnected, (System.Exception)e.Data);
                     else
                         h = new HubStatus(HubStatus.Codes.Disconnected);
+                    hub.RegMode = -1;
                     break;
                 case TcpConnection.Connected:
                     h = new HubStatus(HubStatus.Codes.Connected);
@@ -422,7 +474,7 @@ namespace FlowLib.Protocols
                 if (hub != null && inf.Type.Equals("I"))
                 {
                     //if (inf.Hub.RegMode == -1)    // TODO : We shouldnt have RegMode == 0 here. Fix it.
-                    con.Send(new INF(con, hub.Me));
+                    UpdateInf();
                     Info = inf.UserInfo;
                     if (hub != null && Info.Description == null)
                         Update(con, new FmdcEventArgs(Actions.Name, new Containers.HubName(Info.DisplayName)));
