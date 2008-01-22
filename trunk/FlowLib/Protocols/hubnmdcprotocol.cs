@@ -48,6 +48,8 @@ namespace FlowLib.Protocols
         #region Variables
         protected Hub hub = null;
         protected string recieved = "";
+        protected long hubCountLastUpdated = 0;
+        protected MyINFO lastMyInfo = null;
         #endregion
         #region Properties
         public string Name
@@ -78,8 +80,55 @@ namespace FlowLib.Protocols
         {
             this.hub = hub;
             hub.ConnectionStatusChange += new FmdcEventHandler(hub_ConnectionStatusChange);
+            hub.Share.LastModifiedChanged += new FmdcEventHandler(Share_LastModifiedChanged);
+            Hub.RegModeUpdated += new FmdcEventHandler(Hub_RegModeUpdated);
+
             MessageReceived = new FmdcEventHandler(OnMessageReceived);
             MessageToSend = new FmdcEventHandler(OnMessageToSend);
+        }
+
+        void Share_LastModifiedChanged(object sender, FmdcEventArgs e)
+        {
+            if (!e.Handled)
+            {
+                UpdateMyInfo();
+            }
+        }
+
+        void Hub_RegModeUpdated(object sender, FmdcEventArgs e)
+        {
+            if (sender != hub && !e.Handled)
+            {
+                UpdateMyInfo();
+            }
+        }
+
+        protected void UpdateMyInfo() { UpdateMyInfo(true); }
+        protected virtual void UpdateMyInfo(bool firstTime)
+        {
+            if (new System.DateTime(hubCountLastUpdated).AddMinutes(5) < System.DateTime.Now)
+            {
+                MyINFO tmp = new MyINFO(hub);
+                if (lastMyInfo == null || (tmp.Raw != lastMyInfo.Raw))
+                {
+                    lastMyInfo = tmp;
+                    hub.Send(lastMyInfo);
+                    hubCountLastUpdated = System.DateTime.Now.Ticks;
+                }
+            }
+            else if (firstTime)
+            {
+                System.Threading.Thread t = new System.Threading.Thread(new System.Threading.ThreadStart(OnMyINFOPool));
+                t.Priority = System.Threading.ThreadPriority.Lowest;
+                t.Name = "MyINFO Pool";
+                t.Start();
+            }
+        }
+
+        protected virtual void OnMyINFOPool()
+        {
+            System.Threading.Thread.Sleep(5 * 60 * 1000 + 10);
+            UpdateMyInfo(false);
         }
 
         void hub_ConnectionStatusChange(object sender, FmdcEventArgs e)
@@ -92,6 +141,7 @@ namespace FlowLib.Protocols
                         h = new HubStatus(HubStatus.Codes.Disconnected, (System.Exception)e.Data);
                     else
                         h = new HubStatus(HubStatus.Codes.Disconnected);
+                    hub.RegMode = -1;
                     break;
                 case TcpConnection.Connected:
                     h = new HubStatus(HubStatus.Codes.Connected);
@@ -434,8 +484,6 @@ namespace FlowLib.Protocols
                     usr.UserInfo.IsOperator = op;
                     Update(hub, new FmdcEventArgs(Actions.UserInfoChange, usr.UserInfo));
                 }
-                if (hub.RegMode < 0 && message.From == hub.Me.ID)
-                    Update(hub, new FmdcEventArgs(Actions.RegMode, 0));
             }
             else if (message is Hello)
             {
@@ -443,8 +491,9 @@ namespace FlowLib.Protocols
                 {
                     hub.Send(new Version(hub));
                     hub.Send(new GetNickList(hub));
-                    hub.Send(new MyINFO(hub));
-
+                    if (hub.RegMode < 0)
+                        hub.RegMode = 0;
+                    UpdateMyInfo();
                 }
             }
             else if (message is ConnectToMe)
