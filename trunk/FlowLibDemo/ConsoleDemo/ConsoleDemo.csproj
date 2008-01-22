@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ConsoleDemo</RootNamespace>
     <AssemblyName>ConsoleDemo</AssemblyName>
-    <StartupObject>ConsoleDemo.ConsoleClient.Program</StartupObject>
+    <StartupObject>ConsoleDemo.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

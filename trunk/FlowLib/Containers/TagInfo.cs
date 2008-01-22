@@ -127,44 +127,64 @@ namespace FlowLib.Containers
                 tag = value;
                 if (tag == null)
                     return;
+                // TODO : This tag parsing should be rewrited
                 // <++ V:0.699,M:A,H:2/0/0,S:1>
+                string tmp = tag;
+                tag = tag.Trim('<','>');
                 string[] tagsections = tag.Split(',');
-                if (tagsections.Length >= 4)
+                if (tagsections.Length > 1)
+                    version = tagsections[0];
+                for (int i = 1; i < tagsections.Length; i++)
                 {
-                    #region Hub Count
-                    if (tagsections[2].StartsWith("H:"))
+                    if (tagsections[i].Length < 2)
+                        continue;
+                    string key = tagsections[i].Substring(0, 2);
+                    string val = tagsections[i].Substring(2);
+
+                    switch (key)
                     {
-                        string[] sections;
-                        if ((sections = tagsections[2].Split('/')).Length == 3)
-                        {
+                        case "M:":
+                            switch (val)
+                            {
+                                case "A":
+                                    mode = ConnectionTypes.Direct;
+                                    break;
+                                case "P":
+                                    mode = ConnectionTypes.Passive;
+                                    break;
+                                case "5":
+                                    mode = ConnectionTypes.Socket5;
+                                    break;
+                                default:
+                                    mode = ConnectionTypes.Unknown;
+                                    break;
+                            }
+
+                            break;
+                        case "H:":
+                            string[] sections;
+                            if ((sections = val.Split('/')).Length == 3)
+                            {
+                                try
+                                {
+                                    hubs_normal = int.Parse(sections[0]);
+                                    hubs_regged = int.Parse(sections[1]);
+                                    hubs_op = int.Parse(sections[2]);
+                                }
+                                catch { }
+
+                            }
+                            break;
+                        case "S:":
                             try
                             {
-                                hubs_normal = int.Parse(sections[0]);
-                                hubs_regged = int.Parse(sections[1]);
-                                hubs_op = int.Parse(sections[2]);
+                                slots = int.Parse(val);
                             }
                             catch { }
-
-                        }
-                    }
-                    #endregion
-                    #region Mode
-                    switch (tagsections[1])
-                    {
-                        case "M:A":
-                            mode = ConnectionTypes.Direct;
-                            break;
-                        case "M:P":
-                            mode = ConnectionTypes.Passive;
-                            break;
-                        case "M:5":
-                            mode = ConnectionTypes.Socket5;
                             break;
                         default:
-                            mode = ConnectionTypes.Unknown;
                             break;
                     }
-                    #endregion
                 }
             }
         }
