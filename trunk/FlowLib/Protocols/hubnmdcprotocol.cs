@@ -80,7 +80,8 @@ namespace FlowLib.Protocols
         {
             this.hub = hub;
             hub.ConnectionStatusChange += new FmdcEventHandler(hub_ConnectionStatusChange);
-            hub.Share.LastModifiedChanged += new FmdcEventHandler(Share_LastModifiedChanged);
+            if (hub.Share != null)
+                hub.Share.LastModifiedChanged += new FmdcEventHandler(Share_LastModifiedChanged);
             Hub.RegModeUpdated += new FmdcEventHandler(Hub_RegModeUpdated);
 
             MessageReceived = new FmdcEventHandler(OnMessageReceived);
