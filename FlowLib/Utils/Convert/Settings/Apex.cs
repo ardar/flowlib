@@ -26,7 +26,13 @@ namespace FlowLib.Utils.Convert.Settings
     /// </summary>
     public class Apex : DCppMod
     {
-        public Apex()
+        public enum Versions
+        {
+            v0_40,
+            v1_00Beta5
+        }
+
+        public Apex(Versions version)
         {
             System.Collections.Generic.List<string> hubAttr = Nodes["Hub"];
 
@@ -38,11 +44,6 @@ namespace FlowLib.Utils.Convert.Settings
             hubAttr.Add("HeaderOrder");
             hubAttr.Add("HeaderWidths");
             hubAttr.Add("HeaderVisible");
-            hubAttr.Add("WindowPosX");
-            hubAttr.Add("WindowPosY");
-            hubAttr.Add("WindowSizeX");
-            hubAttr.Add("WindowSizeY");
-            hubAttr.Add("WindowType");
             hubAttr.Add("ChatUserSplit");
             hubAttr.Add("UserListState");
 
@@ -55,13 +56,32 @@ namespace FlowLib.Utils.Convert.Settings
             hubAttr.Add("AwayMsg");
             hubAttr.Add("ExclChecks");
             hubAttr.Add("ShowJoins");
-            hubAttr.Add("OpChat");
 
-            hubAttr.Add("RawOne");
-            hubAttr.Add("RawTwo");
-            hubAttr.Add("RawThree");
-            hubAttr.Add("RawFour");
-            hubAttr.Add("RawFive");
+            switch (version)
+            {
+                case Versions.v0_40:
+                    hubAttr.Add("Encoding");
+                    hubAttr.Add("NoAdlSearch");
+                    hubAttr.Add("LogChat");
+                    hubAttr.Add("MiniTab");
+                    hubAttr.Add("AutoOpenOpenChat");
+                    hubAttr.Add("HubChats");
+                    hubAttr.Add("ProtectedPrefixes");
+                    break;
+                case Versions.v1_00Beta5:
+                    hubAttr.Add("OpChat");
+                    hubAttr.Add("RawOne");
+                    hubAttr.Add("RawTwo");
+                    hubAttr.Add("RawThree");
+                    hubAttr.Add("RawFour");
+                    hubAttr.Add("RawFive");
+                    hubAttr.Add("WindowPosX");
+                    hubAttr.Add("WindowPosY");
+                    hubAttr.Add("WindowSizeX");
+                    hubAttr.Add("WindowSizeY");
+                    hubAttr.Add("WindowType");
+                    break;
+            }
         }
     }
 }
