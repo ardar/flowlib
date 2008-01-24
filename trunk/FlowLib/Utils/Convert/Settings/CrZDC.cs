@@ -19,17 +19,14 @@
  *
  */
 
-using System.Text;
-
 namespace FlowLib.Utils.Convert.Settings
 {
     /// <summary>
-    /// DCDM++ (DCDMsvn)
+    /// Based on CrZDC Beta 3
     /// </summary>
-    public class DCDM : DCppMod
+    public class CrZDC : DCppMod
     {
-        public DCDM()
-            : base(true)
+        public CrZDC()
         {
             System.Collections.Generic.List<string> hubAttr = Nodes["Hub"];
 
@@ -38,17 +35,18 @@ namespace FlowLib.Utils.Convert.Settings
             hubAttr.Remove("Right");
             hubAttr.Remove("Left");
 
-            hubAttr.Add("ProtectedUsers");
-            hubAttr.Add("ColumsOrder");
-            hubAttr.Add("ColumsWidth");
-            hubAttr.Add("ColumsVisible");
+            hubAttr.Add("UserPassword");
+            hubAttr.Add("ClientEmulation");
             hubAttr.Add("WindowPosX");
             hubAttr.Add("WindowPosY");
             hubAttr.Add("WindowSizeX");
             hubAttr.Add("WindowSizeY");
-
             hubAttr.Add("WindowType");
-
+            hubAttr.Add("ChatUserSplit");
+            hubAttr.Add("UserListState");
+            hubAttr.Add("HeaderOrder");
+            hubAttr.Add("HeaderWidths");
+            hubAttr.Add("HeaderVisible");
             hubAttr.Add("RawOne");
             hubAttr.Add("RawTwo");
             hubAttr.Add("RawThree");
@@ -59,21 +57,31 @@ namespace FlowLib.Utils.Convert.Settings
             hubAttr.Add("RawEight");
             hubAttr.Add("RawNine");
             hubAttr.Add("RawTen");
-
+            hubAttr.Add("UserProtected");
+            hubAttr.Add("RawOneActif");
+            hubAttr.Add("RawTwoActif");
+            hubAttr.Add("RawThreeActif");
+            hubAttr.Add("RawFourActif");
+            hubAttr.Add("RawFiveActif");
+            hubAttr.Add("RawSixActif");
+            hubAttr.Add("RawSevenActif");
+            hubAttr.Add("RawEightActif");
+            hubAttr.Add("RawNineActif");
+            hubAttr.Add("RawTenActif");
+            hubAttr.Add("CheckOnConnect");
             hubAttr.Add("CheckClients");
             hubAttr.Add("CheckFilelists");
-            hubAttr.Add("CheckOnConnect");
             hubAttr.Add("UseMyinfoDetect");
-
-            hubAttr.Add("OpChat");
+            hubAttr.Add("CheckFakeShare");
+            hubAttr.Add("ExtendedCheck1");
+            hubAttr.Add("ExtendedCheck2");
+            hubAttr.Add("ExtendedCheck3");
+            hubAttr.Add("HeaderOrder");
+            hubAttr.Add("CheckKey");
+            hubAttr.Add("Mode");
+            hubAttr.Add("IP");
             hubAttr.Add("UserIp");
             hubAttr.Add("HideShare");
-            hubAttr.Add("Trigger");
-            hubAttr.Add("LogChat");
-            hubAttr.Add("HubMessage");
-            hubAttr.Add("DisableSearchSelect");
-            hubAttr.Add("RegStatus");
-            hubAttr.Add("DisableRaw");
         }
     }
 }

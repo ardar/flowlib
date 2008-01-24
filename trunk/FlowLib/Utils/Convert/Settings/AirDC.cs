@@ -22,11 +22,11 @@
 namespace FlowLib.Utils.Convert.Settings
 {
     /// <summary>
-    /// CzDZ
+    /// Based on AirDC 2.01
     /// </summary>
-    public class CzDZ : DCppMod
+    public class AirDC : DCppMod
     {
-        public CzDZ()
+        public AirDC()
         {
             System.Collections.Generic.List<string> hubAttr = Nodes["Hub"];
 
@@ -35,10 +35,9 @@ namespace FlowLib.Utils.Convert.Settings
             hubAttr.Remove("Right");
             hubAttr.Remove("Left");
 
-            hubAttr.Add("UserPassword");
-            hubAttr.Add("ColumsOrder");
-            hubAttr.Add("ColumsWidth");
-            hubAttr.Add("ColumsVisible");
+            hubAttr.Add("HeaderOrder");
+            hubAttr.Add("HeaderWidths");
+            hubAttr.Add("HeaderVisible");
             hubAttr.Add("WindowPosX");
             hubAttr.Add("WindowPosY");
             hubAttr.Add("WindowSizeX");
@@ -46,7 +45,21 @@ namespace FlowLib.Utils.Convert.Settings
             hubAttr.Add("WindowType");
             hubAttr.Add("ChatUserSplit");
             hubAttr.Add("UserListState");
+
+            hubAttr.Add("RawOne");
+            hubAttr.Add("RawTwo");
+            hubAttr.Add("RawThree");
+            hubAttr.Add("RawFour");
+            hubAttr.Add("RawFive");
+
+            hubAttr.Add("HideShare");
+            hubAttr.Add("Mode");
+            hubAttr.Add("IP");
+
+            hubAttr.Add("Encoding");
             hubAttr.Add("StealthMode");
+            hubAttr.Add("AutoCDM");
+            hubAttr.Add("FavNoPM");
         }
     }
 }

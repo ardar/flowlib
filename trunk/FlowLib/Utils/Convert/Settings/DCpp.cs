@@ -26,10 +26,12 @@ using FlowLib.Containers;
 namespace FlowLib.Utils.Convert.Settings
 {
     /// <summary>
-    /// DC++ from 0.4033 to 0.699
+    /// DC++
     /// </summary>
     public class DCpp : XmlClient
     {
+        protected bool oldClient = false;
+
         public DCpp()
         {
             System.Collections.Generic.List<string> hubAttr = new System.Collections.Generic.List<string>();
@@ -47,6 +49,24 @@ namespace FlowLib.Utils.Convert.Settings
             hubAttr.Add("Left");
 
             Nodes.Add("Hub", hubAttr);
+        }
+
+        public DCpp(bool beforeDCpp0_403)
+            : this()
+        {
+            oldClient = beforeDCpp0_403;
+        }
+
+        public override bool Read(byte[] data)
+        {
+            if (oldClient)
+            {
+                MemoryStream ms = new MemoryStream(data);
+                StreamReader sr = new StreamReader(ms, System.Text.Encoding.Default);
+                document = new System.Xml.XmlDocument();
+                document.Load(sr);
+            }
+            return base.Read(data);
         }
 
         public override void NewNode(string nodeName, bool read)

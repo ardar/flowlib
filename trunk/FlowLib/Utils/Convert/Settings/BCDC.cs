@@ -19,24 +19,19 @@
  *
  */
 
-using System.IO;
-
 namespace FlowLib.Utils.Convert.Settings
 {
     /// <summary>
-    /// DC++ to 0.4033
+    /// BCDC
     /// </summary>
-    public class DCpp0_403 :DCpp
+    public class BCDC : DCppMod
     {
-        public DCpp0_403() : base() { }
-
-        public override bool Read(byte[] data)
+        public BCDC()
         {
-            MemoryStream ms = new MemoryStream(data);
-            StreamReader sr = new StreamReader(ms, System.Text.Encoding.Default);
-            document = new System.Xml.XmlDocument();
-            document.Load(sr);
-            return base.Read(data);
+            System.Collections.Generic.List<string> hubAttr = Nodes["Hub"];
+
+            hubAttr.Add("DescriptionFormat");
+            hubAttr.Add("ClientEmulation");
         }
     }
 }

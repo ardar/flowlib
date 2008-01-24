@@ -23,7 +23,43 @@ using System.Text;
 
 namespace FlowLib.Utils.Convert.Settings
 {
-    public class LDC : BaseClientPasswordBase64
+    /// <summary>
+    /// Based on LDC 1.00v2a
+    /// </summary>
+    public class LDC : DCppMod
     {
+        public LDC()
+        {
+            System.Collections.Generic.List<string> hubAttr = Nodes["Hub"];
+
+            hubAttr.Remove("Bottom");
+            hubAttr.Remove("Top");
+            hubAttr.Remove("Right");
+            hubAttr.Remove("Left");
+
+            hubAttr.Add("UserPassword");
+            hubAttr.Add("ShowIPS");
+            hubAttr.Add("ProtectedUsers");
+            hubAttr.Add("RawOne");
+            hubAttr.Add("RawTwo");
+            hubAttr.Add("RawThree");
+            hubAttr.Add("RawFour");
+            hubAttr.Add("RawFive");
+            hubAttr.Add("ClientEmulation");
+            hubAttr.Add("Mode");
+            hubAttr.Add("IP");
+            hubAttr.Add("HideShare");
+            hubAttr.Add("UseMyinfoDetect");
+            hubAttr.Add("HeaderOrder");
+            hubAttr.Add("HeaderWidths");
+            hubAttr.Add("HeaderVisible");
+            hubAttr.Add("WindowPosX");
+            hubAttr.Add("WindowPosY");
+            hubAttr.Add("WindowSizeX");
+            hubAttr.Add("WindowSizeY");
+            hubAttr.Add("WindowType");
+            hubAttr.Add("ChatUserSplit");
+            hubAttr.Add("UserListState");
+        }
     }
 }
