@@ -22,11 +22,11 @@
 namespace FlowLib.Utils.Convert.Settings
 {
     /// <summary>
-    /// CzDZ
+    /// Based on RSX 1.00
     /// </summary>
-    public class CzDZ : DCppMod
+    public class RSX : DCppMod
     {
-        public CzDZ()
+        public RSX()
         {
             System.Collections.Generic.List<string> hubAttr = Nodes["Hub"];
 
@@ -35,10 +35,17 @@ namespace FlowLib.Utils.Convert.Settings
             hubAttr.Remove("Right");
             hubAttr.Remove("Left");
 
-            hubAttr.Add("UserPassword");
-            hubAttr.Add("ColumsOrder");
-            hubAttr.Add("ColumsWidth");
-            hubAttr.Add("ColumsVisible");
+            hubAttr.Add("UseFilter");
+            hubAttr.Add("UseAutosearch");
+            hubAttr.Add("UseHighLight");
+            hubAttr.Add("UsersLimitToUseActions");
+            hubAttr.Add("Mode");
+            hubAttr.Add("IP");
+            hubAttr.Add("HideShare");
+
+            hubAttr.Add("HeaderOrder");
+            hubAttr.Add("HeaderWidths");
+            hubAttr.Add("HeaderVisible");
             hubAttr.Add("WindowPosX");
             hubAttr.Add("WindowPosY");
             hubAttr.Add("WindowSizeX");
@@ -46,7 +53,14 @@ namespace FlowLib.Utils.Convert.Settings
             hubAttr.Add("WindowType");
             hubAttr.Add("ChatUserSplit");
             hubAttr.Add("UserListState");
-            hubAttr.Add("StealthMode");
+
+            hubAttr.Add("CheckOnConnect");
+            hubAttr.Add("CheckClients");
+            hubAttr.Add("CheckFilelists");
+            hubAttr.Add("CheckFakeShare");
+            hubAttr.Add("Encoding");
+            hubAttr.Add("Email");
+            hubAttr.Add("AwayMsg");
         }
     }
 }

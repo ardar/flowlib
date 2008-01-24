@@ -22,31 +22,20 @@
 namespace FlowLib.Utils.Convert.Settings
 {
     /// <summary>
-    /// CzDZ
+    /// Based on fulDC 6.78
     /// </summary>
-    public class CzDZ : DCppMod
+    public class FulDC : DCppMod
     {
-        public CzDZ()
+        public FulDC()
         {
             System.Collections.Generic.List<string> hubAttr = Nodes["Hub"];
 
-            hubAttr.Remove("Bottom");
-            hubAttr.Remove("Top");
-            hubAttr.Remove("Right");
-            hubAttr.Remove("Left");
-
-            hubAttr.Add("UserPassword");
-            hubAttr.Add("ColumsOrder");
-            hubAttr.Add("ColumsWidth");
-            hubAttr.Add("ColumsVisible");
-            hubAttr.Add("WindowPosX");
-            hubAttr.Add("WindowPosY");
-            hubAttr.Add("WindowSizeX");
-            hubAttr.Add("WindowSizeY");
-            hubAttr.Add("WindowType");
-            hubAttr.Add("ChatUserSplit");
-            hubAttr.Add("UserListState");
-            hubAttr.Add("StealthMode");
+            hubAttr.Add("HeaderOrder");
+            hubAttr.Add("HeaderWidths");
+            hubAttr.Add("HeaderVisible");
+            hubAttr.Add("StripIsp");
+            hubAttr.Add("ShowUserlist");
+            hubAttr.Add("LogMainchat");
         }
     }
 }

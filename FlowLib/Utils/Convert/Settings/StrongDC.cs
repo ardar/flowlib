@@ -22,11 +22,11 @@
 namespace FlowLib.Utils.Convert.Settings
 {
     /// <summary>
-    /// CzDZ
+    /// Based on StrongDC 2.1
     /// </summary>
-    public class CzDZ : DCppMod
+    public class StrongDC : DCppMod
     {
-        public CzDZ()
+        public StrongDC()
         {
             System.Collections.Generic.List<string> hubAttr = Nodes["Hub"];
 
@@ -35,10 +35,6 @@ namespace FlowLib.Utils.Convert.Settings
             hubAttr.Remove("Right");
             hubAttr.Remove("Left");
 
-            hubAttr.Add("UserPassword");
-            hubAttr.Add("ColumsOrder");
-            hubAttr.Add("ColumsWidth");
-            hubAttr.Add("ColumsVisible");
             hubAttr.Add("WindowPosX");
             hubAttr.Add("WindowPosY");
             hubAttr.Add("WindowSizeX");
@@ -46,7 +42,24 @@ namespace FlowLib.Utils.Convert.Settings
             hubAttr.Add("WindowType");
             hubAttr.Add("ChatUserSplit");
             hubAttr.Add("UserListState");
-            hubAttr.Add("StealthMode");
+            hubAttr.Add("HeaderOrder");
+            hubAttr.Add("HeaderWidths");
+            hubAttr.Add("HeaderVisible");
+            hubAttr.Add("Mode");
+            hubAttr.Add("IP");
+
+            hubAttr.Add("Encoding");
+            hubAttr.Add("HideShare");
+            hubAttr.Add("RawOne");
+            hubAttr.Add("RawTwo");
+            hubAttr.Add("RawThree");
+            hubAttr.Add("RawFour");
+            hubAttr.Add("RawFive");
+            hubAttr.Add("RawSix");
+            hubAttr.Add("RawSeven");
+            hubAttr.Add("RawEight");
+            hubAttr.Add("RawNine");
+            hubAttr.Add("RawTen");
         }
     }
 }
