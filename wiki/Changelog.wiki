@@ -7,9 +7,6 @@
 
   * *Changes from TODO:*
     # Converting settings
-      * DC++ (From/To)
-      * DCDM (From)
-      * LDC (From)
 
   * *Other changes:*
   * ADD		- Extendability for HubSetting
