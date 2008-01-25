@@ -1,0 +1,13 @@
+#summary Convert common dc client settings
+
+= Introduction =
+
+Convert common DC client settings
+
+= Details =
+
+  * Converts Hub Favorite settings between common dc clients
+
+= Downloads = 
+
+[http://flowlib.googlecode.com/files/FlowConverter.zip Alpha 1]
