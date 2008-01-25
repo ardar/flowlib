@@ -7,6 +7,10 @@
 
   * *Changes from TODO:*
     # Converting settings
+      * *Thanks to:*
+        * Lightgirl_xp for supplying xml files.
+        * Pothead for reporting bug.
+
 
   * *Other changes:*
   * ADD		- Extendability for HubSetting
