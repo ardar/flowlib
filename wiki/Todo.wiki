@@ -10,36 +10,23 @@ _Note that just because it is on this list it is not a promise that it will be d
   _[Changelog See changelog to see fixes and changes not listed here]_
 
   * Converting settings (hub favorites) from/to other clients
-    # *From*
+    # ~~*From/To*~~
       * ~~DC++~~
       * ~~DCDM~~
       * ~~LDC~~
-      * AirDC
-      * BCDC
-      * CrZDC
-      * CZDC
-      * fulDC
-      * IceDC
-      * RSX
-      * StrongDC
-      * StrongDC Lite
-      * Zion Blue
-      * zK
-    # *To*
-      * ~~DC++~~
-      * DCDM
-      * LDC
-      * AirDC
-      * BCDC
-      * CrZDC
-      * CZDC
-      * fulDC
-      * IceDC
-      * RSX
-      * StrongDC
-      * StrongDC Lite
-      * Zion Blue
-      * zK
+      * ~~AirDC~~
+      * ~~BCDC~~
+      * ~~CrZDC~~
+      * ~~CZDC~~
+      * ~~fulDC~~
+      * ~~IceDC~~
+      * ~~RSX~~
+      * ~~StrongDC~~
+      * ~~StrongDC Lite~~
+      * ~~Zion Blue~~
+      * ~~zK~~
+    # Test functionality
+    # Bug fixes
   * Support for encrypted connections
 
 = Release B =
