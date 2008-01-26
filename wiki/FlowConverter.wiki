@@ -10,4 +10,4 @@ Convert common DC client settings
 
 = Downloads = 
 
-[http://flowlib.googlecode.com/files/FlowConverter.zip Alpha 1]
+[http://flowlib.googlecode.com/files/FlowConverter.zip Alpha 2]
