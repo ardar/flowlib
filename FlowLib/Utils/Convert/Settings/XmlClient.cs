@@ -29,7 +29,6 @@ namespace FlowLib.Utils.Convert.Settings
     public abstract class XmlClient : BaseClient
     {
         protected SortedList<string, List<string>> nodes = new SortedList<string, List<string>>();
-        //protected List<string> nodes = new List<string>();
         protected XmlDocument document = null;
         protected XmlElement xmlCurrent = null;
         protected XmlElement xmlParent = null;
@@ -47,7 +46,7 @@ namespace FlowLib.Utils.Convert.Settings
             }
 
             XmlDeclaration xmlDec;
-            xmlDec = document.CreateXmlDeclaration("1.0", System.Text.Encoding.UTF8.BodyName , "yes");
+            xmlDec = document.CreateXmlDeclaration("1.0", System.Text.Encoding.UTF8.BodyName, "yes");
             document.AppendChild(xmlDec);
 
             XmlElement xmlFavorites = document.CreateElement("Favorites");
@@ -91,7 +90,11 @@ namespace FlowLib.Utils.Convert.Settings
             if (document == null)
             {
                 document = new XmlDocument();
-                document.Load(new MemoryStream(data));
+
+                string xml = System.Text.Encoding.UTF8.GetString(data);
+                xml = xml.Replace("\x001", "LOWCHAR001");
+                document.LoadXml(xml);
+                //document.Load(new MemoryStream(data));
             }
 
             foreach (string node in nodes.Keys)
@@ -125,6 +128,9 @@ namespace FlowLib.Utils.Convert.Settings
         {
             if (!read)
             {
+                if (attrValue.Contains("LOWCHAR001"))
+                    attrValue = attrValue.Replace("LOWCHAR001", "\x001");
+
                 xmlCurrent.SetAttribute(attrName, attrValue);
             }
         }

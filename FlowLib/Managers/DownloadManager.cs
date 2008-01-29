@@ -68,6 +68,8 @@ namespace FlowLib.Managers
         protected SortedList<DownloadItem, FlowSortedList<Source>> downloadItems = new SortedList<DownloadItem, FlowSortedList<Source>>();
         protected SortedList<Source, FlowSortedList<DownloadItem>> sourceItems = new SortedList<Source, FlowSortedList<DownloadItem>>();
 
+        protected string directory = null;
+
         /// <summary>
         /// Init listeners for this static class
         /// </summary>
@@ -318,12 +320,24 @@ namespace FlowLib.Managers
         // TODO : Do loading
         public void Load(string dir)
         {
+            directory = directory;
         }
 
         // TODO : Do saving
         public void Save()
         {
+            Save(directory);
+        }
 
+        // TODO : Do saving
+        public void Save(string dir)
+        {
+            lock (downloadItems)
+            {
+                //downloadItems
+
+
+            }
         }
     }
 }

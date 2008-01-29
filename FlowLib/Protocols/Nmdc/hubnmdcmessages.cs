@@ -757,6 +757,8 @@ namespace FlowLib.Protocols.HubNmdc
             this.port = port;
 
             this.address = hub.LocalAddress.Address.ToString();
+            if (hub.Me.ContainsKey(UserInfo.IP))
+                this.address = hub.Me.Get(UserInfo.IP);
             
             Raw = "$ConnectToMe "+this.to+" " + this.address + ":" + this.port+ "|";
             if (!string.IsNullOrEmpty(to) && port > 0 && port < 65535 && !string.IsNullOrEmpty(address))
