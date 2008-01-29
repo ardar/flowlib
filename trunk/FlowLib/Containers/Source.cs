@@ -56,6 +56,11 @@ namespace FlowLib.Containers
             this.userId = userId;
         }
 
+        public override string ToString()
+        {
+            return string.Format("Source[{0}, {1}]", conId, userId);
+        }
+
         #region Comparing
         public int Compare(Source x, Source y)
         {
