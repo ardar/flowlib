@@ -25,6 +25,8 @@
   * FIX		- Own hub count (always showed 0 before) (Thanks GhOstFaCE for reporting)
   * FIX		- Object disposed exception in TcpConnection
   * ADD		- Now updates MyINFO/INF by auto when hubcount or share has changed (Min MyINFO interval is 5 min)
+  * FIX		- Out of range exception in Cancel (DownloadItem)
+  * FIX		- ConnectToMe can now handle external ip.
 
 
 = 20080119 =
