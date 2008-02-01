@@ -37,6 +37,7 @@ namespace FlowLib.Containers
         public string ConnectionId
         {
             get { return conId; }
+			set { conId = value; }
         }
         /// <summary>
         /// User Id
@@ -44,6 +45,7 @@ namespace FlowLib.Containers
         public string UserId
         {
             get { return userId; }
+			set { userId = value; }
         }
         /// <summary>
         /// Creates source from connection id and user id

@@ -526,12 +526,13 @@ namespace FlowLib.Protocols
                     trans.User = req.User;
                     trans.Share = req.Share;
                     trans.Source = req.Source;
-                }
+					trans.Send(new Lock(trans));
+				}
                 else
                 {
                     trans.User = myNick.Info;
-                }
-                trans.Send(new Lock(trans));
+					trans.Source.UserId = trans.User.StoreID;
+				}
             }
             else if (message is Supports)
             {
