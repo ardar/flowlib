@@ -107,7 +107,7 @@ namespace FlowLib.Protocols
         protected void UpdateMyInfo() { UpdateMyInfo(true); }
         protected virtual void UpdateMyInfo(bool firstTime)
         {
-            if (new System.DateTime(myInfoLastUpdated).AddMinutes(5) < System.DateTime.Now)
+            if (new System.DateTime(myInfoLastUpdated).AddMinutes(15) < System.DateTime.Now)
             {
                 MyINFO tmp = new MyINFO(hub);
                 if (lastMyInfo == null || (tmp.Raw != lastMyInfo.Raw))
@@ -128,7 +128,7 @@ namespace FlowLib.Protocols
 
         protected virtual void OnMyINFOPool()
         {
-            System.Threading.Thread.Sleep(5 * 60 * 1000 + 10);
+            System.Threading.Thread.Sleep(15 * 60 * 1000 + 10);
             UpdateMyInfo(false);
         }
 
@@ -503,6 +503,7 @@ namespace FlowLib.Protocols
                 Transfer trans = new Transfer(conToMe.Address, conToMe.Port);
                 trans.Share = this.hub.Share;
                 trans.Me = hub.Me;
+				trans.Source = new Source(hub.RemoteAddress.ToString(), null);
                 // Protocol has to be set last.
                 trans.Protocol = new TransferNmdcProtocol(trans);
                 Update(hub, new FmdcEventArgs(Actions.TransferStarted, trans));

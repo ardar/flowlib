@@ -410,7 +410,7 @@ namespace FlowLib.Protocols.TransferNmdc
 
             extended = true;
 
-            pk = trans.Me.TagInfo.Version.Replace(" ", "") +"ABCABCABCABCABCA";
+			pk = trans.Me.TagInfo.Version.Replace(" ", "").Replace("V:", "") +"ABCABCABCABCABCA";
             if (pk.Length > 16)
                 pk = pk.Substring(0, 16);
             MakeRaw();
