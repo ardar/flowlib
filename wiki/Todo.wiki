@@ -25,8 +25,6 @@ _Note that just because it is on this list it is not a promise that it will be d
       * ~~StrongDC Lite~~
       * ~~Zion Blue~~
       * ~~zK~~
-    # Test functionality
-    # Bug fixes
   * Support for encrypted connections *(Not for .Net Compact)*
 
 = Release B =
