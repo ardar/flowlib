@@ -9,4 +9,10 @@ What should you do if you have a question?
   # Add comment below and your question will be answered (Or removed)
 = Questions =
 
-_No questions added yet_
+
+  # *How do i compile FlowLib for .Net Compact framework?*
+`
+  * Change references so they point to .Net Compact.
+  * Define constant "COMPACT_FRAMEWORK". You are doing this on project level in Visual Studio. (This is so functionality that is not supported by compact framework will not be included)
+` 
+  
