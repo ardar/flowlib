@@ -8,7 +8,7 @@
   * *Changes from TODO:*
     # Converting settings
       * *Special thanks to:*
-        * Lightgirl_xp and Pharaoh for supplying xml files.
+        * Lightgirl_xp for supplying xml files.
         * Pothead for reporting bug.
 
 
