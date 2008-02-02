@@ -370,14 +370,15 @@ namespace FlowLib.Protocols
             }
             else
             {
-                ParseRaw(Encoding.GetString(b, 0, length));
+				if (ParseRaw(Encoding.GetString(b, 0, length)))
+					trans.Protocol.ParseRaw(b, length);
             }
         }
-        public void ParseRaw(string raw)
+        public bool ParseRaw(string raw)
         {
             // If raw lenght is 0. Ignore
             if (raw.Length == 0)
-                return;
+                return false;
 
             // Should we read buffer?
             if (received.Length > 0)
@@ -394,9 +395,7 @@ namespace FlowLib.Protocols
                 if (trans != null)
                 {
                     trans.Protocol = new TransferNmdcProtocol(trans);
-                    byte[] b = trans.Protocol.Encoding.GetBytes(raw);
-                    trans.Protocol.ParseRaw(b,b.Length);
-                    return;
+                    return true;
                 }
                 else if (hub != null)
                 {
@@ -422,6 +421,7 @@ namespace FlowLib.Protocols
             // If Something is still left. Save it to buffer for later use.
             if (raw.Length > 0)
                 received = raw;
+			return false;
         }
         protected StrMessage ParseMessage(string raw)
         {
