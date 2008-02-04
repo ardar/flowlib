@@ -10,20 +10,20 @@
       * *Special thanks to:*
         * Lightgirl_xp for supplying xml files.
         * Pothead for reporting bug.
-      * ~~DC++~~
-      * ~~DCDM~~
-      * ~~LDC~~
-      * ~~AirDC~~
-      * ~~BCDC~~
-      * ~~CrZDC~~
-      * ~~CZDC~~
-      * ~~fulDC~~
-      * ~~IceDC~~
-      * ~~RSX~~
-      * ~~StrongDC~~
-      * ~~StrongDC Lite~~
-      * ~~Zion Blue~~
-      * ~~zK~~
+      * DC++
+      * DCDM
+      * LDC
+      * AirDC
+      * BCDC
+      * CrZDC
+      * CZDC
+      * fulDC
+      * IceDC
+      * RSX
+      * StrongDC
+      * StrongDC Lite
+      * Zion Blue
+      * zK
 
 
 
