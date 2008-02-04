@@ -637,7 +637,7 @@ namespace FlowLib.Protocols
                     //trans.Content.VirtualName = get.File;
                     trans.Content.Set(ContentInfo.VIRTUAL, get.File);
                 }
-                bytesToSend = this.GetContent(System.Text.Encoding.ASCII, trans.CurrentSegment.Position, trans.CurrentSegment.Length - trans.CurrentSegment.Position);
+                bytesToSend = this.GetContent(System.Text.Encoding.ASCII, trans.CurrentSegment.Start + trans.CurrentSegment.Position, trans.CurrentSegment.Length - trans.CurrentSegment.Position);
 
                 // Do file exist?
                 if (trans.Content.Size > -1)
@@ -673,7 +673,7 @@ namespace FlowLib.Protocols
 
                 trans.CurrentSegment = new SegmentInfo(-1, getblocks.Start, getblocks.Length);
                 bool firstTime = true;
-                while (connectionStatus != TcpConnection.Disconnected && (bytesToSend = GetContent(System.Text.Encoding.UTF8, trans.CurrentSegment.Position, trans.CurrentSegment.Length - trans.CurrentSegment.Position)) != null)
+                while (connectionStatus != TcpConnection.Disconnected && (bytesToSend = GetContent(System.Text.Encoding.UTF8, trans.CurrentSegment.Start + trans.CurrentSegment.Position, trans.CurrentSegment.Length - trans.CurrentSegment.Position)) != null)
                 {
                     if (firstTime)
                     {
@@ -759,7 +759,7 @@ namespace FlowLib.Protocols
                     //Util.Compression.ZLib zlib = null;
                     //if (adcget.ZL1)
                     //    zlib = new Fmdc.Util.Compression.ZLib();
-                    while (connectionStatus != TcpConnection.Disconnected && (bytesToSend = GetContent(System.Text.Encoding.UTF8, trans.CurrentSegment.Position, trans.CurrentSegment.Length - trans.CurrentSegment.Position)) != null)
+                    while (connectionStatus != TcpConnection.Disconnected && (bytesToSend = GetContent(System.Text.Encoding.UTF8, trans.CurrentSegment.Start + trans.CurrentSegment.Position, trans.CurrentSegment.Length - trans.CurrentSegment.Position)) != null)
                     {
                         if (firstTime)
                         {

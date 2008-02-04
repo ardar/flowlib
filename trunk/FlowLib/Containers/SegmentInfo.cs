@@ -24,7 +24,7 @@ namespace FlowLib.Containers
     public class SegmentInfo
     {
         protected int vIndex = -1;
-        protected int vPosition = -1;
+        protected long vPosition = -1;
         protected long vStart = 0;
         protected long vLength = -1;
 
@@ -35,7 +35,7 @@ namespace FlowLib.Containers
         ///// <summary>
         ///// Segment position
         ///// </summary>
-        public int Position
+        public long Position
         {
             get { return vPosition; }
             set { vPosition = value; }
