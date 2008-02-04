@@ -6,10 +6,25 @@
   _[Todo See Todo for changes still remaining before release]_
 
   * *Changes from TODO:*
-    # Converting settings
+    # Converting hub settings
       * *Special thanks to:*
         * Lightgirl_xp for supplying xml files.
         * Pothead for reporting bug.
+      * ~~DC++~~
+      * ~~DCDM~~
+      * ~~LDC~~
+      * ~~AirDC~~
+      * ~~BCDC~~
+      * ~~CrZDC~~
+      * ~~CZDC~~
+      * ~~fulDC~~
+      * ~~IceDC~~
+      * ~~RSX~~
+      * ~~StrongDC~~
+      * ~~StrongDC Lite~~
+      * ~~Zion Blue~~
+      * ~~zK~~
+
 
 
   * *Other changes:*
