@@ -637,7 +637,7 @@ namespace FlowLib.Protocols
                     //trans.Content.VirtualName = get.File;
                     trans.Content.Set(ContentInfo.VIRTUAL, get.File);
                 }
-                bytesToSend = this.GetContent(System.Text.Encoding.ASCII, trans.CurrentSegment.Position, trans.CurrentSegment.Length - -trans.CurrentSegment.Position);
+                bytesToSend = this.GetContent(System.Text.Encoding.ASCII, trans.CurrentSegment.Position, trans.CurrentSegment.Length - trans.CurrentSegment.Position);
 
                 // Do file exist?
                 if (trans.Content.Size > -1)
