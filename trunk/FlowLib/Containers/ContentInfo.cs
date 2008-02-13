@@ -185,12 +185,21 @@ namespace FlowLib.Containers
             int i;
             if ((i = Compare(x == null, y == null)) != -2)
                 return i;
-            if (Compare(x.ContainsKey(ID), y.ContainsKey(ID)) != -2)
-                return string.Compare(x[ID], y[ID]);
-            if (Compare(x.ContainsKey(TTH), y.ContainsKey(TTH)) != -2)
-                return string.Compare(x[TTH], y[TTH]);
-            if (Compare(x.ContainsKey(VIRTUAL), y.ContainsKey(VIRTUAL)) != -2)
-                return string.Compare(x[VIRTUAL], y[VIRTUAL]);
+			if ((i = Compare(x.ContainsKey(ID), y.ContainsKey(ID))) != -2)
+				if (i == 0)
+					return string.Compare(x[ID], y[ID]);
+				else
+					return i;
+			if ((i = Compare(x.ContainsKey(TTH), y.ContainsKey(TTH))) != -2)
+				if (i == 0)
+					return string.Compare(x[TTH], y[TTH]);
+				else
+					return i;
+			if ((i = Compare(x.ContainsKey(VIRTUAL), y.ContainsKey(VIRTUAL))) != -2)
+				if (i == 0)
+					return string.Compare(x[VIRTUAL], y[VIRTUAL]);
+				else
+					return i;
             if ((i = x.LastModified.CompareTo(y.LastModified)) != 0)
                 return i;
             if ((i = x.Size.CompareTo(y.Size)) != 0)
