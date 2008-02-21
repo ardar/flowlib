@@ -45,6 +45,9 @@
   * FIX		- Lock and MyNick was sent multiple times sometimes (Nmdc Transfers).
   * CHANGE	- "V:" is now removed from PK in LOCK command (Nmdc Transfers).
   * FIX		- Fixed uploading (Didn't work when a client wanted to resume download)
+  * ADD		- TransferManager now have a property called Requests.
+
+
 
 = 20080119 =
 
