@@ -320,7 +320,7 @@ namespace FlowLib.Managers
         // TODO : Do loading
         public void Load(string dir)
         {
-            directory = directory;
+            directory = dir;
         }
 
         // TODO : Do saving
