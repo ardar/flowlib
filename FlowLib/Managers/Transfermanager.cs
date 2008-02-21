@@ -40,6 +40,11 @@ namespace FlowLib.Managers
         protected SortedList<string, TransferRequest> requests = new SortedList<string, TransferRequest>();
         protected SortedList<string, ITransfer> transfers = new SortedList<string, ITransfer>();
 
+		public SortedList<string, TransferRequest> Requests
+		{
+			get { return requests; }
+		}
+
         public SortedList<string, ITransfer> Transfers
         {
             get { return transfers; }
