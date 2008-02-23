@@ -79,8 +79,6 @@ namespace FlowLib.Utils.Convert.Settings
             xmlFavorites.AppendChild(xmlParent);
             document.AppendChild(xmlFavorites);
 
-            document.Save(System.Console.Out);
-
             MemoryStream ms = new MemoryStream();
             document.Save(ms);
             return ms.ToArray();
@@ -93,8 +91,9 @@ namespace FlowLib.Utils.Convert.Settings
 
                 string xml = System.Text.Encoding.UTF8.GetString(data);
                 xml = xml.Replace("\x001", "LOWCHAR001");
+                if (xml.IndexOf('<') == 1)
+                    xml = xml.Remove(0, 1);
                 document.LoadXml(xml);
-                //document.Load(new MemoryStream(data));
             }
 
             foreach (string node in nodes.Keys)
