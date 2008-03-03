@@ -143,7 +143,10 @@ namespace FlowLib.Protocols
                     else
                         h = new HubStatus(HubStatus.Codes.Disconnected);
                     hub.RegMode = -1;
-                    break;
+					// Sets MyInfo Interval to 0 when connection is disconnected
+					this.myInfoLastUpdated = 0;
+					lastMyInfo = null;
+					break;
                 case TcpConnection.Connected:
                     h = new HubStatus(HubStatus.Codes.Connected);
                     break;
