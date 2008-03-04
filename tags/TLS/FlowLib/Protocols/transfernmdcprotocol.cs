@@ -493,13 +493,36 @@ namespace FlowLib.Protocols
                 if (lk.Extended)
                     trans.Send(mySupport = new Supports(trans));
 
-                GetDownloadItem();
+#if !COMPACT_FRAMEWORK
+				if (userSupport != null && userSupport.TLS && mySupport.TLS)
+				{
+					try
+					{
+						trans.IsSecure = true;
 
-                Direction dir = new Direction(trans, this.download);
-                this.downloadRandom = dir.Number;
-                trans.Send(dir);
+						System.Security.Cryptography.X509Certificates.X509Certificate cert = System.Security.Cryptography.X509Certificates.X509Certificate.CreateFromCertFile(System.AppDomain.CurrentDomain.BaseDirectory + "CodeProject.cer");
 
-                trans.Send(new Key(lk.Key, trans));
+						//System.Security.Cryptography.X509Certificates.X509CertificateCollection col = new System.Security.Cryptography.X509Certificates.X509CertificateCollection();
+						//col.Add(cert);
+						//trans.AuthenticateAsClient("CodeProject", col, System.Security.Authentication.SslProtocols.Tls, false);
+
+						trans.AuthenticateAsServer(cert, false, System.Security.Authentication.SslProtocols.Tls, false);
+						return;
+					}
+					catch (System.Exception exp)
+					{
+						System.Console.WriteLine(exp.ToString());
+					}
+				}
+#endif
+
+				GetDownloadItem();
+
+				Direction dir = new Direction(trans, this.download);
+				this.downloadRandom = dir.Number;
+				trans.Send(dir);
+
+				trans.Send(new Key(lk.Key, trans));
             }
             else if (message is Key)
             {
@@ -539,7 +562,27 @@ namespace FlowLib.Protocols
                 // Sets Supports for protocol.
                 Supports sup = (Supports)message;
                 userSupport = sup;
-            }
+
+#if !COMPACT_FRAMEWORK
+				if (userSupport.TLS && mySupport != null && mySupport.TLS)
+				{
+					try
+					{
+						trans.IsSecure = true;
+
+						System.Security.Cryptography.X509Certificates.X509Certificate cert = System.Security.Cryptography.X509Certificates.X509Certificate.CreateFromCertFile( System.AppDomain.CurrentDomain.BaseDirectory + "CodeProject.cer");
+						System.Security.Cryptography.X509Certificates.X509CertificateCollection col = new System.Security.Cryptography.X509Certificates.X509CertificateCollection();
+						col.Add(cert);
+						trans.AuthenticateAsClient("CodeProject", col, System.Security.Authentication.SslProtocols.Tls, false);
+					}
+					catch (System.Exception exp)
+					{
+						System.Console.WriteLine(exp.ToString());
+					}
+				}
+#endif
+			
+			}
             else if (message is Direction)
             {
                 userDir = (Direction)message;

@@ -73,6 +73,7 @@ namespace FlowLib.Protocols.TransferNmdc
          * TTHL, Extention to ADCGet that will return TTH tree as binary
          * TTHF, EXtention to ADCGet that allows use of TTH for getting file.
          * MiniSlots, A special type of slot that has been historically used to transfer small files and file lists.
+		 * TLS, Encrypts transfer with a TLS Tunnel
          *******/
         protected string[] support = null;
         protected bool zlig = false;
@@ -83,6 +84,22 @@ namespace FlowLib.Protocols.TransferNmdc
         protected bool bzList = false;
         protected bool adcGet = false;
         protected bool getZBlock = false;
+		protected bool tls = false;
+
+		/// <summary>
+		/// TLS: http://www.thenighthawk.biz/smf/index.php?topic=205.0
+		/// This feature indicates support for tls tunnel.
+		/// </summary>
+		public bool TLS
+		{
+			get { return tls; }
+			set
+			{
+				tls = value;
+				SetFromRaw();
+			}
+		}
+
         /// <summary>
         /// ZLIG: http://dcpp.net/wiki/index.php/ZLIG
         /// This feature indicates support for compressing the stream of data sent by $ADCGET with the ZLib library.
@@ -215,6 +232,7 @@ namespace FlowLib.Protocols.TransferNmdc
             tthl = true;
             miniSlots = false;
             bzList = true;
+			tls = true;
 
             // TODO : Remove this when we have enabled ZLib compression
             getZBlock = false;
@@ -254,7 +272,8 @@ namespace FlowLib.Protocols.TransferNmdc
             if (TTHF) tmp += " TTHF";
             if (TTHL) tmp += " TTHL";
             if (MiniSlots) tmp += " MiniSlots";
-            tmp += "|";
+			if (TLS) tmp += " TLS";
+			tmp += "|";
             Raw = tmp;
         }
         /// <summary>
@@ -284,7 +303,8 @@ namespace FlowLib.Protocols.TransferNmdc
                     case "BZList": bzList = true; break;
                     case "ADCGet": adcGet = true; break;
                     case "GetZBlock": getZBlock = true; break;
-                }
+					case "TLS": tls = true; break;
+				}
             }
         }
 

@@ -22,6 +22,14 @@
 using FlowLib.Events;
 using FlowLib.Containers;
 using System.Net;
+// For Security
+#if !COMPACT_FRAMEWORK
+using System.Collections;
+using System.Net.Security;
+using System.Security.Authentication;
+using System.Security.Cryptography.X509Certificates;
+using System.IO;
+#endif
 
 namespace FlowLib.Interfaces
 {
@@ -32,7 +40,18 @@ namespace FlowLib.Interfaces
         event FmdcEventHandler ConnectionStatusChange;
         #endregion
         #region Properties
-        /// <summary>
+#if !COMPACT_FRAMEWORK
+		bool IsSecure
+		{
+			get;
+			set;
+		}
+		SslStream SecureStream
+		{
+			get;
+		}
+#endif			
+		/// <summary>
         /// Protocol that hub should use to understand messages that is received.
         /// </summary>
         IProtocol Protocol
@@ -59,6 +78,12 @@ namespace FlowLib.Interfaces
         }
         #endregion
         #region Functions
+#if !COMPACT_FRAMEWORK
+		void AuthenticateAsClient(string targetHost);
+		void AuthenticateAsClient(string targetHost, X509CertificateCollection clientCertificates, SslProtocols enabledSslProtocols, bool checkCertificateRevocation);
+		void AuthenticateAsServer(X509Certificate serverCertificate);
+		void AuthenticateAsServer(X509Certificate serverCertificate, bool clientCertificateRequired, SslProtocols enabledSslProtocols, bool checkCertificateRevocation);
+#endif
         /// <summary>
         /// Make connection to server.
         /// </summary>

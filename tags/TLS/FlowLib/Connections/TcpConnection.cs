@@ -31,6 +31,14 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System;
+// For Security
+#if !COMPACT_FRAMEWORK
+using System.Collections;
+using System.Net.Security;
+using System.Security.Authentication;
+using System.Security.Cryptography.X509Certificates;
+using System.IO;
+#endif
 
 namespace FlowLib.Connections
 {
@@ -76,11 +84,48 @@ namespace FlowLib.Connections
         protected IProtocol protocol = null;
         protected bool first = true;
 
-        // Thread signal, It is needed so we know when we have a connection.
+		#region Secure
+#if !COMPACT_FRAMEWORK
+		protected TcpClient secureClient = new TcpClient();
+		protected SslStream secure = null;
+		protected bool isServer = false;
+		protected X509Certificate localCertificate = null;
+		protected X509Certificate remoteCertificate = null;
+#endif
+		#endregion
+
+		// Thread signal, It is needed so we know when we have a connection.
         protected System.Threading.ManualResetEvent allDone = new System.Threading.ManualResetEvent(false);
 
         #endregion
         #region Properties
+#if !COMPACT_FRAMEWORK
+		public bool IsSecure
+		{
+			get { return (secure != null); }
+			set
+			{
+				if (secure != null)
+					secure.Dispose();
+				secureClient = null;
+
+				if (value)
+				{
+					secureClient = new TcpClient();
+					secureClient.Client = socket;
+					secure = new SslStream(secureClient.GetStream());
+				}
+			}
+		}
+
+		/// <summary>
+		/// Underlaying SSLStream used if IsSecure is true
+		/// </summary>
+		public SslStream SecureStream
+		{
+			get { return secure; }
+		}
+#endif
         /// <summary>
         /// Sharing instance for this transfer
         /// </summary>
@@ -189,8 +234,42 @@ namespace FlowLib.Connections
 
         #endregion
         #region Functions
-        #region Connect
-        /// <summary>
+#if !COMPACT_FRAMEWORK
+		/// <summary>
+		/// Called by clients to authenticate the server and optionally the client in a client-server connection.
+		/// </summary>
+		/// <param name="targetHost">The name of the server that shares this System.Net.Security.SslStream.</param>
+		public virtual void AuthenticateAsClient(string targetHost)
+		{
+			Authenticate();
+			secure.AuthenticateAsClient(targetHost);
+		}
+		public virtual void AuthenticateAsClient(string targetHost, X509CertificateCollection clientCertificates, SslProtocols enabledSslProtocols, bool checkCertificateRevocation)
+		{
+			Authenticate();
+			secure.AuthenticateAsClient(targetHost, clientCertificates, enabledSslProtocols, checkCertificateRevocation);
+		}
+
+		public virtual void AuthenticateAsServer(X509Certificate serverCertificate)
+		{
+			Authenticate();
+			secure.AuthenticateAsServer(serverCertificate);
+		}
+
+		public virtual void AuthenticateAsServer(X509Certificate serverCertificate, bool clientCertificateRequired, SslProtocols enabledSslProtocols, bool checkCertificateRevocation)
+		{
+			Authenticate();
+			secure.AuthenticateAsServer(serverCertificate, clientCertificateRequired, enabledSslProtocols, checkCertificateRevocation);
+		}
+
+		protected void Authenticate()
+		{
+			if (secure == null)
+				throw new InvalidOperationException("Connection is not in secure mode.");
+		}
+#endif
+		#region Connect
+		/// <summary>
         /// Creates connection to server.
         /// </summary>
         public virtual void Connect()
@@ -208,7 +287,7 @@ namespace FlowLib.Connections
             {
                 // It is needed so we know when we have a connection.
                 allDone.Reset();
-                socket.Blocking = false;
+                //socket.Blocking = false;
                 System.AsyncCallback onconnect = new System.AsyncCallback(OnConnect);
                 socket.BeginConnect(remoteAddress, onconnect, socket);
                 // Waits until we have a connection...
@@ -322,10 +401,11 @@ namespace FlowLib.Connections
             // Check if we got any data
             try
             {
+
                 int nBytesRec = sock.EndReceive(ar);
                 if (nBytesRec > 0)
-                {
-                    // Send data to protocol.
+				{
+					// Send data to protocol.
                     Protocol.ParseRaw(buffer, nBytesRec);
 
                     // If the connection is still usable restablish the callback
@@ -408,9 +488,20 @@ namespace FlowLib.Connections
                 if (raw == null || raw.Length <= 0)
                     return;
 
-                // Some how Send doesnt work on my Pocket PC. Because of this we use BeginSend // Flow84
+				int length = raw.Length;
+
+
+				// Some how Send doesnt work on my Pocket PC. Because of this we use BeginSend // Flow84
                 AsyncCallback sendData = new AsyncCallback(OnSendData);
-                socket.BeginSend(raw, 0, raw.Length, SocketFlags.None, sendData, socket);
+
+#if !COMPACT_FRAMEWORK
+				if (IsSecure)
+				{
+					secure.BeginWrite(raw, 0, length, sendData, socket);
+					return;
+				}
+#endif
+				socket.BeginSend(raw, 0, length, SocketFlags.None, sendData, socket);
                 return;
             }
             catch (ObjectDisposedException) { }
@@ -428,7 +519,15 @@ namespace FlowLib.Connections
             Socket handler = (Socket)async.AsyncState;
             try
             {
-                int bytesSent = handler.EndSend(async);
+				int bytesSent;
+#if !COMPACT_FRAMEWORK
+
+				if (IsSecure)
+				{
+					secure.EndWrite(async);
+				}
+#endif
+                bytesSent = handler.EndSend(async);
             }
             catch (ObjectDisposedException) { }
             catch (SocketException se)
