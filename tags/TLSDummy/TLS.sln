@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TLS", "TLS.csproj", "{0D7E9318-1D60-4924-9F1D-5B877F8719DE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlowLib", "..\..\..\..\..\..\Private\Code\FlowLib\trunk\FlowLib\FlowLib.csproj", "{4C9A3F81-7660-4170-8D6B-62C239922C89}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0D7E9318-1D60-4924-9F1D-5B877F8719DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D7E9318-1D60-4924-9F1D-5B877F8719DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D7E9318-1D60-4924-9F1D-5B877F8719DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D7E9318-1D60-4924-9F1D-5B877F8719DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C9A3F81-7660-4170-8D6B-62C239922C89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C9A3F81-7660-4170-8D6B-62C239922C89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C9A3F81-7660-4170-8D6B-62C239922C89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C9A3F81-7660-4170-8D6B-62C239922C89}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

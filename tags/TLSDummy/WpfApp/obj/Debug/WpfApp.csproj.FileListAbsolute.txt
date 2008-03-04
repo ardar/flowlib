@@ -1,0 +1,13 @@
+C:\Documents and Settings\1217\My Documents\Visual Studio 2008\Projects\TLS\WpfApp\bin\Debug\WpfApp.exe
+C:\Documents and Settings\1217\My Documents\Visual Studio 2008\Projects\TLS\WpfApp\bin\Debug\WpfApp.pdb
+C:\Documents and Settings\1217\My Documents\Visual Studio 2008\Projects\TLS\WpfApp\obj\Debug\ResolveAssemblyReference.cache
+C:\Documents and Settings\1217\My Documents\Visual Studio 2008\Projects\TLS\WpfApp\obj\Debug\Window1.baml
+C:\Documents and Settings\1217\My Documents\Visual Studio 2008\Projects\TLS\WpfApp\obj\Debug\Window1.g.cs
+C:\Documents and Settings\1217\My Documents\Visual Studio 2008\Projects\TLS\WpfApp\obj\Debug\App.g.cs
+C:\Documents and Settings\1217\My Documents\Visual Studio 2008\Projects\TLS\WpfApp\obj\Debug\WpfApp_MarkupCompile.cache
+C:\Documents and Settings\1217\My Documents\Visual Studio 2008\Projects\TLS\WpfApp\obj\Debug\WpfApp.g.resources
+C:\Documents and Settings\1217\My Documents\Visual Studio 2008\Projects\TLS\WpfApp\obj\Debug\WpfApp.Properties.Resources.resources
+C:\Documents and Settings\1217\My Documents\Visual Studio 2008\Projects\TLS\WpfApp\obj\Debug\WpfApp.csproj.GenerateResource.Cache
+C:\Documents and Settings\1217\My Documents\Visual Studio 2008\Projects\TLS\WpfApp\obj\Debug\WpfApp.exe
+C:\Documents and Settings\1217\My Documents\Visual Studio 2008\Projects\TLS\WpfApp\obj\Debug\WpfApp.pdb
+C:\Documents and Settings\1217\My Documents\Visual Studio 2008\Projects\TLS\WpfApp\bin\Debug\Window1.xaml.cs
