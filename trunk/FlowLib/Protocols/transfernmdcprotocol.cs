@@ -368,6 +368,7 @@ namespace FlowLib.Protocols
         {
             // Get content
             trans.DownloadItem = null;
+            trans.CurrentSegment = null;
             DownloadItem dwnItem = null;
             UserInfo usrInfo = trans.User;
             if (usrInfo != null)

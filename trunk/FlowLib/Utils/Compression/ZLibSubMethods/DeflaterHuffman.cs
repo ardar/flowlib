@@ -803,8 +803,9 @@ namespace FlowLib.Utils.Compression.ZLibSubMethods
 				/* Force static trees */
 				opt_len = static_len;
 			}
-			
-			if (storedOffset >= 0 && storedLength + 4 < opt_len >> 3) {
+
+            /* Flow84: This is stupid... But monodevelop seem to need this... (See Issue 10) */
+            if ((storedOffset >= 0) && ((storedLength + 4) < (opt_len >> 3))) {
 				/* Store Block */
 				//				if (DeflaterConstants.DEBUGGING) {
 				//					//Console.WriteLine("Storing, since " + storedLength + " < " + opt_len
