@@ -50,6 +50,18 @@ namespace FlowLib.Connections
 			// Do not allow this client to communicate with unauthenticated servers.
 			return false;
 		}
+
+		public static X509Certificate SelectLocalCertificate(
+			object sender,
+			string targetHost,
+			X509CertificateCollection localCertificates,
+			X509Certificate remoteCertificate,
+			string[] acceptableIssures)
+		{
+			Console.WriteLine(sender.ToString());
+			return null;
+		}
+
 		public static void RunClient(string machineName, string serverName)
 		{
 			// Create a TCP/IP client socket.
@@ -62,7 +74,7 @@ namespace FlowLib.Connections
 				client.GetStream(),
 				false,
 				new RemoteCertificateValidationCallback(ValidateServerCertificate),
-				null
+				new LocalCertificateSelectionCallback(SelectLocalCertificate)
 				);
 			// The server name must match the name on the server certificate.
 			try

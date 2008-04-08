@@ -79,12 +79,6 @@
     </Compile>
     <Compile Include="TServer.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\..\Private\Code\FlowLib\trunk\FlowLib\FlowLib.csproj">
-      <Project>{4C9A3F81-7660-4170-8D6B-62C239922C89}</Project>
-      <Name>FlowLib</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
