@@ -465,6 +465,21 @@ namespace FlowLib.Containers
         #region For Transfer Protocol that makes Filelists.
         public virtual bool AddFile(ContentInfo contentInfo)
         {
+			VirtualDir vd = null;
+			lock (virtualDirs)
+			{
+				if (virtualDirs.ContainsKey("dummy"))
+					vd = virtualDirs["dummy"];
+				else
+				{
+					vd = new VirtualDir("dummy", "dummy");
+					virtualDirs.Add("dummy", vd);
+				}
+			}
+
+			vd.TotalSize += contentInfo.Size;
+			vd.TotalCount++;
+
             bool value = false;
             if (contentInfo.ContainsKey(ContentInfo.STORAGEPATH) && !share.ContainsKey(contentInfo.Get(ContentInfo.STORAGEPATH)))
             {
@@ -479,6 +494,10 @@ namespace FlowLib.Containers
             if (contentInfo.ContainsKey(ContentInfo.TTH) && !tthNames.ContainsKey(contentInfo.Get(ContentInfo.TTH)))
             {
                 tthNames.Add(contentInfo.Get(ContentInfo.TTH), contentInfo);
+
+				vd.HashedSize += contentInfo.Size;
+				vd.HashedCount++;
+
                 value = true;
             }
             return value;
