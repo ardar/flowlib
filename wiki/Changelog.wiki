@@ -46,7 +46,7 @@
   * CHANGE	- "V:" is now removed from PK in LOCK command (Nmdc Transfers).
   * FIX		- Fixed uploading (Didn't work when a client wanted to resume download)
   * ADD		- TransferManager now have a property called Requests.
-
+  * FIX		- Shares converted from filelist do now have correct TotalSize, TotalCount,  HashedCount and HashedSize values.
 
 
 = 20080119 =
