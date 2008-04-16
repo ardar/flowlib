@@ -477,8 +477,11 @@ namespace FlowLib.Containers
 				}
 			}
 
-			vd.TotalSize += contentInfo.Size;
-			vd.TotalCount++;
+			if (!contentInfo.ContainsKey(ContentInfo.FILELIST))
+			{
+				vd.TotalSize += contentInfo.Size;
+				vd.TotalCount++;
+			}
 
             bool value = false;
             if (contentInfo.ContainsKey(ContentInfo.STORAGEPATH) && !share.ContainsKey(contentInfo.Get(ContentInfo.STORAGEPATH)))
@@ -495,8 +498,11 @@ namespace FlowLib.Containers
             {
                 tthNames.Add(contentInfo.Get(ContentInfo.TTH), contentInfo);
 
-				vd.HashedSize += contentInfo.Size;
-				vd.HashedCount++;
+				if (!contentInfo.ContainsKey(ContentInfo.FILELIST))
+				{
+					vd.HashedSize += contentInfo.Size;
+					vd.HashedCount++;
+				}
 
                 value = true;
             }
