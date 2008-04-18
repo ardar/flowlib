@@ -141,6 +141,7 @@ namespace FlowLib.Managers
                             if (tmpSrc != null)
                             {
                                 tmpSrc.Remove(d);
+								sourceItems.Remove(var);
                             }
                         }
                     }

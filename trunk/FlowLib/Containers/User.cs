@@ -100,6 +100,13 @@ namespace FlowLib.Containers
         {
             get { return userinfo.ID; }
         }
+		/// <summary>
+		/// User Storage Id.
+		/// </summary>
+		public string StoreID
+		{
+			get { return userinfo.StoreID; }
+		}
         /// <summary>
         /// Indicates if this user is a operator or not
         /// </summary>
