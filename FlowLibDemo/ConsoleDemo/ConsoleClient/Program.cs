@@ -43,16 +43,16 @@ namespace ConsoleDemo.ConsoleClient
         Setting windowSetting = new Setting();
         Hub windowHub = new Hub();
 
-        static void Main(string[] args)
-        {
-            ConsoleColor fg = Console.ForegroundColor;
-            ConsoleColor bg = Console.BackgroundColor;
-
-            new Program();
-
-            Console.ForegroundColor = fg;
-            Console.BackgroundColor = bg;
-        }
+//        static void Main(string[] args)
+//        {
+//            ConsoleColor fg = Console.ForegroundColor;
+//            ConsoleColor bg = Console.BackgroundColor;
+//
+//            new Program();
+//
+//            Console.ForegroundColor = fg;
+//            Console.BackgroundColor = bg;
+//        }
 
         public Program()
         {

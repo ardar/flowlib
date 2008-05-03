@@ -818,7 +818,7 @@ namespace FlowLib.Protocols
             }
             #endregion
             #region GET
-            else if (message is GET && trans != null)
+            else if (message is GET && this.trans != null)
             {
                 GET get = (GET)message;
                 // If we are supposed to download and other client tries to download. Disconnect.
