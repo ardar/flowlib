@@ -31,15 +31,17 @@ namespace ConsoleDemo.Examples
     {
         public ConvertSettings()
         {
+			string dir = System.AppDomain.CurrentDomain.BaseDirectory + System.IO.Path.DirectorySeparatorChar;
+			
             // Reads DCpp xml
             BaseClient client = null;
             client = new DCDM();
-            client.Read(@"C:\Private\Code\FlowLib\trunk\Settings\Hub\DCDM-0.495.Favorites.xml");
+            client.Read(dir + "DCDM-0.495.Favorites.xml");
 
             // Writes to LDC xml
             BaseClient client2 = new DCpp();
             client2.Hubs = client.Hubs;
-            client2.Write(@"C:\Private\Code\FlowLib\trunk\Settings\FlowLib.xml");
+            client2.Write(dir + "FlowLib.xml");
         }
     }
 }

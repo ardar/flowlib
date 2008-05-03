@@ -428,7 +428,7 @@ namespace FlowLib.Connections
             Socket handler = (Socket)async.AsyncState;
             try
             {
-                int bytesSent = handler.EndSend(async);
+                handler.EndSend(async);
             }
             catch (ObjectDisposedException) { }
             catch (SocketException se)
