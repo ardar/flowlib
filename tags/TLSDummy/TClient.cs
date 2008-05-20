@@ -42,8 +42,6 @@ namespace FlowLib.Connections
 			  X509Chain chain,
 			  SslPolicyErrors sslPolicyErrors)
 		{
-            return true;
-
 			if (sslPolicyErrors == SslPolicyErrors.None)
 				return true;
 
