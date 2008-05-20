@@ -33,16 +33,17 @@ namespace FlowLib.Connections
 {
 	public class TServer
 	{
-		static X509Certificate2 serverCertificate = null;
-		// The certificate parameter specifies the name of the file 
+		//static X509Certificate2 serverCertificate = null;
+        static X509Certificate serverCertificate = null;
+        // The certificate parameter specifies the name of the file 
 		// containing the machine certificate.
 
 		public static void RunServer(string certificate)
 		{
 			// http://www.microsoft.com/msdownload/platformsdk/sdkupdate/XPSP2FULLInstall.htm
 
-			serverCertificate = new X509Certificate2(certificate, "123456");
-			//serverCertificate = X509Certificate.CreateFromCertFile(certificate);
+			//serverCertificate = new X509Certificate2(certificate, "123456");
+			serverCertificate = X509Certificate.CreateFromCertFile(certificate);
 
 			// Create a TCP/IP (IPv4) socket and listen for incoming connections.
 			//TcpListener listener = new TcpListener(IPAddress.Any, 8080);

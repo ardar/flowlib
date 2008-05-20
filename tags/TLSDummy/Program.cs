@@ -45,8 +45,8 @@ namespace TLS
 		public static void RunServer()
 		{
 			// selfcert.pfx
-			//FlowLib.Connections.TServer.RunServer(AppDomain.CurrentDomain.BaseDirectory + "CodeProject.cer");
-			FlowLib.Connections.TServer.RunServer(AppDomain.CurrentDomain.BaseDirectory + "selfcert.pfx");
+			FlowLib.Connections.TServer.RunServer(AppDomain.CurrentDomain.BaseDirectory + "FlowLib.cer");
+			//FlowLib.Connections.TServer.RunServer(AppDomain.CurrentDomain.BaseDirectory + "selfcert.pfx");
 		}
 	}
 }
