@@ -33,7 +33,7 @@ namespace FlowLib.Connections
 {
 	public class TClient
 	{
-		private static Hashtable certificateErrors = new Hashtable();
+        protected static X509Certificate clientCertificate = null;
 
 		// The following method is invoked by the RemoteCertificateValidationDelegate.
 		public static bool ValidateServerCertificate(
@@ -42,7 +42,7 @@ namespace FlowLib.Connections
 			  X509Chain chain,
 			  SslPolicyErrors sslPolicyErrors)
 		{
-			if (sslPolicyErrors == SslPolicyErrors.None)
+			//if (sslPolicyErrors == SslPolicyErrors.None)
 				return true;
 
 			Console.WriteLine("Certificate error: {0}", sslPolicyErrors);
@@ -59,11 +59,15 @@ namespace FlowLib.Connections
 			string[] acceptableIssures)
 		{
 			Console.WriteLine(sender.ToString());
-			return null;
+            return clientCertificate;
+			//return null;
 		}
 
-		public static void RunClient(string machineName, string serverName)
+        public static void RunClient(string machineName, string serverName, string certificate)
 		{
+
+            clientCertificate = X509Certificate.CreateFromCertFile(certificate);
+
 			// Create a TCP/IP client socket.
 			// machineName is the host running the server application.
 			//TcpClient client = new TcpClient(machineName, 443);
@@ -79,8 +83,9 @@ namespace FlowLib.Connections
 			// The server name must match the name on the server certificate.
 			try
 			{
-				sslStream.AuthenticateAsClient(serverName);
-			}
+				//sslStream.AuthenticateAsClient(serverName);
+                sslStream.AuthenticateAsClient(serverName, new X509CertificateCollection(), SslProtocols.Default, true);
+            }
 			catch (AuthenticationException e)
 			{
 				Console.WriteLine("Exception: {0}", e.Message);

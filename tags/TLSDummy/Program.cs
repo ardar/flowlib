@@ -34,7 +34,7 @@ namespace TLS
 				t.IsBackground = true;
 				t.Start();
 
-				FlowLib.Connections.TClient.RunClient("127.0.0.1", "FlowLib");
+                FlowLib.Connections.TClient.RunClient("127.0.0.1", "", AppDomain.CurrentDomain.BaseDirectory + "FlowLib.cer");
 			}
 			catch (System.Exception e)
 			{

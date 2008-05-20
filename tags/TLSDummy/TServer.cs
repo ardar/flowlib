@@ -58,18 +58,56 @@ namespace FlowLib.Connections
 				ProcessClient(client);
 			}
 		}
+
+        // The following method is invoked by the RemoteCertificateValidationDelegate.
+        public static bool ValidateClientCertificate(
+              object sender,
+              X509Certificate certificate,
+              X509Chain chain,
+              SslPolicyErrors sslPolicyErrors)
+        {
+            //if (sslPolicyErrors == SslPolicyErrors.None)
+                return true;
+
+            Console.WriteLine("Certificate error: {0}", sslPolicyErrors);
+
+            // Do not allow this client to communicate with unauthenticated servers.
+            return false;
+        }
+
+        public static X509Certificate SelectLocalCertificate(
+            object sender,
+            string targetHost,
+            X509CertificateCollection localCertificates,
+            X509Certificate remoteCertificate,
+            string[] acceptableIssures)
+        {
+            //Console.WriteLine(sender.ToString());
+            //return localCertificates[0];
+            return serverCertificate;
+            //return null;
+        }
+
 		static void ProcessClient(TcpClient client)
 		{
 			// A client has connected. Create the 
 			// SslStream using the client's network stream.
-			SslStream sslStream = new SslStream(
-				client.GetStream(), false);
-			// Authenticate the server but don't require the client to authenticate.
+			//SslStream sslStream = new SslStream(
+			//	client.GetStream(), false);
+            SslStream sslStream = new SslStream(
+                client.GetStream(),
+                false,
+                new RemoteCertificateValidationCallback(ValidateClientCertificate),
+                new LocalCertificateSelectionCallback(SelectLocalCertificate)
+                );
+            // Authenticate the server but don't require the client to authenticate.
 			try
 			{
-				sslStream.AuthenticateAsServer(serverCertificate,
-					false, SslProtocols.Tls, false);
-				// Display the properties and settings for the authenticated stream.
+				sslStream.AuthenticateAsServer(new X509Certificate(),
+			        true, SslProtocols.Tls, true);
+                //sslStream.AuthenticateAsServer(serverCertificate,
+                //    false, SslProtocols.Tls, false);
+                // Display the properties and settings for the authenticated stream.
 				DisplaySecurityLevel(sslStream);
 				DisplaySecurityServices(sslStream);
 				DisplayCertificateInformation(sslStream);
@@ -111,6 +149,7 @@ namespace FlowLib.Connections
 				client.Close();
 			}
 		}
+
 		static string ReadMessage(SslStream sslStream)
 		{
 			// Read the  message sent by the client.
