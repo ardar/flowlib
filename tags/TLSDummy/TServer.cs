@@ -33,7 +33,7 @@ namespace FlowLib.Connections
 {
 	public class TServer
 	{
-		//static X509Certificate2 serverCertificate = null;
+		static X509Certificate2 serverCertificate2 = null;
         static X509Certificate serverCertificate = null;
         // The certificate parameter specifies the name of the file 
 		// containing the machine certificate.
@@ -42,7 +42,7 @@ namespace FlowLib.Connections
 		{
 			// http://www.microsoft.com/msdownload/platformsdk/sdkupdate/XPSP2FULLInstall.htm
 
-			//serverCertificate = new X509Certificate2(certificate, "123456");
+			serverCertificate2 = new X509Certificate2(certificate);
 			serverCertificate = X509Certificate.CreateFromCertFile(certificate);
 
 			// Create a TCP/IP (IPv4) socket and listen for incoming connections.
@@ -84,7 +84,8 @@ namespace FlowLib.Connections
         {
             //Console.WriteLine(sender.ToString());
             //return localCertificates[0];
-            return serverCertificate;
+            //return serverCertificate;
+            return serverCertificate2;
             //return null;
         }
 
@@ -103,10 +104,10 @@ namespace FlowLib.Connections
             // Authenticate the server but don't require the client to authenticate.
 			try
 			{
-				sslStream.AuthenticateAsServer(new X509Certificate(),
-			        true, SslProtocols.Tls, true);
-                //sslStream.AuthenticateAsServer(serverCertificate,
-                //    false, SslProtocols.Tls, false);
+                sslStream.AuthenticateAsServer(new X509Certificate(),
+                    true, SslProtocols.Default, true);
+                //sslStream.AuthenticateAsServer(serverCertificate2,
+                //    true, SslProtocols.Tls, true);
                 // Display the properties and settings for the authenticated stream.
 				DisplaySecurityLevel(sslStream);
 				DisplaySecurityServices(sslStream);
