@@ -75,6 +75,22 @@ namespace ConsoleDemo.Examples
                 prot.Update -= hubConnection_Update;
             }
             hubConnection.Protocol.Update += new FmdcEventHandler(hubConnection_Update);
+            hubConnection.Protocol.MessageReceived += new FmdcEventHandler(Protocol_MessageReceived);
+            hubConnection.Protocol.MessageToSend += new FmdcEventHandler(Protocol_MessageToSend);
+        }
+
+        void Protocol_MessageToSend(object sender, FmdcEventArgs e)
+        {
+            StrMessage msg = e.Data as StrMessage;
+            if (msg != null)
+                System.Console.WriteLine(string.Format("[{0}] CLNT SND: {1}", System.DateTime.Now.ToLongTimeString(), msg.Raw));
+        }
+
+        void Protocol_MessageReceived(object sender, FmdcEventArgs e)
+        {
+            StrMessage msg = e.Data as StrMessage;
+            if (msg != null)
+                System.Console.WriteLine(string.Format("[{0}] CLNT REC: {1}", System.DateTime.Now.ToLongTimeString(), msg.Raw));
         }
 
         void AddFilelistsToShare(Share s)
@@ -96,6 +112,7 @@ namespace ConsoleDemo.Examples
                         trans.SecureUpdate += new FmdcEventHandler(trans_SecureUpdate);
                         trans.Protocol.ChangeDownloadItem += new FmdcEventHandler(Protocol_ChangeDownloadItem);
                         trans.ConnectionStatusChange += new FmdcEventHandler(trans_ConnectionStatusChange);
+                        trans.ProtocolChange += new FmdcEventHandler(trans_ProtocolChange);
                     }
                     break;
                 case Actions.TransferRequest:
@@ -172,5 +189,22 @@ namespace ConsoleDemo.Examples
                 e.Handled = true;
             }
         }
+
+        void trans_ProtocolChange(object sender, FmdcEventArgs e)
+        {
+            Transfer trans = sender as Transfer;
+            if (trans == null)
+                return;
+            IProtocolTransfer prot = e as IProtocolTransfer;
+            if (prot != null)
+            {
+                prot.ChangeDownloadItem -= Protocol_ChangeDownloadItem;
+            }
+
+            trans.Protocol.MessageReceived += new FmdcEventHandler(Protocol_MessageReceived);
+            trans.Protocol.MessageToSend += new FmdcEventHandler(Protocol_MessageToSend);
+        }
+
+
     }
 }

@@ -85,14 +85,14 @@ namespace ConsoleDemo.Examples
         {
             StrMessage msg = e.Data as StrMessage;
             if (msg != null)
-                System.Console.WriteLine(string.Format("[{0}] SND: {1}", System.DateTime.Now.ToLongTimeString(), msg.Raw));
+                System.Console.WriteLine(string.Format("[{0}] SERV SND: {1}", System.DateTime.Now.ToLongTimeString(), msg.Raw));
         }
 
         void Protocol_MessageReceived(object sender, FmdcEventArgs e)
         {
             StrMessage msg = e.Data as StrMessage;
             if (msg != null)
-                System.Console.WriteLine(string.Format("[{0}] REC: {1}", System.DateTime.Now.ToLongTimeString(), msg.Raw));
+                System.Console.WriteLine(string.Format("[{0}] SERV REC: {1}", System.DateTime.Now.ToLongTimeString(), msg.Raw));
         }
 
         void AddFilelistsToShare(Share s)
