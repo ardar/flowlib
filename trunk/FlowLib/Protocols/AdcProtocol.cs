@@ -973,6 +973,9 @@ namespace FlowLib.Protocols
                 return;
             }
 
+            if (share == null)
+                return;
+
             int maxReturns = 10;
             string token = null;
             if (info.ContainsKey(SearchInfo.TOKEN))
