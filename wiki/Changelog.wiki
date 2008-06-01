@@ -49,6 +49,8 @@
   * FIX		- Shares converted from filelist do now have correct TotalSize, TotalCount,  HashedCount and HashedSize values.
   * FIX		- Bug where sources was not removed when downloaditem was.
   * FIX		- Some [http://www.mono-project.com mono] fixes
+  * FIX		- Crash when receiving SCH and no Share was associated with hub (Adc protocol).
+
 
 
 = 20080119 =
