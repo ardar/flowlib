@@ -8,5 +8,4 @@
 = Bots =
 
    * SpeedBot _(1.0)_
-   * CleanFlow
    * FlowConverter
