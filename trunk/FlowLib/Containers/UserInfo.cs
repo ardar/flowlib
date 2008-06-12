@@ -48,6 +48,10 @@ namespace FlowLib.Containers
         /// User IP Adress
         /// </summary>
         public const string IP = "ip";
+        /// <summary>
+        /// Client support secure connections
+        /// </summary>
+        public const string SECURE = "secure";
 
         public const string STOREID = "storeid";
 
@@ -211,6 +215,35 @@ namespace FlowLib.Containers
             set { taginfo.Mode = value; }
         }
         #endregion
+
+        public UserInfo() { }
+
+        public UserInfo(UserInfo value)
+        {
+            TagInfo.GenerateTag = value.TagInfo.GenerateTag;
+            // If this is just a update. Dont empty all other values.
+            if (value.DisplayName.Length != 0)
+                DisplayName = value.DisplayName;
+            TagInfo = new TagInfo(value.TagInfo);
+
+            if (value.ContainsKey(UserInfo.SID))
+                Set(UserInfo.SID, value.Get(UserInfo.SID));
+            if (value.ContainsKey(UserInfo.CID))
+                Set(UserInfo.CID, value.Get(UserInfo.CID));
+            if (value.ContainsKey(UserInfo.IP))
+                Set(UserInfo.IP, value.Get(UserInfo.IP));
+            if (value.Share.Length != 0)
+                Share = value.Share;
+            if (value.Email.Length != 0)
+                Email = value.Email;
+            if (value.Description.Length != 0)
+                Description = value.Description;
+            if (value.Connection.Length != 0)
+                Connection = value.Connection;
+            if (value.Account != -1)
+                Account = value.Account;
+
+        }
         #region Functions
         protected void formatShare(string instr)
         {

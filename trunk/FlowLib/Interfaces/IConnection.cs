@@ -23,6 +23,13 @@ using FlowLib.Events;
 using FlowLib.Containers;
 using System.Net;
 
+#if !COMPACT_FRAMEWORK
+// Security
+using System.Net.Security;
+using System.Security.Authentication;
+#endif
+
+
 namespace FlowLib.Interfaces
 {
     public interface IConnection
@@ -30,6 +37,10 @@ namespace FlowLib.Interfaces
         #region Events
         event FmdcEventHandler ProtocolChange;
         event FmdcEventHandler ConnectionStatusChange;
+#if !COMPACT_FRAMEWORK
+        // Security
+        event FmdcEventHandler SecureUpdate;
+#endif
         #endregion
         #region Properties
         /// <summary>
@@ -57,6 +68,19 @@ namespace FlowLib.Interfaces
             get;
             set;
         }
+#if !COMPACT_FRAMEWORK
+        // Security
+        SslStream SecureStream
+        {
+            get;
+            set;
+        }
+        SslProtocols SecureProtocol
+        {
+            get;
+            set;
+        }
+#endif
         #endregion
         #region Functions
         /// <summary>

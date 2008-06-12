@@ -39,6 +39,7 @@ namespace FlowLib.Protocols
         // Variables to remember
         protected string gpaString = "";        // GPA Random data
         protected SUP supports = null;          // Current support
+        protected bool hasSentSUP = false;      // have we sent SUP?
         protected UserInfo info = new UserInfo();     // Hub/User Info (Name and description and so on).
         protected IConnection con = null;       // Current Connection where this protocol is used
         protected Hub hub = null;               // Current hub where this protocol is used
@@ -52,8 +53,7 @@ namespace FlowLib.Protocols
         protected long infLastUpdated = 0;
         protected INF lastInf = null;
 
-
-        protected static string yourtranssupports = "ADBAS0 ADBASE BZIP";
+        protected static string yourtranssupports = "ADBAS0 ADBASE ADBZIP";
         protected static string yoursupports = "ADBAS0 ADBASE ADTIGR";
         //protected static string yoursupports = "ADBASE RMBAS0 ADTIGR";
 
@@ -486,50 +486,42 @@ namespace FlowLib.Protocols
                 }
                 else if (trans != null && inf.Type.Equals("C"))
                 {
+                    string token = null;
                     // CINF IDE3VACJVAXNOQLGRFQS7D5HYH4A6GLZDO3LJ33HQ TO2718662518
-                    if ((trans.Me == null || trans.Share == null) && inf.UserInfo.ContainsKey("TO"))
-                    {
-                        string token = inf.UserInfo.Get("TO");
-                        TransferRequest req = new TransferRequest(token, null, null);
+                    if (trans.Me != null && trans.Me.ContainsKey("TO"))
+                        token = trans.Me.Get("TO");
+                    else if (inf.UserInfo.ContainsKey("TO"))
+                        token = inf.UserInfo.Get("TO");
 
-                        FmdcEventArgs eArgs = new FmdcEventArgs(0, req);
-                        RequestTransfer(this, eArgs);
-                        req = eArgs.Data as TransferRequest;
-                        if (!eArgs.Handled || req == null)
-                        {
-                            // Can't see user on my allow list
-                            trans.Disconnect("No match for Request");
-                            return;
-                        }
-                        if (!((req.User.ContainsKey(UserInfo.CID) && inf.UserInfo.ContainsKey(UserInfo.CID)) && req.User.Get(UserInfo.CID).Equals(inf.UserInfo.Get(UserInfo.CID))))
-                        {
-                            // For some reason user is trying to tell us it is a diffrent user. We dont like that.
-                            FmdcEventArgs e = new FmdcEventArgs((int)TransferErrors.USERID_MISMATCH);
-                            Error(this, e);
-                            if (!e.Handled)
-                            {
-                                trans.Disconnect("User Id Mismatch");
-                                return;
-                            }
-                        }
-                        trans.Me = req.Me;
-                        trans.User = req.User;
-                        info = trans.User;
-                        trans.Share = req.Share;
-                        trans.Source = req.Source;
-                        download = req.Download;
-                    }
-                    else if (trans.Me == null)
+                    TransferRequest req = new TransferRequest(token, null, inf.UserInfo);
+                    FmdcEventArgs eArgs = new FmdcEventArgs(0, req);
+                    RequestTransfer(this, eArgs);
+                    req = eArgs.Data as TransferRequest;
+                    if (!eArgs.Handled || req == null)
                     {
-                        // Can't see user on my allow list
+                        // Can't see user/connection on my allow list
                         trans.Disconnect("No match for Request");
                         return;
                     }
-                    else
+                    if (!((req.User.ContainsKey(UserInfo.CID) && inf.UserInfo.ContainsKey(UserInfo.CID)) && req.User.Get(UserInfo.CID).Equals(inf.UserInfo.Get(UserInfo.CID))))
                     {
-                        info = inf.UserInfo;
-                        trans.User = info;
+                        // For some reason user is trying to tell us it is a diffrent user. We dont like that.
+                        FmdcEventArgs e = new FmdcEventArgs((int)TransferErrors.USERID_MISMATCH);
+                        Error(this, e);
+                        if (!e.Handled)
+                        {
+                            trans.Disconnect("User Id Mismatch");
+                            return;
+                        }
                     }
+                    if (trans.Me == null)
+                        trans.Me = req.Me;
+                    trans.User = req.User;
+                    info = trans.User;
+                    trans.Share = req.Share;
+                    trans.Source = req.Source;
+                    download = req.Download;
+
                     con.Send(new INF(con, trans.Me));
                     if (download)
                     {
@@ -641,7 +633,7 @@ namespace FlowLib.Protocols
             #region SUP
             else if (message is SUP)
             {
-                if (trans != null && supports == null)
+                if (trans != null && !hasSentSUP)
                 {
                     con.Send(new SUP(con));
                 }
@@ -651,6 +643,17 @@ namespace FlowLib.Protocols
                 {
                     // We will just simply disconnect if hub doesnt support this right now
                     con.Disconnect("Connection doesnt support BASE or BAS0");
+                }
+                // Encrypted transfers
+                if (supports.ADCS)
+                {
+                    if (
+                        (hub != null && hub.Me.ContainsKey(UserInfo.SECURE)) ||
+                        (trans != null && trans.Me.ContainsKey(UserInfo.SECURE))
+                        )
+                    {
+                        con.SecureProtocol = System.Security.Authentication.SslProtocols.Tls;
+                    }
                 }
             }
             #endregion
@@ -694,7 +697,7 @@ namespace FlowLib.Protocols
 
                 // Do we support same protocol?
                 double version = 0.0;
-                if (ctm.Protocol != null && ctm.Protocol.StartsWith("ADC/"))
+                if (ctm.Protocol != null && (ctm.Protocol.StartsWith("ADC/") && ctm.Protocol.StartsWith("ADCS/")))
                 {
                     try
                     {
@@ -713,14 +716,18 @@ namespace FlowLib.Protocols
                     addr = usr.UserInfo.Get(UserInfo.IP);
                     Transfer trans = new Transfer(addr, ctm.Port);
                     trans.Share = hub.Share;
-                    User me = hub.GetUserById(hub.Me.ID);
                     // We are doing this because we want to filter out PID and so on.
-                    trans.Me = me.UserInfo;
+                    User me = hub.GetUserById(hub.Me.ID);
+                    trans.Me = new UserInfo(me.UserInfo);
                     trans.Protocol = new AdcProtocol(trans);
+                    if (ctm.Secure)
+                        trans.SecureProtocol = System.Security.Authentication.SslProtocols.Tls;
+
                     // Support for prior versions of adc then 1.0
                     string token = ctm.Token;
                     if (version < 1.0 && ctm.Token.StartsWith("TO"))
                         token = ctm.Token.Substring(2);
+                    trans.Me.Set("TO", token);
 
                     Update(con, new FmdcEventArgs(Actions.TransferRequest, new TransferRequest(token, hub, usr.UserInfo,false)));
                     Update(con, new FmdcEventArgs(Actions.TransferStarted, trans));
@@ -743,7 +750,7 @@ namespace FlowLib.Protocols
                     {
                         // Do we support same protocol?
                         double version = 0.0;
-                        if (rcm.Protocol != null && rcm.Protocol.StartsWith("ADC/"))
+                        if (rcm.Protocol != null && (rcm.Protocol.StartsWith("ADC/") && rcm.Protocol.StartsWith("ADCS/")))
                         {
                             try
                             {
@@ -973,6 +980,7 @@ namespace FlowLib.Protocols
                 return;
             }
 
+            // If we dont have a share object. break here.
             if (share == null)
                 return;
 
@@ -1127,7 +1135,10 @@ namespace FlowLib.Protocols
                             // We are active and they are active. Let them connect to us
                             // TODO : We should really use something else as token
                             Update(con, new FmdcEventArgs(Actions.TransferRequest, new TransferRequest(usr.ID, hub, usr.UserInfo,true)));
-                            hub.Send(new CTM(hub, usr.ID, hub.Me.ID, hub.Share.Port, usr.ID));
+                            if (usr.UserInfo.ContainsKey(UserInfo.SECURE))
+                                hub.Send(new CTM(hub, usr.ID, hub.Me.ID, "ADCS/0.10", hub.Share.Port, usr.ID));
+                            else
+                                hub.Send(new CTM(hub, usr.ID, hub.Me.ID, hub.Share.Port, usr.ID));
                             break;
                         case ConnectionTypes.Passive:
                         case ConnectionTypes.Socket5:
@@ -1140,7 +1151,10 @@ namespace FlowLib.Protocols
                             }
                             // TODO : We should really use something else as token
                             Update(con, new FmdcEventArgs(Actions.TransferRequest, new TransferRequest(usr.ID, hub, usr.UserInfo, true)));
-                            hub.Send(new RCM(usr.ID, hub, hub.Me.ID, usr.ID));
+                            if (usr.UserInfo.ContainsKey(UserInfo.SECURE))
+                                hub.Send(new RCM(usr.ID, hub, hub.Me.ID, usr.ID));
+                            else
+                                hub.Send(new RCM(usr.ID, hub, "ADCS/0.10", hub.Me.ID, usr.ID));
                             break;
                     }
                 }
@@ -1165,7 +1179,13 @@ namespace FlowLib.Protocols
         #region Event(s)
         void OnUpdate(object sender, FmdcEventArgs e) { }
         protected void OnMessageReceived(object sender, FmdcEventArgs e) { }
-        protected void OnMessageToSend(object sender, FmdcEventArgs e) { }
+        protected void OnMessageToSend(object sender, FmdcEventArgs e)
+        {
+            if (e.Data is SUP)
+            {
+                hasSentSUP = true;
+            }
+        }
         #endregion
 
         #region IProtocolTransfer Members

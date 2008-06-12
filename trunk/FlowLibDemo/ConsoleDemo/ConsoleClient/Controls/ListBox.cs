@@ -47,8 +47,8 @@ namespace ConsoleDemo.ConsoleClient.Controls
 
         public override int Focus()
         {
-            return base.Focus();
             index = Console.CursorTop - Y;
+            return base.Focus();
         }
     }
 }
