@@ -123,5 +123,20 @@ namespace FlowLib.Events
         /// object is User
         /// </summary>
         public const int StartTransfer = 21;
+
+
+
+#if !COMPACT_FRAMEWORK
+        /// <summary>
+        /// Used when validating a remote certificate in a secure connection.
+        /// object is CertificateValidationInfo
+        /// </summary>
+        public const int SecurityValidateRemoteCertificate = 1000;
+        /// <summary>
+        /// Used to select Certificate to use in a secure connection.
+        /// object is LocalCertificationSelectionInfo
+        /// </summary>
+        public const int SecuritySelectLocalCertificate = 1001;
+#endif
     }
 }

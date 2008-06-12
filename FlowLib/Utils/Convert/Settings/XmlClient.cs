@@ -167,6 +167,10 @@ namespace FlowLib.Utils.Convert.Settings
                 }
                 catch { port = 411; }
             }
+
+            if (string.IsNullOrEmpty(current.Address))
+                current.Address = address;
+
             current.Port = port;
         }
         public virtual string ToAddress()

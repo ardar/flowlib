@@ -313,6 +313,12 @@ namespace FlowLib.Connections
                     case "Adc":     // ADC
                         Protocol = new AdcProtocol(this);
                         break;
+#if !COMPACT_FRAMEWORK
+                    case "AdcSecure":
+                        Protocol = new AdcProtocol(this);
+                        SecureProtocol = System.Security.Authentication.SslProtocols.Tls;
+                        break;
+#endif
                     default:
                         FmdcEventArgs e = new FmdcEventArgs(0);
                         UnknownProtocolId(this, e);

@@ -58,6 +58,25 @@ namespace FlowLib.Containers
             version = null;
         }
 
+        public TagInfo(TagInfo value)
+        {
+            if (value.Mode != ConnectionTypes.Unknown)
+                Mode = value.Mode;
+            if (!value.GenerateTag/* value.TagInfo.Tag != null*/)
+                Tag = value.Tag;
+            if (value.Version != null)
+                Version = value.Version;
+            if (value.Normal != -1)
+                Normal = value.Normal;
+            if (value.Regged != -1)
+                Regged = value.Regged;
+            if (value.OP != -1)
+                OP = value.OP;
+            if (value.Slots != -1)
+                Slots = value.Slots;
+
+        }
+
         /// <summary>
         /// Should tag be generated
         /// </summary>

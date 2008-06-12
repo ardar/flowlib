@@ -169,6 +169,12 @@ namespace FlowLib.Protocols.Adc
     {
         protected string protocol = null;
         protected string token = null;
+        protected bool secure = false;
+
+        public bool Secure
+        {
+            get { return secure; }
+        }
 
         public string Protocol
         {
@@ -185,6 +191,7 @@ namespace FlowLib.Protocols.Adc
             if (param.Count >= 2)
             {
                 protocol = param[0];
+                secure = protocol.StartsWith("ADCS/");
                 token = param[1];
                 valid = true;
             }
@@ -205,11 +212,18 @@ namespace FlowLib.Protocols.Adc
         protected string protocol = null;
         protected int port = -1;
         protected string token = null;
+        protected bool secure = false;
 
         public string Protocol
         {
             get { return protocol; }
         }
+
+        public bool Secure
+        {
+            get { return secure; }
+        }
+
         public int Port
         {
             get { return port; }
@@ -224,6 +238,7 @@ namespace FlowLib.Protocols.Adc
             if (param.Count >= 3)
             {
                 protocol = param[0];
+                secure = protocol.StartsWith("ADCS/");
                 try
                 {
                     port = int.Parse(param[1]);
@@ -615,6 +630,7 @@ namespace FlowLib.Protocols.Adc
         protected bool bas = false;
         protected bool bzip = false;
         protected bool tigr = false;
+        protected bool adcs = false;
 
         public bool BASE
         {
@@ -631,6 +647,12 @@ namespace FlowLib.Protocols.Adc
             get { return tigr; }
         }
 
+        public bool ADCS
+        {
+            get { return adcs; }
+            set { adcs = value; }
+        }
+
         /// <summary>
         /// Sending Support to hub
         /// </summary>
@@ -639,11 +661,17 @@ namespace FlowLib.Protocols.Adc
         {
             if (con is Hub)
             {
-                Raw = "HSUP " + AdcProtocol.Support + "\n";
+                if (((Hub)con).Me.ContainsKey(UserInfo.SECURE))
+                    Raw = "HSUP " + AdcProtocol.Support + " ADADC0" + "\n";
+                else
+                    Raw = "HSUP " + AdcProtocol.Support + "\n";
             }
             else
             {
-                Raw = "CSUP " + AdcProtocol.TransferSupport + "\n";
+                if (((Transfer)con).Me.ContainsKey(UserInfo.SECURE))
+                    Raw = "CSUP " + AdcProtocol.TransferSupport + " ADADC0" + "\n";
+                else
+                    Raw = "CSUP " + AdcProtocol.TransferSupport + "\n";
             }
             ParseRaw();
         }
@@ -671,6 +699,8 @@ namespace FlowLib.Protocols.Adc
                     bzip = true;
                 if (sup.Equals("ADBASE"))
                     bas = true;
+                if (sup.Equals("ADADC0"))
+                    adcs = true;
             }
 
             if (bas && tigr)
@@ -792,6 +822,7 @@ namespace FlowLib.Protocols.Adc
                         break;
                     case "TO":
                         token = value;
+                        info.Set(key, value);
                         break;
                     case "OP":      // Before ADC 1.0
                         info.IsOperator = (value == "1");
@@ -822,6 +853,19 @@ namespace FlowLib.Protocols.Adc
                         }
                         catch { }
                         break;
+                    case "SU":
+                        info.Set(key, value);
+                        string[] supports = value.Split(',');
+                        foreach (string sup in supports)
+                        {
+                            switch (sup)
+                            {
+                                case "ADC0":
+                                    info.Set(UserInfo.SECURE, "1");
+                                    break;
+                            }
+                        }
+                        break;
                     default:
                         // We will add all unhandled fields to user. This is because developer may know how to handle it even if we dont.
                         info.Set(key, value);
@@ -845,6 +889,8 @@ namespace FlowLib.Protocols.Adc
             {
                 sb.Append("CINF");
                 sb.Append(" ID" + info.Get(UserInfo.CID));
+                if (info.ContainsKey("TO"))
+                    sb.Append(" TO" + info.Get("TO"));
             }
             else
             {
@@ -874,27 +920,36 @@ namespace FlowLib.Protocols.Adc
                 sb.Append(" SS" + (con.Share != null ? con.Share.HashedSize : 0));    // Share Size in bytes
                 if (con.Share != null)
                 {
-                    string ip = info.Get(UserInfo.IP);
                     System.Text.StringBuilder support = new System.Text.StringBuilder();
-                    if (string.IsNullOrEmpty(ip) || ip.Contains("."))
+                    switch (info.TagInfo.Mode)
                     {
-                        if (string.IsNullOrEmpty(ip))
-                            sb.Append(" I40.0.0.0");
-                        else
-                            sb.Append(" I4" + ip);
-                        support.Append("TCP4,");    // Support
-                        support.Append("UDP4,");    // Support
-                        sb.Append(" U4" + con.Share.Port.ToString());
-                    }
-                    else
-                    {
-                        sb.Append(" I6" + ip);
-                        support.Append("TCP6,");    // Support
-                        support.Append("UDP6,");    // Support
-                        sb.Append(" U6" + con.Share.Port.ToString());
+                        case FlowLib.Enums.ConnectionTypes.Direct:
+                        case FlowLib.Enums.ConnectionTypes.UPnP:
+                        case FlowLib.Enums.ConnectionTypes.Forward:
+                            string ip = info.Get(UserInfo.IP);
+                            if (string.IsNullOrEmpty(ip) || ip.Contains("."))
+                            {
+                                if (string.IsNullOrEmpty(ip))
+                                    sb.Append(" I40.0.0.0");
+                                else
+                                    sb.Append(" I4" + ip);
+                                support.Append("TCP4,");    // Support
+                                support.Append("UDP4,");    // Support
+                                sb.Append(" U4" + con.Share.Port.ToString());
+                            }
+                            else
+                            {
+                                sb.Append(" I6" + ip);
+                                support.Append("TCP6,");    // Support
+                                support.Append("UDP6,");    // Support
+                                sb.Append(" U6" + con.Share.Port.ToString());
+                            }
+                            break;
                     }
 
-                    support.Append("BZIP");         // Support
+                    support.Append("BZIP,");         // Support
+                    if (info.ContainsKey(UserInfo.SECURE))
+                        support.Append("ADC0,");         // Support
                     sb.Append(" SU" + support.ToString());  // Support
                 }
                 sb.Append(" VE" + AdcProtocol.ConvertOutgoing(info.TagInfo.Version));

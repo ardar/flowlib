@@ -32,6 +32,14 @@ using System.Net.Sockets;
 using System.Text;
 using System;
 
+#if !COMPACT_FRAMEWORK
+// Security
+using System.Net.Security;
+using System.Security.Authentication;
+using System.Security.Cryptography.X509Certificates;
+using FlowLib.Containers.Security;
+#endif
+
 namespace FlowLib.Connections
 {
     /// <summary>
@@ -66,6 +74,10 @@ namespace FlowLib.Connections
         /// 2 = Disconnected
         /// </summary>
         public event FmdcEventHandler ConnectionStatusChange;
+#if !COMPACT_FRAMEWORK
+// Security
+        public event FmdcEventHandler SecureUpdate;
+#endif
         #endregion
         #region Variables
         protected bool importedSocket = false;
@@ -76,11 +88,73 @@ namespace FlowLib.Connections
         protected IProtocol protocol = null;
         protected bool first = true;
 
+#if !COMPACT_FRAMEWORK
+// Security
+        protected SslStream secStream = null;
+        protected SslProtocols secProtocol = SslProtocols.None;
+#endif
+
         // Thread signal, It is needed so we know when we have a connection.
         protected System.Threading.ManualResetEvent allDone = new System.Threading.ManualResetEvent(false);
 
         #endregion
         #region Properties
+
+#if !COMPACT_FRAMEWORK
+// Security
+        public SslStream SecureStream
+        {
+            get { return secStream; }
+            set { secStream = value; }
+        }
+
+        public SslProtocols SecureProtocol
+        {
+            get { return secProtocol; }
+            set
+            {
+                secProtocol = value;
+                switch (secProtocol)
+                {
+                    case SslProtocols.None:
+                        if (secStream != null)
+                            secStream.Close();
+                        secStream = null;
+                        socket.Blocking = false;
+                        break;
+                    default:
+                        if (socket == null || !socket.Connected)
+                            return;
+                        CheckSecure();
+                        break;
+                }
+            }
+        }
+
+
+        protected void CheckSecure()
+        {
+            if (secProtocol != SslProtocols.None && secStream == null)
+            {
+                // This is ugly as hell! :p
+                // TODO : Make this less ugly
+                TcpClient client = new TcpClient();
+                socket.Blocking = true;
+                client.Client = socket;
+                secStream = new SslStream(
+                    client.GetStream(),
+                    false,
+                    new RemoteCertificateValidationCallback(OnRemoteCertificateValidation),
+                    new LocalCertificateSelectionCallback(OnLocalCertificateSelection)
+                    );
+
+                if (importedSocket)
+                    secStream.AuthenticateAsServer(new X509Certificate(), true, secProtocol, true);
+                else
+                    secStream.AuthenticateAsClient("", new X509CertificateCollection(), secProtocol, true);
+            }
+        }
+#endif
         /// <summary>
         /// Sharing instance for this transfer
         /// </summary>
@@ -133,6 +207,10 @@ namespace FlowLib.Connections
             #region Event(s)
             ProtocolChange = new FmdcEventHandler(OnProtocolChanged);
             ConnectionStatusChange = new FmdcEventHandler(OnConnectionStatusChanged);
+#if !COMPACT_FRAMEWORK
+// Security
+            SecureUpdate = new FmdcEventHandler(OnSecureUpdate);
+#endif
             #endregion
         }
 
@@ -168,12 +246,14 @@ namespace FlowLib.Connections
             System.Net.IPAddress addy = null;
             try
             {
-                addy = System.Net.Dns.GetHostEntry(address).AddressList[0];
+                //addy = System.Net.Dns.GetHostEntry(address).AddressList[0];
+                addy = System.Net.IPAddress.Parse(address);
             }
             catch (System.Exception)
             {
                 // We are not going to try to catch this as developer that used this class made something wrong if this has to be thrown.
-                addy = System.Net.IPAddress.Parse(address);
+                //addy = System.Net.IPAddress.Parse(address);
+                addy = System.Net.Dns.GetHostEntry(address).AddressList[0];
             }
             remoteAddress = new IPEndPoint(addy, prt);
         }
@@ -200,12 +280,12 @@ namespace FlowLib.Connections
             first = true;
             if (Protocol == null)
                 throw new NullReferenceException("Protocol is null, You need to set Protocol before trying to connect.");
-            // Establish Connection
-            socket = new Socket(AddressFamily.InterNetwork
-                , SocketType.Stream
-                , ProtocolType.Tcp);
             try
             {
+                // Establish Connection
+                socket = new Socket(remoteAddress.AddressFamily
+                    , SocketType.Stream
+                    , ProtocolType.Tcp);
                 // It is needed so we know when we have a connection.
                 allDone.Reset();
                 socket.Blocking = false;
@@ -259,6 +339,11 @@ namespace FlowLib.Connections
                 {
                     // Change Connection Status
                     this.ConnectionStatusChange(this, new FmdcEventArgs(Connected));
+
+#if !COMPACT_FRAMEWORK
+                    CheckSecure();
+#endif
+
                     SetupRecieveCallback(sock);
                 }
                 else
@@ -293,7 +378,12 @@ namespace FlowLib.Connections
                             Send(Protocol.FirstCommand);
                     }
                     AsyncCallback recieveData = new AsyncCallback(OnRecievedData);
-                    sock.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, recieveData, sock);
+#if !COMPACT_FRAMEWORK
+                    if (secStream != null)
+                        secStream.BeginRead(buffer, 0, buffer.Length, recieveData, secStream);
+                    else
+#endif
+                        sock.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, recieveData, sock);
                 }
             }
             catch (System.ObjectDisposedException) { }
@@ -317,12 +407,22 @@ namespace FlowLib.Connections
         protected virtual void OnRecievedData(System.IAsyncResult ar)
         {
             // Socket was the passed in object
-            Socket sock = (Socket)ar.AsyncState;
-
+            Socket sock = ar.AsyncState as Socket;
+            int nBytesRec = 0;
             // Check if we got any data
             try
             {
-                int nBytesRec = sock.EndReceive(ar);
+#if !COMPACT_FRAMEWORK
+                if (sock == null)
+                {
+                    SslStream handler = ar.AsyncState as SslStream;
+                    nBytesRec = handler.EndRead(ar);
+                    // TODO : REMOVE
+                    sock = socket;
+                }
+                else
+#endif
+                    nBytesRec = sock.EndReceive(ar);
                 if (nBytesRec > 0)
                 {
                     // Send data to protocol.
@@ -375,6 +475,9 @@ namespace FlowLib.Connections
                 localAddress = (System.Net.IPEndPoint)socket.LocalEndPoint;
                 remoteAddress = (System.Net.IPEndPoint)socket.RemoteEndPoint;
 
+#if !COMPACT_FRAMEWORK
+                CheckSecure();
+#endif
                 this.SetupRecieveCallback(socket);
                 // Change Connection Status
                 this.ConnectionStatusChange(this, new FmdcEventArgs(Connected));
@@ -410,7 +513,14 @@ namespace FlowLib.Connections
 
                 // Some how Send doesnt work on my Pocket PC. Because of this we use BeginSend // Flow84
                 AsyncCallback sendData = new AsyncCallback(OnSendData);
-                socket.BeginSend(raw, 0, raw.Length, SocketFlags.None, sendData, socket);
+#if !COMPACT_FRAMEWORK
+                if (secStream != null)
+                    // TODO : Why cant we use async write here?! :S
+                    secStream.Write(raw, 0, raw.Length);
+                    //secStream.BeginWrite(raw, 0, raw.Length, sendData, secStream);
+                else
+#endif
+                    socket.BeginSend(raw, 0, raw.Length, SocketFlags.None, sendData, socket);
                 return;
             }
             catch (ObjectDisposedException) { }
@@ -425,10 +535,19 @@ namespace FlowLib.Connections
         }
         protected virtual void OnSendData(System.IAsyncResult async)
         {
-            Socket handler = (Socket)async.AsyncState;
+
+            Socket handler = async.AsyncState as Socket;
             try
             {
-                handler.EndSend(async);
+#if !COMPACT_FRAMEWORK
+                if (handler == null)
+                {
+                    SslStream handlerS = async.AsyncState as SslStream;
+                    handlerS.EndWrite(async);
+                }
+                else
+#endif
+                    handler.EndSend(async);
             }
             catch (ObjectDisposedException) { }
             catch (SocketException se)
@@ -446,6 +565,43 @@ namespace FlowLib.Connections
         {
 
         }
+
+
+#if !COMPACT_FRAMEWORK
+        // Secure
+        void OnSecureUpdate(object sender, FmdcEventArgs e) { }
+        protected bool OnRemoteCertificateValidation(
+              object sender,
+              X509Certificate certificate,
+              X509Chain chain,
+              SslPolicyErrors sslPolicyErrors)
+        {
+            CertificateValidationInfo info = new CertificateValidationInfo(certificate, chain, sslPolicyErrors);
+            FmdcEventArgs args = new FmdcEventArgs(Actions.SecurityValidateRemoteCertificate, info);
+            SecureUpdate(this, args);
+            info = args.Data as CertificateValidationInfo;
+            if (info == null)
+                return false;
+            return info.Accepted;
+        }
+
+        protected X509Certificate OnLocalCertificateSelection(
+            object sender,
+            string targetHost,
+            X509CertificateCollection localCertificates,
+            X509Certificate remoteCertificate,
+            string[] acceptableIssures)
+        {
+            LocalCertificationSelectionInfo info = new LocalCertificationSelectionInfo(targetHost, localCertificates, remoteCertificate, acceptableIssures);
+            FmdcEventArgs args = new FmdcEventArgs(Actions.SecuritySelectLocalCertificate, info);
+            SecureUpdate(this, args);
+            info = args.Data as LocalCertificationSelectionInfo;
+            if (info == null)
+                return null;
+            return info.SelectedCertificate;
+        }
+#endif
+
         #endregion
     }
 }

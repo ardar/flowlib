@@ -41,7 +41,7 @@ namespace ConsoleDemo.ConsoleClient
         System.Timers.Timer updateTimer = new System.Timers.Timer();
         
         Con.Hub hub = null;
-        string name = null;
+        //string name = null;
         bool updating = false;
         int connectionStatus = -1;
         System.Collections.Generic.List<string> userList = new System.Collections.Generic.List<string>();
@@ -59,6 +59,8 @@ namespace ConsoleDemo.ConsoleClient
 
         public Hub()
         {
+            UpdateBase = new FmdcEventHandler(Hub_UpdateBase);
+
             listMainchat = new ListBox(0, 2, Console.WindowWidth - 21, Console.WindowHeight - 4, ref msgList);
             listUserlist = new ListBox(Console.WindowWidth - 20, 2, 20, Console.WindowHeight - 4, ref userList);
             input = new TextField(0, Console.WindowHeight - 1, Console.WindowWidth);
@@ -79,6 +81,11 @@ namespace ConsoleDemo.ConsoleClient
             input.BgColor = ConsoleColor.White;
             input.FgColor = ConsoleColor.Black;
             Controls.Add(input);
+        }
+
+        void Hub_UpdateBase(object sender, FmdcEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         void updateTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
