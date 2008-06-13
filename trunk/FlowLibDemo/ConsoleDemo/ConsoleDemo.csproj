@@ -63,10 +63,8 @@
     <Compile Include="Examples\TLS.cs" />
     <Compile Include="Examples\TLSClient.cs" />
     <Compile Include="Examples\TLSServer.cs" />
-    <Compile Include="WorkingConnections.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Testing.cs" />
     <Compile Include="UiHub.cs" />
   </ItemGroup>
   <ItemGroup>
