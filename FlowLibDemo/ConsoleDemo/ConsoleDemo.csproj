@@ -60,6 +60,8 @@
     <Compile Include="Examples\ConnectToHub.cs" />
     <Compile Include="ConsoleClient\Hub.cs" />
     <Compile Include="Examples\ConvertSettings.cs" />
+    <Compile Include="Examples\ActiveEmptySharingUsingTLS.cs" />
+    <Compile Include="Examples\PassiveDownloadFilelistFromUserUsingTLS.cs" />
     <Compile Include="Examples\ReceiveMainChatOrPMFromHub.cs" />
     <Compile Include="Examples\DisplayRawMessages.cs" />
     <Compile Include="Examples\PassiveDownloadFilelistFromUser.cs" />
