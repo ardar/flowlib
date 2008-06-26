@@ -20,6 +20,7 @@
  */
 
 using System.Text;
+using System.Threading;
 
 using FlowLib.Interfaces;
 using FlowLib.Events;
@@ -50,6 +51,9 @@ namespace FlowLib.Protocols
         protected string recieved = "";
         protected long myInfoLastUpdated = 0;
         protected MyINFO lastMyInfo = null;
+        protected Supports hubSupport = null;
+        protected Timer updateMyInfoTimer;
+        protected bool disposed = false;
         #endregion
         #region Properties
         public string Name
@@ -84,8 +88,28 @@ namespace FlowLib.Protocols
                 hub.Share.LastModifiedChanged += new FmdcEventHandler(Share_LastModifiedChanged);
             Hub.RegModeUpdated += new FmdcEventHandler(Hub_RegModeUpdated);
 
+            TimerCallback updateCallback = new TimerCallback(OnUpdateMyInfo);
+            updateMyInfoTimer = new Timer(updateCallback, this, Timeout.Infinite, Timeout.Infinite);
+
             MessageReceived = new FmdcEventHandler(OnMessageReceived);
             MessageToSend = new FmdcEventHandler(OnMessageToSend);
+        }
+
+        public void Dispose()
+        {
+            if (!disposed)
+            {
+                hub.ConnectionStatusChange -= hub_ConnectionStatusChange;
+                if (hub.Share != null)
+                    hub.Share.LastModifiedChanged -= Share_LastModifiedChanged;
+                Hub.RegModeUpdated -= Hub_RegModeUpdated;
+
+                hub = null;
+                updateMyInfoTimer.Dispose();
+                updateMyInfoTimer = null;
+
+                disposed = true;
+            }
         }
 
         void Share_LastModifiedChanged(object sender, FmdcEventArgs e)
@@ -104,6 +128,11 @@ namespace FlowLib.Protocols
             }
         }
 
+        protected void OnUpdateMyInfo(System.Object stateInfo)
+        {
+            UpdateMyInfo(false);
+        }
+
         protected void UpdateMyInfo() { UpdateMyInfo(true); }
         protected virtual void UpdateMyInfo(bool firstTime)
         {
@@ -115,21 +144,13 @@ namespace FlowLib.Protocols
                     lastMyInfo = tmp;
                     hub.Send(lastMyInfo);
                     myInfoLastUpdated = System.DateTime.Now.Ticks;
+                    updateMyInfoTimer.Change(Timeout.Infinite, Timeout.Infinite);
                 }
             }
             else if (firstTime)
             {
-                System.Threading.Thread t = new System.Threading.Thread(new System.Threading.ThreadStart(OnMyINFOPool));
-                t.Priority = System.Threading.ThreadPriority.Lowest;
-                t.Name = "MyINFO Pool";
-                t.Start();
+                updateMyInfoTimer.Change(0, 15 * 60 * 1000 + 10);
             }
-        }
-
-        protected virtual void OnMyINFOPool()
-        {
-            System.Threading.Thread.Sleep(15 * 60 * 1000 + 10);
-            UpdateMyInfo(false);
         }
 
         void hub_ConnectionStatusChange(object sender, FmdcEventArgs e)
@@ -194,9 +215,9 @@ namespace FlowLib.Protocols
             // If wrong Protocol type has been set. change it to ADC
             if (hub.RegMode == -1 && raw.StartsWith("ISUP")) 
             {   // Setting hubtype to ADC
+                Hub tmpHub = hub;
                 hub.Protocol = new AdcProtocol(hub);
-                hub.HubSetting.Protocol = hub.Protocol.Name;
-                hub.Reconnect();
+                tmpHub.Reconnect();
             }
             // If Something is still left. Save it to buffer for later use.
             if (raw.Length > 0)
@@ -506,9 +527,13 @@ namespace FlowLib.Protocols
                 Transfer trans = new Transfer(conToMe.Address, conToMe.Port);
                 trans.Share = this.hub.Share;
                 trans.Me = hub.Me;
-				trans.Source = new Source(hub.RemoteAddress.ToString(), null);
+                trans.Source = new Source(hub.RemoteAddress.ToString(), null);
                 // Protocol has to be set last.
                 trans.Protocol = new TransferNmdcProtocol(trans);
+#if !COMPACT_FRAMEWORK
+                if (conToMe.TLS)
+                    trans.SecureProtocol = SecureProtocols.TLS;
+#endif
                 Update(hub, new FmdcEventArgs(Actions.TransferStarted, trans));
             }
             else if (message is RevConnectToMe)

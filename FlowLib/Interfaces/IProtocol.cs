@@ -27,7 +27,7 @@ namespace FlowLib.Interfaces
     /// <summary>
     /// Interface that can be used if plugin(s) want to support a new protocol. (ADCS and Compressed are 2 examples)
     /// </summary>
-    public interface IProtocol : IUpdate
+    public interface IProtocol : IUpdate, System.IDisposable
     {
         /// <summary>
         /// Is triggered when a message from server is received.

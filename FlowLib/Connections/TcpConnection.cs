@@ -38,6 +38,7 @@ using System.Net.Security;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using FlowLib.Containers.Security;
+using FlowLib.Enums;
 #endif
 
 namespace FlowLib.Connections
@@ -91,7 +92,7 @@ namespace FlowLib.Connections
 #if !COMPACT_FRAMEWORK
 // Security
         protected SslStream secStream = null;
-        protected SslProtocols secProtocol = SslProtocols.None;
+        protected SecureProtocols secProtocol = SecureProtocols.None;
 #endif
 
         // Thread signal, It is needed so we know when we have a connection.
@@ -108,7 +109,7 @@ namespace FlowLib.Connections
             set { secStream = value; }
         }
 
-        public SslProtocols SecureProtocol
+        public SecureProtocols SecureProtocol
         {
             get { return secProtocol; }
             set
@@ -116,7 +117,7 @@ namespace FlowLib.Connections
                 secProtocol = value;
                 switch (secProtocol)
                 {
-                    case SslProtocols.None:
+                    case SecureProtocols.None:
                         if (secStream != null)
                             secStream.Close();
                         secStream = null;
@@ -134,25 +135,53 @@ namespace FlowLib.Connections
 
         protected void CheckSecure()
         {
-            if (secProtocol != SslProtocols.None && secStream == null)
+            try
             {
-                // This is ugly as hell! :p
-                // TODO : Make this less ugly
-                TcpClient client = new TcpClient();
-                socket.Blocking = true;
-                client.Client = socket;
-                secStream = new SslStream(
-                    client.GetStream(),
-                    false,
-                    new RemoteCertificateValidationCallback(OnRemoteCertificateValidation),
-                    new LocalCertificateSelectionCallback(OnLocalCertificateSelection)
-                    );
+                if (secProtocol != SecureProtocols.None && secStream == null)
+                {
+                    // This is ugly as hell! :p
+                    // TODO : Make this less ugly
+                    TcpClient client = new TcpClient();
+                    socket.Blocking = true;
+                    client.Client = socket;
+                    secStream = new SslStream(
+                        client.GetStream(),
+                        false,
+                        new RemoteCertificateValidationCallback(OnRemoteCertificateValidation),
+                        new LocalCertificateSelectionCallback(OnLocalCertificateSelection)
+                        );
 
-                if (importedSocket)
-                    secStream.AuthenticateAsServer(new X509Certificate(), true, secProtocol, true);
-                else
-                    secStream.AuthenticateAsClient("", new X509CertificateCollection(), secProtocol, true);
+                    SslProtocols protocol = SslProtocols.None;
+                    switch (secProtocol)
+                    {
+                        case SecureProtocols.SSL2:
+                            protocol = SslProtocols.Ssl2;
+                            break;
+                        case SecureProtocols.SSL3:
+                            protocol = SslProtocols.Ssl3;
+                            break;
+                        case SecureProtocols.TLS:
+                            protocol = SslProtocols.Tls;
+                            break;
+                        default:
+                            throw new NotSupportedException("This protocol '" + secProtocol + "' is not supported");
+                    }
+
+                    if (importedSocket)
+                        secStream.AuthenticateAsServer(new X509Certificate(), true, protocol, true);
+                    else
+                        secStream.AuthenticateAsClient("", new X509CertificateCollection(), protocol, true);
+                }
             }
+            catch (AuthenticationException ae)
+            {
+                SecureUpdate(this, new FmdcEventArgs(Actions.SecurityAuthenticationError, ae));
+            }
+            catch (PlatformNotSupportedException pe)
+            {
+                SecureUpdate(this, new FmdcEventArgs(Actions.SecurityAuthenticationError, pe));
+            }
+
         }
 #endif
         /// <summary>
@@ -174,7 +203,13 @@ namespace FlowLib.Connections
                 IProtocol tmp = protocol;
                 protocol = value;
                 // Trigger Protocol Changed Event.
-                ProtocolChange(this, new FmdcEventArgs(0, tmp));
+                FmdcEventArgs e = new FmdcEventArgs(0, tmp);
+                ProtocolChange(this, e);
+                if (!e.Handled && tmp != null)
+                {
+                    // If not marked as handled. Dispose protocol
+                    tmp.Dispose();
+                }
             }
         }
         /// <summary>

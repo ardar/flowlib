@@ -20,6 +20,7 @@
  */
 
 using System.Text;
+using System.Threading;
 
 using FlowLib.Interfaces;
 using FlowLib.Protocols.Adc;
@@ -48,10 +49,12 @@ namespace FlowLib.Protocols
         protected int connectionStatus = -1;
         protected bool firstMsg = true;
         protected bool rawData = false;
+        protected bool disposed = false;
 
         // INF updating
         protected long infLastUpdated = 0;
         protected INF lastInf = null;
+        protected Timer updateInfTimer;
 
         protected static string yourtranssupports = "ADBAS0 ADBASE ADBZIP";
         protected static string yoursupports = "ADBAS0 ADBASE ADTIGR";
@@ -114,6 +117,9 @@ namespace FlowLib.Protocols
             ChangeDownloadItem = new FmdcEventHandler(AdcProtocol_ChangeDownloadItem);
             RequestTransfer = new FmdcEventHandler(AdcProtocol_RequestTransfer);
             Error = new FmdcEventHandler(AdcProtocol_Error);
+
+            TimerCallback updateCallback = new TimerCallback(OnUpdateInf);
+            updateInfTimer = new Timer(updateCallback, this, Timeout.Infinite, Timeout.Infinite);
         }
 
         void AdcProtocol_Error(object sender, FmdcEventArgs e) { }
@@ -143,6 +149,31 @@ namespace FlowLib.Protocols
             Hub.RegModeUpdated += new FmdcEventHandler(Hub_RegModeUpdated);
         }
         #endregion
+
+        public void Dispose()
+        {
+            if (!disposed)
+            {
+                updateInfTimer.Dispose();
+                updateInfTimer = null;
+                if (trans != null)
+                {
+                    trans.ConnectionStatusChange -= trans_ConnectionStatusChange;
+                }
+                trans = null;
+                if (hub != null)
+                {
+                    hub.ConnectionStatusChange -= hub_ConnectionStatusChange;
+                    if (hub.Share != null)
+                        hub.Share.LastModifiedChanged -= Share_LastModifiedChanged;
+                    Hub.RegModeUpdated -= Hub_RegModeUpdated;
+                    hub = null;
+                }
+                con = null;
+                disposed = true;
+            }
+        }
+
         void Share_LastModifiedChanged(object sender, FmdcEventArgs e)
         {
             if (!e.Handled)
@@ -159,6 +190,11 @@ namespace FlowLib.Protocols
             }
         }
 
+        protected void OnUpdateInf(System.Object stateInfo)
+        {
+            UpdateInf(false);
+        }
+
         protected void UpdateInf() { UpdateInf(true); }
         protected virtual void UpdateInf(bool firstTime)
         {
@@ -170,23 +206,14 @@ namespace FlowLib.Protocols
                     lastInf = tmp;
                     hub.Send(lastInf);
                     infLastUpdated = System.DateTime.Now.Ticks;
+                    updateInfTimer.Change(Timeout.Infinite, Timeout.Infinite);
                 }
             }
             else if (firstTime)
             {
-                System.Threading.Thread t = new System.Threading.Thread(new System.Threading.ThreadStart(OnInfPool));
-                t.Priority = System.Threading.ThreadPriority.Lowest;
-                t.Name = "Inf Pool";
-                t.Start();
+                updateInfTimer.Change(0, 15 * 60 * 1000 + 10);
             }
         }
-
-        protected virtual void OnInfPool()
-        {
-            System.Threading.Thread.Sleep(5 * 60 * 1000 + 10);
-            UpdateInf(false);
-        }
-
 
         void trans_ConnectionStatusChange(object sender, FmdcEventArgs e)
         {
@@ -373,10 +400,12 @@ namespace FlowLib.Protocols
             }
             else
             {
-				if (ParseRaw(Encoding.GetString(b, 0, length)))
-					trans.Protocol.ParseRaw(b, length);
+                //if (ParseRaw(Encoding.GetString(b, 0, length)))
+                //    trans.Protocol.ParseRaw(b, length);
+                ParseRaw(Encoding.GetString(b, 0, length));
             }
         }
+
         public bool ParseRaw(string raw)
         {
             // If raw lenght is 0. Ignore
@@ -397,13 +426,17 @@ namespace FlowLib.Protocols
             {
                 if (trans != null)
                 {
+                    ITransfer tmpTrans = trans;
+                    byte[] bytes = Encoding.GetBytes(raw);
                     trans.Protocol = new TransferNmdcProtocol(trans);
+                    tmpTrans.Protocol.ParseRaw(bytes, bytes.Length);
                     return true;
                 }
                 else if (hub != null)
                 {
+                    Hub tmpHub = hub;
                     hub.Protocol = new HubNmdcProtocol(hub);
-                    hub.Reconnect();
+                    tmpHub.Reconnect();
                 }
                 //return
             }
@@ -652,7 +685,7 @@ namespace FlowLib.Protocols
                         (trans != null && trans.Me.ContainsKey(UserInfo.SECURE))
                         )
                     {
-                        con.SecureProtocol = System.Security.Authentication.SslProtocols.Tls;
+                        con.SecureProtocol = SecureProtocols.TLS;
                     }
                 }
             }
@@ -697,17 +730,17 @@ namespace FlowLib.Protocols
 
                 // Do we support same protocol?
                 double version = 0.0;
-                if (ctm.Protocol != null && (ctm.Protocol.StartsWith("ADC/") && ctm.Protocol.StartsWith("ADCS/")))
+                if (ctm.Protocol != null && (ctm.Protocol.StartsWith("ADC/") || ctm.Protocol.StartsWith("ADCS/")))
                 {
                     try
                     {
-                        version = double.Parse(ctm.Protocol.Substring(4).Replace(".", ","));
+                        version = double.Parse(ctm.Protocol.Substring( ctm.Protocol.IndexOf("/") +1 ).Replace(".", ","));
                     }
                     catch { }
                 }
                 if (version > 1.0)
                 {
-                    hub.Send(new STA(hub, ctm.Id, hub.Me.ID, "241", "Protocol is not supported. I only support ADC 1.0 and prior", "TO" + ctm.Token + " PR" + ctm.Protocol));
+                    hub.Send(new STA(hub, ctm.Id, hub.Me.ID, "241", "Protocol is not supported. I only support ADC 1.0/ADCS 0.10 and prior", "TO" + ctm.Token + " PR" + ctm.Protocol));
                     return;
                 }
 
@@ -721,7 +754,7 @@ namespace FlowLib.Protocols
                     trans.Me = new UserInfo(me.UserInfo);
                     trans.Protocol = new AdcProtocol(trans);
                     if (ctm.Secure)
-                        trans.SecureProtocol = System.Security.Authentication.SslProtocols.Tls;
+                        trans.SecureProtocol = SecureProtocols.TLS;
 
                     // Support for prior versions of adc then 1.0
                     string token = ctm.Token;
@@ -750,11 +783,11 @@ namespace FlowLib.Protocols
                     {
                         // Do we support same protocol?
                         double version = 0.0;
-                        if (rcm.Protocol != null && (rcm.Protocol.StartsWith("ADC/") && rcm.Protocol.StartsWith("ADCS/")))
+                        if (rcm.Protocol != null && (rcm.Protocol.StartsWith("ADC/") || rcm.Protocol.StartsWith("ADCS/")))
                         {
                             try
                             {
-                                version = double.Parse(rcm.Protocol.Substring(4).Replace(".", ","));
+                                version = double.Parse(rcm.Protocol.Substring( rcm.Protocol.IndexOf("/") +1 ).Replace(".", ","));
                             }
                             catch { }
                             if (version <= 1.0)
@@ -765,8 +798,11 @@ namespace FlowLib.Protocols
                                     token = rcm.Token.Substring(2);
 
                                 Update(con, new FmdcEventArgs(Actions.TransferRequest, new TransferRequest(token, hub, usr.UserInfo, false)));
-
-                                hub.Send(new CTM(hub, rcm.Id, rcm.IDTwo, rcm.Protocol, hub.Share.Port, token));
+                                
+                                if (rcm.Secure && hub.Me.ContainsKey(UserInfo.SECURE))
+                                    hub.Send(new CTM(hub, rcm.Id, rcm.IDTwo, rcm.Protocol, int.Parse(0 + hub.Me.Get(UserInfo.SECURE)), token));
+                                else
+                                    hub.Send(new CTM(hub, rcm.Id, rcm.IDTwo, rcm.Protocol, hub.Share.Port, token));
                             }
                             else
                             {

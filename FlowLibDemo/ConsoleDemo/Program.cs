@@ -8,7 +8,7 @@ namespace ConsoleDemo
     {
         static void Main(string[] args)
         {
-            new ConvertSettings();
+            new DisplayRawMessages();
             Console.Read();
         }
 
