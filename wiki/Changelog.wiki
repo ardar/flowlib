@@ -28,7 +28,7 @@
   * Support for encrypted connections *(Not for .Net Compact)*
       * Supports ADC0 in ADC hubs (This allows encrypted transfers between DC++ and FlowLib)
       * Supports a modified version of $ConnectToMe and $MyINFO.
-            * {{{$ConnectToMe <RemoteNick> <SenderIp>:<SenderPort>[S]|}}} S indicate secure connection and should only be sent from user a if user b also supports TLS, this is indicated in $MyINFO.
+            * {{{$ConnectToMe <RemoteNick> <SenderIp>:<SenderTLSPort>[S]|}}} S indicate secure connection and should only be sent from user a if user b also supports TLS, this is indicated in $MyINFO.
             * {{{$MyINFO $ALL <nick> <description>$ $<connection><flag>$<e-mail>$<sharesize>$|}}} flag value of: {{{0x10 = TLS (0x10 hex == 16 dec)}}} indicates support for tls
 
   * *Other changes:*
