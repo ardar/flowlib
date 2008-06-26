@@ -8,7 +8,9 @@ namespace ConsoleDemo
     {
         static void Main(string[] args)
         {
-            new DisplayRawMessages();
+            new ActiveEmptySharingUsingTLS();
+            System.Threading.Thread.Sleep(10 * 1000);
+            new PassiveDownloadFilelistFromUserUsingTLS();
             Console.Read();
         }
 
