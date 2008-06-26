@@ -30,10 +30,12 @@ namespace FlowLib.Events
         public const int Password = 0;
         /// <summary>
         /// MainChat Message.
+        /// object is of type MainMessage
         /// </summary>
         public const int MainMessage = 1;
         /// <summary>
         /// Private Message.
+        /// object is of type PrivateMessage
         /// </summary>
         public const int PrivateMessage = 2;
         /// <summary>
@@ -137,6 +139,11 @@ namespace FlowLib.Events
         /// object is LocalCertificationSelectionInfo
         /// </summary>
         public const int SecuritySelectLocalCertificate = 1001;
+        /// <summary>
+        /// Used when a known error occured in the authentication phase (With a secure connection)
+        /// object is a dervided class of Exception
+        /// </summary>
+        public const int SecurityAuthenticationError = 1002;
 #endif
     }
 }

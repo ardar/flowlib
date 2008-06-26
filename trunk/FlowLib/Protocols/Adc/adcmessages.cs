@@ -861,7 +861,7 @@ namespace FlowLib.Protocols.Adc
                             switch (sup)
                             {
                                 case "ADC0":
-                                    info.Set(UserInfo.SECURE, "1");
+                                    info.Set(UserInfo.SECURE, "");
                                     break;
                             }
                         }

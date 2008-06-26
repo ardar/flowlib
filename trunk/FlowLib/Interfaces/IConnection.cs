@@ -27,6 +27,7 @@ using System.Net;
 // Security
 using System.Net.Security;
 using System.Security.Authentication;
+using FlowLib.Enums;
 #endif
 
 
@@ -75,7 +76,7 @@ namespace FlowLib.Interfaces
             get;
             set;
         }
-        SslProtocols SecureProtocol
+        SecureProtocols SecureProtocol
         {
             get;
             set;

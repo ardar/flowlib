@@ -49,6 +49,7 @@ namespace FlowLib.Protocols
         protected int protocolStatus = -1;
         protected Supports mySupport = null;
         protected Timer timer = null;
+        protected bool disposed = false;
 
         protected string directory = string.Empty;
         /// <summary>
@@ -121,6 +122,19 @@ namespace FlowLib.Protocols
 
 
             trans.ConnectionStatusChange += new FmdcEventHandler(trans_ConnectionStatusChange);
+        }
+
+        public void Dispose()
+        {
+            if (!disposed)
+            {
+                trans.ConnectionStatusChange -= trans_ConnectionStatusChange;
+                trans = null;
+
+                timer.Dispose();
+                timer = null;
+                disposed = true;
+            }
         }
 
         void OnUpdate(object sender, FmdcEventArgs e) { }

@@ -101,4 +101,16 @@ namespace FlowLib.Enums
         FILE_NOT_AVAILABLE = 4,
         USERID_MISMATCH = 8
     }
+
+    /// <summary>
+    /// Secure Protocols, can be used to encrypt TcpConnections
+    /// </summary>
+    [Flags]
+    public enum SecureProtocols
+    {
+        None = 0,
+        SSL2 = 1,
+        SSL3 = 2,
+        TLS = 4
+    }
 }

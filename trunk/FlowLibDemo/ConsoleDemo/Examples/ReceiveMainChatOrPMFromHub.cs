@@ -19,71 +19,58 @@
  *
  */
 
-using FlowLib.Containers;
 using FlowLib.Connections;
+using FlowLib.Containers;
 using FlowLib.Interfaces;
 using FlowLib.Events;
-using Nmdc = FlowLib.Protocols.HubNmdc;
-using System.Net;
 
 namespace ConsoleDemo.Examples
 {
-    public class PassiveSearch : IBaseUpdater
+    public class ReceiveMainChatOrPMFromHub
     {
-        #region IBaseUpdater Members
-        public event FlowLib.Events.FmdcEventHandler UpdateBase;
-        #endregion
-
-        public PassiveSearch()
+        public ReceiveMainChatOrPMFromHub()
         {
-            UpdateBase = new FlowLib.Events.FmdcEventHandler(PassiveSearch_UpdateBase);
-
             HubSetting settings = new HubSetting();
             settings.Address = "127.0.0.1";
             settings.Port = 411;
             settings.DisplayName = "FlowLib";
             settings.Protocol = "Auto";
 
-            Hub hubConnection = new Hub(settings,this);
+            Hub hubConnection = new Hub(settings);
             hubConnection.ProtocolChange += new FmdcEventHandler(hubConnection_ProtocolChange);
             hubConnection.Connect();
-
-            // Wait 5 seconds (We should really listen on ConnectionStatusChange instead.
-            System.Threading.Thread.Sleep(5 * 1000);
-
-            // Send Search
-            SearchInfo searchInfo = new SearchInfo();
-            searchInfo.Set(SearchInfo.SEARCH, "Identifier.cs");
-
-            UpdateBase(this, new FlowLib.Events.FmdcEventArgs(Actions.Search, searchInfo));
         }
 
         void hubConnection_ProtocolChange(object sender, FmdcEventArgs e)
         {
             Hub hubConnection = sender as Hub;
-            IProtocol prot = e.Data as IProtocol;
-            if (prot != null)
+            if (hubConnection != null)
             {
-                prot.Update -= hubConnection_Update;
+                hubConnection.Protocol.Update += new FmdcEventHandler(prot_Update);
             }
-            hubConnection.Protocol.Update += new FmdcEventHandler(hubConnection_Update);
-            hubConnection.Protocol.Update += new FlowLib.Events.FmdcEventHandler(hubConnection_Update);
         }
 
-        void PassiveSearch_UpdateBase(object sender, FlowLib.Events.FmdcEventArgs e) { }
-
-        void hubConnection_Update(object sender, FlowLib.Events.FmdcEventArgs e)
+        void prot_Update(object sender, FmdcEventArgs e)
         {
             switch (e.Action)
             {
-                case Actions.SearchResult:
-                    if (e.Data is SearchResultInfo)
-                    {
-                        SearchResultInfo srInfo = (SearchResultInfo)e.Data;
-                    }
+                case Actions.MainMessage:
+                    MainMessage msgMain = e.Data as MainMessage;
+                    System.Console.Write(string.Format("[{0}] <{1}> {2}\r\n",
+                        System.DateTime.Now.ToLongTimeString(),
+                        msgMain.From,
+                        msgMain.Content));
+                    break;
+
+                case Actions.PrivateMessage:
+                    PrivateMessage msgPriv = e.Data as PrivateMessage;
+                    System.Console.Write(string.Format("[{0}] PM:{1}\r\n",
+                        System.DateTime.Now.ToLongTimeString(),
+                        msgPriv.Content));
                     break;
             }
-
+        
+        
         }
     }
 }

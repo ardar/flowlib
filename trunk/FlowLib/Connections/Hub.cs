@@ -59,6 +59,7 @@ namespace FlowLib.Connections
         // For Connection Keepalive
         protected long keepAliveTicks = System.DateTime.Now.Ticks;
         protected Timer keepAliveTimer;
+        protected Timer updateInfoTimer;
         #region Connection
         protected int regMode = -1;
         #endregion
@@ -85,6 +86,7 @@ namespace FlowLib.Connections
             set 
             {
                 base.Protocol = value;
+                this.HubSetting.Protocol = value.Name;
                 protocol = (IProtocol)value;
 
             }
@@ -314,9 +316,14 @@ namespace FlowLib.Connections
                         Protocol = new AdcProtocol(this);
                         break;
 #if !COMPACT_FRAMEWORK
+// Security
                     case "AdcSecure":
                         Protocol = new AdcProtocol(this);
-                        SecureProtocol = System.Security.Authentication.SslProtocols.Tls;
+                        SecureProtocol = FlowLib.Enums.SecureProtocols.TLS;
+                        break;
+                    case "NmdcSecure":
+                        Protocol = new HubNmdcProtocol(this);
+                        SecureProtocol = FlowLib.Enums.SecureProtocols.TLS;
                         break;
 #endif
                     default:

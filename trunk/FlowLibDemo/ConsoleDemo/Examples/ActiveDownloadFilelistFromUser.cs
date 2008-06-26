@@ -39,6 +39,7 @@ namespace ConsoleDemo.Examples
 
         //string currentDir = @"C:\Temp\";
         string currentDir = System.AppDomain.CurrentDomain.BaseDirectory;
+        bool sentRequest = false;
 
         public ActiveDownloadFilelistFromUser()
         {
@@ -68,9 +69,6 @@ namespace ConsoleDemo.Examples
             hubConnection.Share = share;
             hubConnection.Me.Mode = FlowLib.Enums.ConnectionTypes.Direct;
             hubConnection.Connect();
-
-            hubConnection.ConnectionStatusChange += new FmdcEventHandler(hubConnection_ConnectionStatusChange);
-
         }
 
         void Connection_Update(object sender, FlowLib.Events.FmdcEventArgs e)
@@ -112,29 +110,6 @@ namespace ConsoleDemo.Examples
             trans.Protocol.RequestTransfer += new FmdcEventHandler(Protocol_RequestTransfer);
         }
 
-        void hubConnection_ConnectionStatusChange(object sender, FmdcEventArgs e)
-        {
-            Hub hubConnection = sender as Hub;
-            if (hubConnection == null)
-                return;
-
-            if (e.Action == TcpConnection.Connected)
-            {
-                // Do a user name Flow84 exist in hub?
-                User usr = hubConnection.GetUserByNick("Flow84");
-                if (usr != null)
-                {
-                    // Adding filelist of unknown type to download manager.
-                    // to the user Flow84
-                    ContentInfo info = new ContentInfo(ContentInfo.FILELIST, BaseFilelist.UNKNOWN);
-                    info.Set(ContentInfo.STORAGEPATH, currentDir + @"Filelists\" + usr.ID + ".filelist");
-                    downloadManager.AddDownload(new DownloadItem(info), new Source(null, usr.ID));
-                    // Start transfer to user
-                    UpdateBase(this, new FmdcEventArgs(Actions.StartTransfer, usr));
-                }
-            }
-        }
-
         void PassiveConnectToUser_UpdateBase(object sender, FmdcEventArgs e) { }
 
         void hubConnection_ProtocolChange(object sender, FmdcEventArgs e)
@@ -159,11 +134,39 @@ namespace ConsoleDemo.Examples
             Hub hub = (Hub)sender;
             switch (e.Action)
             {
+                case Actions.TransferRequest:
+                    if (e.Data is TransferRequest)
+                    {
+                        TransferRequest req = (TransferRequest)e.Data;
+                        if (transferManager.GetTransferReq(req.Key) == null)
+                            transferManager.AddTransferReq(req);
+                    }
+                    break;
                 case Actions.TransferStarted:
                     Transfer trans = e.Data as Transfer;
                     if (trans != null)
                     {
                         transferManager.StartTransfer(trans);
+                        trans.Protocol.ChangeDownloadItem += new FmdcEventHandler(Protocol_ChangeDownloadItem);
+                        trans.Protocol.RequestTransfer += new FmdcEventHandler(Protocol_RequestTransfer);
+                    }
+                    break;
+                case  Actions.UserOnline:
+                    bool hasMe = (hub.GetUserById(hub.Me.ID) != null);
+                    if (!sentRequest && hasMe)
+                    {
+                        User usr = null;
+                        if ((usr = hub.GetUserById("DCpp706")) != null)
+                        {
+                            // Adding filelist of unknown type to download manager.
+                            // to the user Flow84
+                            ContentInfo info = new ContentInfo(ContentInfo.FILELIST, BaseFilelist.UNKNOWN);
+                            info.Set(ContentInfo.STORAGEPATH, currentDir + @"Filelists\" + usr.ID + ".filelist");
+                            downloadManager.AddDownload(new DownloadItem(info), new Source(hub.RemoteAddress.ToString(), usr.ID));
+                            // Start transfer to user
+                            UpdateBase(this, new FmdcEventArgs(Actions.StartTransfer, usr));
+                            sentRequest = true;
+                        }
                     }
                     break;
             }
@@ -187,7 +190,7 @@ namespace ConsoleDemo.Examples
             if (trans == null)
                 return;
             DownloadItem dwnItem = null;
-            if (downloadManager.TryGetDownload(new Source(null, trans.User.ID), out dwnItem))
+            if (downloadManager.TryGetDownload(trans.Source, out dwnItem))
             {
                 e.Data = dwnItem;
                 e.Handled = true;

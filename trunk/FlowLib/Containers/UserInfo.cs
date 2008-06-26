@@ -70,6 +70,7 @@ namespace FlowLib.Containers
         protected string connection = "";
         protected string email = "";
         protected int account = -1;
+
         protected TagInfo taginfo = new TagInfo(true);
 
         #endregion
@@ -226,12 +227,6 @@ namespace FlowLib.Containers
                 DisplayName = value.DisplayName;
             TagInfo = new TagInfo(value.TagInfo);
 
-            if (value.ContainsKey(UserInfo.SID))
-                Set(UserInfo.SID, value.Get(UserInfo.SID));
-            if (value.ContainsKey(UserInfo.CID))
-                Set(UserInfo.CID, value.Get(UserInfo.CID));
-            if (value.ContainsKey(UserInfo.IP))
-                Set(UserInfo.IP, value.Get(UserInfo.IP));
             if (value.Share.Length != 0)
                 Share = value.Share;
             if (value.Email.Length != 0)
@@ -243,6 +238,13 @@ namespace FlowLib.Containers
             if (value.Account != -1)
                 Account = value.Account;
 
+            lock (value)
+            {
+                foreach (System.Collections.Generic.KeyValuePair<string, string> pair in value.list)
+                {
+                    Set(pair.Key, pair.Value);
+                }
+            }
         }
         #region Functions
         protected void formatShare(string instr)

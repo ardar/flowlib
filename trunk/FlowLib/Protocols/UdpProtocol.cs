@@ -70,6 +70,11 @@ namespace FlowLib.Protocols
             Update = new FmdcEventHandler(UdpNmdcProtocol_Update);
         }
 
+        public void Dispose()
+        {
+            // We dont need todo anything here..
+        }
+
         void UdpNmdcProtocol_Update(object sender, FmdcEventArgs e) { }
         void UdpNmdcProtocol_MessageToSend(object sender, FmdcEventArgs e) { }
         void UdpNmdcProtocol_MessageReceived(object sender, FmdcEventArgs e) { }

@@ -117,10 +117,47 @@ namespace FlowLib.Protocols.HubNmdc
     public class Supports : HubMessage
     {
         protected string[] support = null;
+        protected bool tls = false;
+
+        public bool SupportTLS
+        {
+            get { return tls; }
+        }
+
         public string[] Support
         {
             get { return support; }
         }
+
+        public new string Raw
+        {
+            get { return base.Raw; }
+            set
+            {
+                base.Raw = value;
+                int pos;
+                if ((pos = raw.IndexOf(" ")) != -1)
+                {
+                    pos++;
+                    string tmp = raw.Substring(pos);
+                    support = tmp.Split(' ');
+                    foreach (string sup in support)
+                    {
+                        switch (sup.ToLower())
+                        {
+                            case "tls":
+                                tls = true;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    IsValid = true;
+                }
+
+            }
+        }
+
         /// <summary>
         /// This Constructor is for sending
         /// </summary>
@@ -128,7 +165,10 @@ namespace FlowLib.Protocols.HubNmdc
         public Supports(Hub hub)
             : base(hub, null)
         {
-            Raw = "$Supports NoHello NoGetINFO |";
+            if (hub.Me.ContainsKey(UserInfo.SECURE))
+                Raw = "$Supports NoHello NoGetINFO TLS |";
+            else
+                Raw = "$Supports NoHello NoGetINFO |";
             IsValid = true;
         }
 
@@ -138,21 +178,65 @@ namespace FlowLib.Protocols.HubNmdc
         /// <param name="hub"></param>
         /// <param name="raw"></param>
         public Supports(Hub hub, string raw)
-            : base(hub, raw)
+            : base(hub, null)
         {
-            int pos;
-            if ((pos = raw.IndexOf(" ")) != -1)
-            {
-                pos++;
-                string tmp = raw.Substring(pos);
-                support = tmp.Split(' ');
-                IsValid = true;
-            }
+            Raw = raw;
         }
     }
     public class MyINFO : HubMessage
     {
+        [System.Flags]
+        public enum UserStatusFlag
+        {
+            Unknown = 0,
+            Normal = 1,
+            Away = 2,
+            Server = 4,
+            Fireball = 8,
+            TLS = 16
+        }
+
+        public static UserStatusFlag ConvertByteToStatusFlag(byte value)
+        {
+            UserStatusFlag flag = UserStatusFlag.Unknown;
+            if ((1 & value) == 1)
+                flag |= UserStatusFlag.Normal;
+            if ((2 & value) == 2)
+                flag |= UserStatusFlag.Away;
+            if ((4 & value) == 4)
+                flag |= UserStatusFlag.Server;
+            if ((8 & value) == 8)
+                flag |= UserStatusFlag.Fireball;
+            if ((16 & value) == 16)
+                flag |= UserStatusFlag.TLS;
+            return flag;
+        }
+
+        public static byte ConvertStatusFlagToByte(UserStatusFlag statusFlag)
+        {
+            byte statusFlagRawByte = 0;
+            if ((UserStatusFlag.Normal & statusFlag) == UserStatusFlag.Normal)
+                statusFlagRawByte |= 1;
+            if ((UserStatusFlag.Away & statusFlag) == UserStatusFlag.Away)
+                statusFlagRawByte |= 2;
+            if ((UserStatusFlag.Server & statusFlag) == UserStatusFlag.Server)
+                statusFlagRawByte |= 4;
+            if ((UserStatusFlag.Fireball & statusFlag) == UserStatusFlag.Fireball)
+                statusFlagRawByte |= 8;
+            if ((UserStatusFlag.TLS & statusFlag) == UserStatusFlag.TLS)
+                statusFlagRawByte |= 16;
+            return statusFlagRawByte;
+        }
+
         protected UserInfo info = null;
+        protected byte statusFlag;
+
+        public byte StatusFlag
+        {
+            get { return statusFlag; }
+            set { statusFlag = value; }
+        }
+
         public UserInfo UserInfo
         {
             get { return info; }
@@ -187,6 +271,14 @@ namespace FlowLib.Protocols.HubNmdc
                             info.Description = sections[0];
                         }
                         info.Connection = sections[2];
+                        if (info.Connection.Length > 0)
+                        {
+                            statusFlag = (byte)info.Connection[info.Connection.Length - 1];
+                            UserStatusFlag flag = ConvertByteToStatusFlag(statusFlag);
+                            if ((flag & UserStatusFlag.TLS) == UserStatusFlag.TLS)
+                                info.Set(UserInfo.SECURE, "");
+                        }
+
                         info.Email = sections[3];
                         info.Share = sections[4];
 
@@ -198,9 +290,14 @@ namespace FlowLib.Protocols.HubNmdc
         }
         // Sending
         public MyINFO(Hub hub)
+            : this(hub, ConvertStatusFlagToByte(UserStatusFlag.Normal))
+        { }
+
+        public MyINFO(Hub hub, byte flg)
             : base(hub, null)
         {
             this.info = hub.Me;
+            this.statusFlag = flg;
             System.Text.StringBuilder tag = new System.Text.StringBuilder();
             tag.Append("<");
             tag.Append(info.TagInfo.Version);
@@ -220,6 +317,10 @@ namespace FlowLib.Protocols.HubNmdc
             tag.Append(info.TagInfo.OP.ToString() + "");    // OP
             tag.Append(",S:" + (info.TagInfo.Slots == -1 ? 0 : info.TagInfo.Slots).ToString() + ">");
 
+            UserStatusFlag status = ConvertByteToStatusFlag(statusFlag);
+            if (info.ContainsKey(UserInfo.SECURE))
+                status |= UserStatusFlag.TLS;
+
             Raw = "$MyINFO $ALL "
                 + info.DisplayName
                 + " "
@@ -227,7 +328,7 @@ namespace FlowLib.Protocols.HubNmdc
                 + tag
                 + "$ $"
                 + info.Connection
-                + "$"      // TODO : Add User status (Normal, away, server, fireball and so on)
+                + System.Text.Encoding.ASCII.GetString(new byte[] { ConvertStatusFlagToByte(status) }) + "$"
                 + info.Email + "$"
                 + info.Share
                 + "$|";
@@ -737,8 +838,9 @@ namespace FlowLib.Protocols.HubNmdc
     public class ConnectToMe : HubMessage
     {
         #region Variables
-        string address = null;
-        int port = -1;
+        protected string address = null;
+        protected int port = -1;
+        protected bool tls = false;
         #endregion
         #region Properties
         public string Address
@@ -748,6 +850,10 @@ namespace FlowLib.Protocols.HubNmdc
         public int Port
         {
             get { return port; }
+        }
+        public bool TLS
+        {
+            get { return tls; }
         }
         #endregion
         public ConnectToMe(string toNick, int port, Hub hub)
@@ -779,6 +885,8 @@ namespace FlowLib.Protocols.HubNmdc
             this.address = address[0];
             try
             {
+                if ((tls = address[1].EndsWith("S", System.StringComparison.OrdinalIgnoreCase)))
+                    address[1] = address[1].TrimEnd('S');
                 port = int.Parse(address[1]);
             }
             catch { }

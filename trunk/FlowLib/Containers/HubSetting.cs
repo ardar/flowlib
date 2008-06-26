@@ -44,8 +44,9 @@ namespace FlowLib.Containers
         /// Sets/Gets what protocol that should be used.
         /// string.empty    = Automaticly Determin what protocol
         /// Nmdc            = NMDC
+        /// NmdcSecure      = Nmdc (TLS)
         /// Adc             = ADC
-        /// Adc Secure      = ADCS
+        /// AdcSecure      = ADCS
         /// </summary>
         public string Protocol
         {

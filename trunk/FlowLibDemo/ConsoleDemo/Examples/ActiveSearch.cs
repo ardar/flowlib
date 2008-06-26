@@ -31,6 +31,7 @@ namespace ConsoleDemo.Examples
     {
         public event FmdcEventHandler UpdateBase;
         Hub hubConnection = null;
+        bool sentRequest = false;
 
         public ActiveSearch()
         {
@@ -56,7 +57,6 @@ namespace ConsoleDemo.Examples
             // Enable Active searching
             hubConnection.Me.Mode = FlowLib.Enums.ConnectionTypes.Direct;
             hubConnection.Share = share;
-            hubConnection.ConnectionStatusChange += new FmdcEventHandler(hubConnection_ConnectionStatusChange);
         }
 
         void hubConnection_ProtocolChange(object sender, FmdcEventArgs e)
@@ -69,7 +69,7 @@ namespace ConsoleDemo.Examples
                 prot.MessageToSend -= Protocol_MessageToSend;
                 prot.Update -= hubConnection_Update;
             }
-            hubConnection.Protocol.MessageReceived += new FlowLib.Events.FmdcEventHandler(Protocol_MessageReceived);
+            hubConnection.Protocol.MessageReceived += new FlowLib.Events.FmdcEventHandler(Protocol_MessageReceived2);
             hubConnection.Protocol.MessageToSend += new FlowLib.Events.FmdcEventHandler(Protocol_MessageToSend);
             hubConnection.Protocol.Update += new FlowLib.Events.FmdcEventHandler(hubConnection_Update);
         }
@@ -88,20 +88,6 @@ namespace ConsoleDemo.Examples
                 System.Console.WriteLine("IN:" + msg.Raw);
         }
 
-        void hubConnection_ConnectionStatusChange(object sender, FmdcEventArgs e)
-        {
-            if (e.Action == TcpConnection.Connected)
-            {
-                // Send Search
-                //SearchInfo searchInfo = new SearchInfo();
-                ////searchInfo.Set(SearchInfo.SEARCH, "Ecma-334");
-                //searchInfo.Set(SearchInfo.SEARCH, "books");
-                //searchInfo.Set(SearchInfo.SIZE, "1000");
-                //searchInfo.Set(SearchInfo.SIZETYPE, "1");
-                //UpdateBase(this, new FlowLib.Events.FmdcEventArgs(Actions.Search, searchInfo));
-            }
-        }
-
         void ActiveSearch_UpdateBase(object sender, FmdcEventArgs e) { }
 
         void Protocol_MessageReceived(object sender, FmdcEventArgs e)
@@ -116,7 +102,9 @@ namespace ConsoleDemo.Examples
 
         void hubConnection_Update(object sender, FlowLib.Events.FmdcEventArgs e)
         {
-
+            Hub hub = sender as Hub;
+            if (hub == null)
+                return;
             switch (e.Action)
             {
                 case Actions.SearchResult:
@@ -132,6 +120,20 @@ namespace ConsoleDemo.Examples
                         //    // Add Source to the existing downloaditem. Note that we first check if it exist.
                         //    dm.AddDownload(tmpDownloadItem, srInfo.Source);
                         //}
+                    }
+                    break;
+                case Actions.UserOnline:
+                    bool hasMe = (hub.GetUserById(hub.Me.ID) != null);
+                    if (!sentRequest && hasMe)
+                    {
+                        // Send Search
+                        SearchInfo searchInfo = new SearchInfo();
+                        //searchInfo.Set(SearchInfo.SEARCH, "Ecma-334");
+                        searchInfo.Set(SearchInfo.SEARCH, "Identifier.cs");
+                        //searchInfo.Set(SearchInfo.SIZE, "1000");
+                        //searchInfo.Set(SearchInfo.SIZETYPE, "1");
+                        UpdateBase(this, new FlowLib.Events.FmdcEventArgs(Actions.Search, searchInfo));
+                        sentRequest = true;
                     }
                     break;
             }

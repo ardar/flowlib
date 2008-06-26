@@ -54,7 +54,7 @@ namespace ConsoleDemo.Examples
             UpdateBase(this, new FlowLib.Events.FmdcEventArgs(FlowLib.Events.Actions.MainMessage, msg));
 
             // Create private message.
-            PrivateMessage privMsg = new PrivateMessage("DCDM++0.0495", hubConnection.Me.ID, "Testing");
+            PrivateMessage privMsg = new PrivateMessage("DCpp706", hubConnection.Me.ID, "Testing");
 
             // message will here be converted to right format and then be sent.
             UpdateBase(this, new FlowLib.Events.FmdcEventArgs(FlowLib.Events.Actions.PrivateMessage, privMsg));
