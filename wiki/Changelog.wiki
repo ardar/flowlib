@@ -50,6 +50,16 @@
   * FIX		- Bug where sources was not removed when downloaditem was.
   * FIX		- Some [http://www.mono-project.com mono] fixes
   * FIX		- Crash when receiving SCH and no Share was associated with hub (Adc protocol).
+  * ADD		- A copy constructor for UserInfo and TagInfo. This way we can create a copy of the object.
+  * FIX		- ADC client to client transfers.
+  * FIX		- FlowLib is no longer marked as active if it is passive (ADC only).
+  * FIX		- Support tag for client to client transfers (BZIP is added correctly, ADC only)
+  * FIX		- [http://code.google.com/p/flowlib/issues/detail?id=9 Issue 9].
+  * FIX		- Protocols wasnt disposed correctly.
+	Implemented IDisposable to all Protocols.
+  * CHANGE	- HubSettings.Protocol will be updated on Protocol change. 
+  * FIX		- All Examples are up to date
+
 
 
 
