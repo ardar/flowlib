@@ -55,8 +55,7 @@
   * FIX		- FlowLib is no longer marked as active if it is passive (ADC only).
   * FIX		- Support tag for client to client transfers (BZIP is added correctly, ADC only)
   * FIX		- [http://code.google.com/p/flowlib/issues/detail?id=9 Issue 9].
-  * FIX		- Protocols wasnt disposed correctly.
-	Implemented IDisposable to all Protocols.
+  * FIX		- Protocols wasnt disposed correctly. Implemented IDisposable to all Protocols.
   * CHANGE	- HubSettings.Protocol will be updated on Protocol change. 
   * FIX		- All Examples are up to date
 
