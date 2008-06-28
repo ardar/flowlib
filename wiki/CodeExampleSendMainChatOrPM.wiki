@@ -1,4 +1,4 @@
-#summary How to send Main Chat / PM
+#summary Code Example - How to send Main Chat / PM
 
 = Description =
 
