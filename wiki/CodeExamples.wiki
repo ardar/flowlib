@@ -16,4 +16,4 @@ Every example will have a description to tell little about what problem it solve
 || [CodeExamplesActiveEmptySharing Enable active sharing (Empty)] ||
 || [CodeExamplesPassiveDownloadFilelistFromUser Download filelist from user (Passive)] ||
 || [CodeExamplesActiveDownloadFilelistFromUser Download filelist from user (Active)] ||
-|| [CodeExampleEncryptedTraffic Encrypted Communicaion]
+|| [CodeExampleEncryptedTraffic Encrypted Communicaion] ||
