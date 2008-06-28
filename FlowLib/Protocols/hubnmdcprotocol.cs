@@ -558,7 +558,17 @@ namespace FlowLib.Protocols
                     if (usr != null)
                     {
                         Update(hub, new FmdcEventArgs(Actions.TransferRequest, new TransferRequest(usr.ID, hub, usr.UserInfo)));
-                        hub.Send(new ConnectToMe(usr.ID, hub.Share.Port, hub));
+#if !COMPACT_FRAMEWORK
+                        // Security, Windows Mobile doesnt support SSLStream so we disable this feature for it.
+                        if (
+                            usr.UserInfo.ContainsKey(UserInfo.SECURE) &&
+                            hub.Me.ContainsKey(UserInfo.SECURE) &&
+                            !string.IsNullOrEmpty(hub.Me.Get(UserInfo.SECURE))
+                            )
+                            hub.Send(new ConnectToMe(usr.ID, hub.Share.Port, hub, SecureProtocols.TLS));
+                        else
+#endif
+                            hub.Send(new ConnectToMe(usr.ID, hub.Share.Port, hub));
                     }
                 }
             }
@@ -601,7 +611,17 @@ namespace FlowLib.Protocols
                     case ConnectionTypes.UPnP:
                     case ConnectionTypes.Forward:
                         Update(hub, new FmdcEventArgs(Actions.TransferRequest, new TransferRequest(usr.ID, hub, usr.UserInfo)));
-                        hub.Send(new ConnectToMe(usr.ID, hub.Share.Port, hub));
+#if !COMPACT_FRAMEWORK
+// Security, Windows Mobile doesnt support SSLStream so we disable this feature for it.
+                        if (
+                            usr.UserInfo.ContainsKey(UserInfo.SECURE) && 
+                            hub.Me.ContainsKey(UserInfo.SECURE) &&
+                            !string.IsNullOrEmpty( hub.Me.Get(UserInfo.SECURE) )
+                            )
+                            hub.Send(new ConnectToMe(usr.ID, hub.Share.Port, hub, SecureProtocols.TLS));
+                        else
+#endif
+                            hub.Send(new ConnectToMe(usr.ID, hub.Share.Port, hub));
                         break;
                     case ConnectionTypes.Passive:
                     case ConnectionTypes.Socket5:

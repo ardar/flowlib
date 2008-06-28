@@ -857,6 +857,11 @@ namespace FlowLib.Protocols.HubNmdc
         }
         #endregion
         public ConnectToMe(string toNick, int port, Hub hub)
+            : this(toNick, port, hub, FlowLib.Enums.SecureProtocols.None)
+        {
+
+        }
+        public ConnectToMe(string toNick, int port, Hub hub, Enums.SecureProtocols secProt)
             : base(hub, null)
         {
             this.to = toNick;
@@ -865,8 +870,11 @@ namespace FlowLib.Protocols.HubNmdc
             this.address = hub.LocalAddress.Address.ToString();
             if (hub.Me.ContainsKey(UserInfo.IP))
                 this.address = hub.Me.Get(UserInfo.IP);
-            
-            Raw = "$ConnectToMe "+this.to+" " + this.address + ":" + this.port+ "|";
+
+            if ((Enums.SecureProtocols.TLS & secProt) == FlowLib.Enums.SecureProtocols.TLS)
+                tls = true;
+
+            Raw = "$ConnectToMe "+this.to+" " + this.address + ":" + (tls ? hub.Me.Get(UserInfo.SECURE) + "S" : this.port.ToString()) + "|";
             if (!string.IsNullOrEmpty(to) && port > 0 && port < 65535 && !string.IsNullOrEmpty(address))
                 IsValid = true;
         }

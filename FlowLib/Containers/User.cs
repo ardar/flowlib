@@ -75,12 +75,6 @@ namespace FlowLib.Containers
                     userinfo.TagInfo.OP = value.TagInfo.OP;
                 if (value.TagInfo.Slots != -1)
                     userinfo.TagInfo.Slots = value.TagInfo.Slots;
-                if (value.ContainsKey(UserInfo.SID))
-                    userinfo.Set(UserInfo.SID, value.Get(UserInfo.SID));
-                if (value.ContainsKey(UserInfo.CID))
-                    userinfo.Set(UserInfo.CID, value.Get(UserInfo.CID));
-                if (value.ContainsKey(UserInfo.IP))
-                    userinfo.Set(UserInfo.IP, value.Get(UserInfo.IP));
                 if (value.Share.Length != 0)
                     userinfo.Share = value.Share;
                 if (value.Email.Length != 0)
@@ -91,6 +85,15 @@ namespace FlowLib.Containers
                     userinfo.Connection = value.Connection;
                 if (value.Account != -1)
                     userinfo.Account = value.Account;
+
+                PropertyContainer<string, string>.PropertyContainerItems items = value.Items;
+                lock (items)
+                {
+                    foreach (FlowKeyValuePair<string, string> pair in items)
+                    {
+                        userinfo.Set(pair.Key, pair.Value);
+                    }
+                }
             }
         }
         /// <summary>
