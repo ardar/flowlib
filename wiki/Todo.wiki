@@ -9,27 +9,8 @@ _Note that just because it is on this list it is not a promise that it will be d
   
   _[Changelog See changelog to see fixes and changes not listed here]_
 
-  * ~~Converting settings (hub favorites) from/to other clients~~
-    # ~~*From/To*~~
-      * ~~DC++~~
-      * ~~DCDM~~
-      * ~~LDC~~
-      * ~~AirDC~~
-      * ~~BCDC~~
-      * ~~CrZDC~~
-      * ~~CZDC~~
-      * ~~fulDC~~
-      * ~~IceDC~~
-      * ~~RSX~~
-      * ~~StrongDC~~
-      * ~~StrongDC Lite~~
-      * ~~Zion Blue~~
-      * ~~zK~~
-  * ~~Support for encrypted connections *(Not for .Net Compact)*~~
-  * Packing and submiting release to Google.
-
-= Release B =
   * UPnP Support
+  * Statistics support (Show how much of X traffic that has been transfered and what kind of traffic. You will of course be able to declare your own matching objects.)
 
 = Release ? =
   * Verify downloaded content
