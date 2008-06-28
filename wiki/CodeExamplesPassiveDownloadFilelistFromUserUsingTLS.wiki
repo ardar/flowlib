@@ -1,4 +1,4 @@
-#summary Code Example - Downloading filelist from user using TLS (Passive) CodeExamplesPassiveDownloadFilelistFromUser
+#summary Code Example - Downloading filelist from user using TLS (Passive)
 
 = Description =
 
