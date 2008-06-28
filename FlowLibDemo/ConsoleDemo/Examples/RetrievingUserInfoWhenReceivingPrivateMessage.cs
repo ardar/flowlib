@@ -67,6 +67,7 @@ namespace ConsoleDemo.Examples
                 User usr = hubConnection.GetUserById(msg.From);
                 if (usr != null)
                 {
+                    // Note that this will always be empty if you dont set it. (As this took me like 1-2 min todo. i havnt added a none static one)
                     usr.UserInfo.Set(UserInfo.IP, "193.0.19.25");   // http://ripe.net
 
                     System.Text.StringBuilder sb = new System.Text.StringBuilder("\r\n");

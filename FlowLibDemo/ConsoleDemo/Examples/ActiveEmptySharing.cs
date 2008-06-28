@@ -76,7 +76,7 @@ namespace ConsoleDemo.Examples
 
         void AddFilelistsToShare(Share s)
         {
-            General.AddCommonFilelistsToShare(s, currentDir + @"MyFileLists\");
+            General.AddCommonFilelistsToShare(s, currentDir + "MyFileLists\\");
         }
 
         void Connection_Update(object sender, FlowLib.Events.FmdcEventArgs e)
@@ -157,7 +157,7 @@ namespace ConsoleDemo.Examples
             if (trans == null)
                 return;
             DownloadItem dwnItem = null;
-            if (downloadManager.TryGetDownload(new Source(null, trans.User.ID), out dwnItem))
+            if (downloadManager.TryGetDownload(trans.Source, out dwnItem))
             {
                 e.Data = dwnItem;
                 e.Handled = true;

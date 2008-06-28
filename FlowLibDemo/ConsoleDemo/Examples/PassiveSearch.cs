@@ -53,7 +53,7 @@ namespace ConsoleDemo.Examples
 
             // Send Search
             SearchInfo searchInfo = new SearchInfo();
-            searchInfo.Set(SearchInfo.SEARCH, "Identifier.cs");
+            searchInfo.Set(SearchInfo.SEARCH, "Ubuntu");
 
             UpdateBase(this, new FlowLib.Events.FmdcEventArgs(Actions.Search, searchInfo));
         }
@@ -67,7 +67,6 @@ namespace ConsoleDemo.Examples
                 prot.Update -= hubConnection_Update;
             }
             hubConnection.Protocol.Update += new FmdcEventHandler(hubConnection_Update);
-            hubConnection.Protocol.Update += new FlowLib.Events.FmdcEventHandler(hubConnection_Update);
         }
 
         void PassiveSearch_UpdateBase(object sender, FlowLib.Events.FmdcEventArgs e) { }
