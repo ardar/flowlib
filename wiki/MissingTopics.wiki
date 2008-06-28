@@ -10,4 +10,5 @@ Your mind is the limit! :)
 
 
 
-(Note that you need to login with a google account to make a comment)
+(Note 1: that you need to login with a google account to make a comment)
+(Note 2: your request will be removed from this page when it has been implemented)
