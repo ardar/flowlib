@@ -1,12 +1,12 @@
 #summary What has been changed?
 #labels Featured
 
-= 20080628 =
+= Next release =
 
   _[Todo See Todo for changes still remaining before release]_
 
 
-= Next release =
+= 20080628 =
 
   * *Changes from TODO:*
     # Converting hub settings
