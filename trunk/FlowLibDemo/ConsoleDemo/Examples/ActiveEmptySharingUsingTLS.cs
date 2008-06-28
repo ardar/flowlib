@@ -225,6 +225,7 @@ namespace ConsoleDemo.Examples
                         if (trans.Protocol == null)
                         {
                             trans.Protocol = new FlowLib.Protocols.AdcProtocol(trans);
+                            trans.SecureUpdate += new FmdcEventHandler(trans_SecureUpdate);
                             trans.SecureProtocol = FlowLib.Enums.SecureProtocols.TLS;
                             trans.Listen();
                             transferManager.AddTransfer(trans);
