@@ -126,7 +126,7 @@ namespace ConsoleDemo.Examples
         void AddFilelistsToShare(Share s)
         {
             // This will add common filelists to share and save them in directory specified.
-            General.AddCommonFilelistsToShare(s, currentDir + @"MyFileLists\");
+            General.AddCommonFilelistsToShare(s, currentDir + "MyFileLists\\");
         }
 
         void hubConnection_Update(object sender, FmdcEventArgs e)
@@ -161,7 +161,7 @@ namespace ConsoleDemo.Examples
                             // Adding filelist of unknown type to download manager.
                             // to the user Flow84
                             ContentInfo info = new ContentInfo(ContentInfo.FILELIST, BaseFilelist.UNKNOWN);
-                            info.Set(ContentInfo.STORAGEPATH, currentDir + @"Filelists\" + usr.ID + ".filelist");
+                            info.Set(ContentInfo.STORAGEPATH, currentDir + "Filelists\\" + usr.ID + ".filelist");
                             downloadManager.AddDownload(new DownloadItem(info), new Source(hub.RemoteAddress.ToString(), usr.ID));
                             // Start transfer to user
                             UpdateBase(this, new FmdcEventArgs(Actions.StartTransfer, usr));

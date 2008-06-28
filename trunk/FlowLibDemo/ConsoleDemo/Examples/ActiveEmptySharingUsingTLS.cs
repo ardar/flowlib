@@ -92,7 +92,7 @@ namespace ConsoleDemo.Examples
 
         void AddFilelistsToShare(Share s)
         {
-            General.AddCommonFilelistsToShare(s, currentDir + @"MyFileLists\");
+            General.AddCommonFilelistsToShare(s, currentDir + "MyFileLists\\");
         }
 
         void Connection_Update(object sender, FlowLib.Events.FmdcEventArgs e)

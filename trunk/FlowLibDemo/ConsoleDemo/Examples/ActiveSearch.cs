@@ -128,8 +128,7 @@ namespace ConsoleDemo.Examples
                     {
                         // Send Search
                         SearchInfo searchInfo = new SearchInfo();
-                        //searchInfo.Set(SearchInfo.SEARCH, "Ecma-334");
-                        searchInfo.Set(SearchInfo.SEARCH, "Identifier.cs");
+                        searchInfo.Set(SearchInfo.SEARCH, "Ubuntu");
                         //searchInfo.Set(SearchInfo.SIZE, "1000");
                         //searchInfo.Set(SearchInfo.SIZETYPE, "1");
                         UpdateBase(this, new FlowLib.Events.FmdcEventArgs(Actions.Search, searchInfo));
