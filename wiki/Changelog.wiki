@@ -62,6 +62,7 @@
   * FIX		- Protocols wasnt disposed correctly. Implemented IDisposable to all Protocols.
   * CHANGE	- HubSettings.Protocol will be updated on Protocol change. 
   * FIX		- All Examples are up to date
+  * CHANGE	- Not only CID, SID and IP are updated (All extendable info will be updated for user)
 
 
 
