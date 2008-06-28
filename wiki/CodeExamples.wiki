@@ -10,10 +10,14 @@ Every example will have a description to tell little about what problem it solve
 
 || [CodeExamplesConnectToHub Connect to hub] ||
 || [CodeExampleChangeBotUserInfo Change bot info (MyInfo)] ||
+|| [CodeExampleRetrievingUserInfoWhenReceivingPrivateMessage Retreive user information] ||
 || [CodeExampleDebugRawCommands Show/Handle raw commands] ||
 || [CodeExampleSendMainChatOrPM Send MainChat / PM] ||
+|| [CodeExampleRecevieMainChatOrPMFromHub Retreive MainChat / PM] ||
 || [CodeExamplesPassvieEmptySharing Enable passive sharing (Empty)] ||
 || [CodeExamplesActiveEmptySharing Enable active sharing (Empty)] ||
 || [CodeExamplesPassiveDownloadFilelistFromUser Download filelist from user (Passive)] ||
 || [CodeExamplesActiveDownloadFilelistFromUser Download filelist from user (Active)] ||
+|| [CodeExampleSearchPassive Search for content (Passive)] ||
+|| [CodeExampleSearchActive Search for content (Active)] ||
 || [CodeExampleEncryptedTraffic Encrypted Communicaion] ||
