@@ -1,0 +1,242 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{B9584743-EFC6-493B-92CA-9E0EAA49F574}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ClientExample</RootNamespace>
+    <AssemblyName>ClientExample</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="FlowLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Desktop\Private\Code\FlowLib\trunk\FlowLib\bin\Debug\FlowLib.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Client\Interface\MainWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Client\Interface\MainWindow.Designer.cs">
+      <DependentUpon>MainWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Client\Interface\MessageWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Client\Interface\MessageWindow.Designer.cs">
+      <DependentUpon>MessageWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ExpandablePanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\ExpandablePanel.Designer.cs">
+      <DependentUpon>ExpandablePanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\List.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\List.Designer.cs">
+      <DependentUpon>List.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Guide\Connection\Detect.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Guide\Connection\Detect.Designer.cs">
+      <DependentUpon>Detect.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Guide\GuideWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Guide\GuideWindow.Designer.cs">
+      <DependentUpon>GuideWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Guide\Import\SelectClient.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Guide\Import\SelectClient.designer.cs">
+      <DependentUpon>SelectClient.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Guide\Import\Search.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Guide\Import\Search.Designer.cs">
+      <DependentUpon>Search.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Guide\UCConnection.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Guide\UCConnection.Designer.cs">
+      <DependentUpon>UCConnection.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Guide\UCFinished.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Guide\UCFinished.Designer.cs">
+      <DependentUpon>UCFinished.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Guide\UCImport.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Guide\UCImport.Designer.cs">
+      <DependentUpon>UCImport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Guide\UCInstallationMode.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Guide\UCInstallationMode.Designer.cs">
+      <DependentUpon>UCInstallationMode.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Guide\UCWelcome.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Guide\UCWelcome.Designer.cs">
+      <DependentUpon>UCWelcome.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Guide\UserControlTemplate.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Guide\UserControlTemplate.Designer.cs">
+      <DependentUpon>UserControlTemplate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MainWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainWindow.Designer.cs">
+      <DependentUpon>MainWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HubWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HubWindow.Designer.cs">
+      <DependentUpon>HubWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Guide\GuideWindow.resx">
+      <DependentUpon>GuideWindow.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Guide\UCWelcome.resx">
+      <DependentUpon>UCWelcome.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Guide\UserControlTemplate.resx">
+      <DependentUpon>UserControlTemplate.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HubWindow.resx">
+      <DependentUpon>HubWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Utils\Finder.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Client\Interface\MainWindow.resx">
+      <DependentUpon>MainWindow.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\ExpandablePanel.resx">
+      <DependentUpon>ExpandablePanel.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Guide\Connection\Detect.resx">
+      <DependentUpon>Detect.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Guide\Import\SelectClient.resx">
+      <DependentUpon>SelectClient.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Guide\Import\Search.resx">
+      <DependentUpon>Search.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Guide\UCConnection.resx">
+      <DependentUpon>UCConnection.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Guide\UCFinished.resx">
+      <DependentUpon>UCFinished.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Guide\UCImport.resx">
+      <DependentUpon>UCImport.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Guide\UCInstallationMode.resx">
+      <DependentUpon>UCInstallationMode.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images\flowlib-main.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Client\Interface\MessageWindow.resx">
+      <DependentUpon>MessageWindow.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images\collapse.gif" />
+    <EmbeddedResource Include="Images\expand.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Controls\List.resx">
+      <DependentUpon>List.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images\pen.gif" />
+    <EmbeddedResource Include="Images\user.gif" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
