@@ -25,6 +25,7 @@ namespace ClientExample.Controls
         protected bool isUpdating = false;
         protected System.Windows.Forms.Timer updateTimer = new System.Windows.Forms.Timer();
         protected Queue<FmdcEventArgs> updateQueue = new Queue<FmdcEventArgs>();
+        protected bool clearList = false;
 
         protected Tiger tiger = new Tiger();
         protected Hub connection = null;
@@ -63,6 +64,7 @@ namespace ClientExample.Controls
                     break;
                 case TcpConnection.Disconnected:
                     TopLabel.ForeColor = Color.Red;
+                    clearList = true;
                     break;
                 default:
                     break;
@@ -87,7 +89,7 @@ namespace ClientExample.Controls
             Message msg = null;
             Hub hubConnection = sender as Hub;
             byte[] bytes = null;
-            UserInfo usr = null;
+            User usr = null;
 
             if (hubConnection == null)
                 return;
@@ -98,7 +100,14 @@ namespace ClientExample.Controls
                     if (msgMain == null)
                         return;
                     msg = new Message();
-                    msg.From = msgMain.From;
+                    if (!string.IsNullOrEmpty(msgMain.From))
+                    {
+                        usr = hubConnection.GetUserById(msgMain.From);
+                        if (usr != null)
+                            msg.From = usr.DisplayName;
+                        else
+                            msg.From = msgMain.From;
+                    }
                     msg.Content = msgMain.Content;
 
                     bytes = tiger.ComputeHash( System.Text.Encoding.UTF32.GetBytes(hubConnection.RemoteAddress.ToString()) );
@@ -111,11 +120,14 @@ namespace ClientExample.Controls
                     if (msgPM == null)
                         return;
                     msg = new Message();
-                    msg.From = msgPM.From;
+                    usr = hubConnection.GetUserById(msgPM.From);
+                    msg.From = usr.DisplayName;
                     msg.To = msgPM.To;
                     msg.Content = msgPM.Content;
 
-                    string groupName = (!string.IsNullOrEmpty(msgPM.Group) ? msgPM.Group : msgPM.From);
+                    if (!string.IsNullOrEmpty(msgPM.Group))
+                        usr = hubConnection.GetUserById(msgPM.Group);
+                    string groupName = usr.DisplayName;
 
                     bytes = tiger.ComputeHash( System.Text.Encoding.UTF32.GetBytes(hubConnection.RemoteAddress.ToString() + groupName) );
                     msg.GroupId = Base32.Encode(bytes);
@@ -139,6 +151,8 @@ namespace ClientExample.Controls
             HubUpdate = new FmdcEventHandler(HubControl_Update);
             InitializeComponent();
 
+            label1.Width = 180;
+
             updateTimer.Tick += new EventHandler(updateTimer_Tick);
             updateTimer.Interval = 50;
             updateTimer.Start();
@@ -149,6 +163,9 @@ namespace ClientExample.Controls
             if (isUpdating)
                 return;
             isUpdating = true;
+
+            if (clearList)
+                listView1.Items.Clear();
 
             if (updateQueue.Count > 0)
             {
@@ -168,6 +185,10 @@ namespace ClientExample.Controls
                         bytes = tiger.ComputeHash(System.Text.Encoding.UTF32.GetBytes(usr.ID));
                         item.Name = Base32.Encode(bytes);
                         listView1.Items.Add(item);
+
+                        //Rectangle rec = listView1.GetItemRect(0, System.Windows.Forms.ItemBoundsPortion.Entire);
+                        //this.Height = rec.Height * listView1.Items.Count;
+                        //this.Invalidate();
                         break;
                     case Actions.UserOffline:
                         usr = e.Data as UserInfo;
