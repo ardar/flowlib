@@ -31,10 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FlowLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Desktop\Private\Code\FlowLib\trunk\FlowLib\bin\Debug\FlowLib.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
@@ -55,6 +51,7 @@
     <Compile Include="Client\Interface\MessageWindow.Designer.cs">
       <DependentUpon>MessageWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="Containers\AppSetting.cs" />
     <Compile Include="Containers\Message.cs" />
     <Compile Include="Controls\ExpandablePanel.cs">
       <SubType>UserControl</SubType>
@@ -239,6 +236,12 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Images\ignore.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\FlowLib\FlowLib.csproj">
+      <Project>{4C9A3F81-7660-4170-8D6B-62C239922C89}</Project>
+      <Name>FlowLib</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

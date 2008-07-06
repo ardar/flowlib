@@ -21,12 +21,10 @@ namespace ClientExample.Client.Interface
 
         private void MainWindow_Load(object sender, EventArgs e)
         {
-            toolBtnUsers.Image = new Bitmap(typeof(Program), @"Images.user.gif");
             toolBtnMessages.Image = new Bitmap(typeof(Program), @"Images.pen.gif");
-
+            // Hub 1
             ClientExample.Controls.HubControl hub = new ClientExample.Controls.HubControl();
             msgWindow.AddHub(hub);
-            hub.HubUpdate += new FlowLib.Events.FmdcEventHandler(hub_Update);
             list1.Items.Add(hub);
 
             HubSetting setting = new HubSetting();
@@ -35,15 +33,19 @@ namespace ClientExample.Client.Interface
             setting.Port = 1669;
             setting.Protocol = "Nmdc";
             hub.Setting = setting;
-        }
 
-        void hub_Update(object sender, FlowLib.Events.FmdcEventArgs e)
-        {
+            // Hub 2
+            ClientExample.Controls.HubControl hub2 = new ClientExample.Controls.HubControl();
+            msgWindow.AddHub(hub2);
+            list1.Items.Add(hub2);
+            HubSetting setting2 = new HubSetting();
+            setting2.DisplayName = "Xmpl";
+            setting2.Address = "devpublic.adcportal.com";
+            setting2.Port = 16591;
+            setting2.Protocol = "Adc";
 
-        }
+            hub2.Setting = setting2;
 
-        private void toolBtnUsers_Click(object sender, EventArgs e)
-        {
 
         }
 
@@ -57,6 +59,7 @@ namespace ClientExample.Client.Interface
                 msgWindow.Location = new Point(this.Left + this.Width, this.Top);
             else
                 msgWindow.Location = new Point(this.Left - msgWindow.Width, this.Top);
+            msgWindow.Focus();
         }
     }
 }

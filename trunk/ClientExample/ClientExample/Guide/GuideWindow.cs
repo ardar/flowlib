@@ -6,6 +6,8 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 
+using ClientExample.Containers;
+
 namespace ClientExample.Guide
 {
     public partial class GuideWindow : Form
@@ -16,7 +18,8 @@ namespace ClientExample.Guide
             Welcome = 0,
             InstallationMode = 1,
             ImportSettings = 2,
-            ConnectionDetection = 3
+            ConnectionDetection = 3,
+            Finished = 4
         }
 
         public GuideWindow()
@@ -27,6 +30,10 @@ namespace ClientExample.Guide
 
         void tabControl1_Selecting(object sender, TabControlCancelEventArgs e)
         {
+            if (e.TabPageIndex == (int)Tabs.Finished)
+            {
+                btnNext.Text = "Start Xmpl";
+            }
             e.Cancel = !allowTabChange;
         }
 
@@ -48,8 +55,9 @@ namespace ClientExample.Guide
                                 allowTabChange = true;
                                 break;
                             case 1:     // Advanced mode (Close Guide)
-                                this.Close();
-                                break;
+                                allowTabChange = true;
+                                tabControl1.SelectedIndex = (int)Tabs.Finished;
+                                return;
                         }
                         break;
                         #endregion
@@ -63,7 +71,7 @@ namespace ClientExample.Guide
                                 case 0:     // Search for installation path
                                     Import.Search search = new Import.Search();
                                     search.ShowDialog();
-                                    if ( search.List.Count > 0 )
+                                    if (search.List.Count > 0)
                                     {
                                         list.AddRange(search.List);
                                     }
@@ -94,6 +102,8 @@ namespace ClientExample.Guide
                                 select.Files = list;
                                 if (select.ShowDialog() == DialogResult.OK)
                                 {
+                                    Program.Settings.SavedHubs = select.Settings;
+                                    Save();
                                     allowTabChange = true;
                                 }
                             }
@@ -110,23 +120,45 @@ namespace ClientExample.Guide
                                 {
                                     allowTabChange = true;
                                 }
+                                Program.Settings.ConnectionMode = ucConnection1.Mode;
+                                Save();
                                 break;
                             case 1:
                                 // TODO : Add settings here
                                 allowTabChange = true;
                                 break;
                             case 2:
+                                Program.Settings.ConnectionMode = 1;
+                                Save();
                                 allowTabChange = true;
                                 break;
                         }
                         break;
-                    default:
-                        break;
+                    //case Tabs.Finished:
+                        //Program.Settings.Installed = true;
+                        //Save();
+                        //this.Close();
+                        //return;
                 }
                 if (allowTabChange)
                     tabControl1.SelectedIndex += 1;
                 allowTabChange = false;
             }
+            else
+            {
+                Program.Settings.Installed = true;
+                Save();
+                this.Close();
+            }
+        }
+
+        public void Save()
+        {
+            try
+            {
+                FlowLib.Utils.FileOperations<AppSetting>.SaveObject(AppSetting.GetSettingsFile(), Program.Settings);
+            }
+            catch { }
         }
     }
 }

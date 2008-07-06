@@ -63,6 +63,7 @@
             this.splitContainer1.Size = new System.Drawing.Size(413, 316);
             this.splitContainer1.SplitterDistance = 287;
             this.splitContainer1.TabIndex = 0;
+            this.splitContainer1.TabStop = false;
             // 
             // toolStrip1
             // 
@@ -85,12 +86,15 @@
             // 
             // txtOutput
             // 
+            this.txtOutput.BackColor = System.Drawing.SystemColors.Window;
             this.txtOutput.Dock = System.Windows.Forms.DockStyle.Fill;
             this.txtOutput.Location = new System.Drawing.Point(0, 25);
             this.txtOutput.Multiline = true;
             this.txtOutput.Name = "txtOutput";
+            this.txtOutput.ReadOnly = true;
             this.txtOutput.Size = new System.Drawing.Size(413, 262);
             this.txtOutput.TabIndex = 1;
+            this.txtOutput.TabStop = false;
             // 
             // splitContainer2
             // 
@@ -108,6 +112,7 @@
             this.splitContainer2.Size = new System.Drawing.Size(413, 25);
             this.splitContainer2.SplitterDistance = 332;
             this.splitContainer2.TabIndex = 0;
+            this.splitContainer2.TabStop = false;
             // 
             // btnSend
             // 

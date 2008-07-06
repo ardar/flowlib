@@ -132,7 +132,7 @@ namespace ClientExample.Guide.Import
 
                 if (!error)
                 {
-                    clientFrom.Read(openFileDialog1.FileName);
+                    clientFrom.Read(comboBox2.Text);
 
                     settings = clientFrom.Hubs;
                     MessageBox.Show("Convertion has been done");
