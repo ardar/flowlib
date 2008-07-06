@@ -6,6 +6,8 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 
+using FlowLib.Containers;
+
 namespace ClientExample.Client.Interface
 {
     public partial class MainWindow : Form
@@ -22,44 +24,21 @@ namespace ClientExample.Client.Interface
             toolBtnUsers.Image = new Bitmap(typeof(Program), @"Images.user.gif");
             toolBtnMessages.Image = new Bitmap(typeof(Program), @"Images.pen.gif");
 
-            ListView listview = new ListView();
-            listview.View = View.Details;
-            listview.Columns.Add("Nick", 190);
-            listview.Items.Add("-=Aquila=-");
-            listview.Items.Add("-=OpChat=-");
-            listview.Items.Add("ChrisShUK");
-            listview.Items.Add("Daywalker™");
-            listview.Items.Add("exPERten");
-            listview.Items.Add("Flow84");
-            listview.Items.Add("Gabberworld");
-            listview.Items.Add("Gnuff");
-            listview.Items.Add("honda");
-            listview.Items.Add("MikeJJ");
-            listview.Items.Add("Misçhiêvøus");
-            listview.Items.Add("Pharaoh");
-            listview.Items.Add("Pothead");
-            listview.Items.Add("SeNcO");
-            listview.Items.Add("TheNOP");
-            listview.Items.Add("Tiberian");
-            listview.Scrollable = false;
+            ClientExample.Controls.HubControl hub = new ClientExample.Controls.HubControl();
+            msgWindow.AddHub(hub);
+            hub.HubUpdate += new FlowLib.Events.FmdcEventHandler(hub_Update);
+            list1.Items.Add(hub);
 
-            ClientExample.Controls.ExpandablePanel panel = new ClientExample.Controls.ExpandablePanel();
-            panel.TopLabel.Text = " Test Hub (16 users)";
-            panel.Panel.Controls.Add(listview);
-            listview.Dock = DockStyle.Fill;
-            list1.Items.Add(panel);
-            panel.Dock = DockStyle.Fill;
+            HubSetting setting = new HubSetting();
+            setting.DisplayName = "Xmpl";
+            setting.Address = "mrmikejj.co.uk";
+            setting.Port = 1669;
+            setting.Protocol = "Nmdc";
+            hub.Setting = setting;
+        }
 
-            ClientExample.Controls.ExpandablePanel panel2 = new ClientExample.Controls.ExpandablePanel();
-            panel2.TopLabel.Text = "Wiee";
-            //panel2.Panel.Controls.Add(listview);
-            Button b = new Button();
-            b.Text = "Button :D";
-            panel2.Panel.Controls.Add(b);
-            list1.Items.Add(panel2);
-
-
-
+        void hub_Update(object sender, FlowLib.Events.FmdcEventArgs e)
+        {
 
         }
 

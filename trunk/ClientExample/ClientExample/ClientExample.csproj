@@ -55,17 +55,30 @@
     <Compile Include="Client\Interface\MessageWindow.Designer.cs">
       <DependentUpon>MessageWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="Containers\Message.cs" />
     <Compile Include="Controls\ExpandablePanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Controls\ExpandablePanel.Designer.cs">
       <DependentUpon>ExpandablePanel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\HubControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\HubControl.Designer.cs">
+      <DependentUpon>HubControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\List.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Controls\List.Designer.cs">
       <DependentUpon>List.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\MessagePanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\MessagePanel.Designer.cs">
+      <DependentUpon>MessagePanel.cs</DependentUpon>
     </Compile>
     <Compile Include="Guide\Connection\Detect.cs">
       <SubType>Form</SubType>
@@ -127,18 +140,6 @@
     <Compile Include="Guide\UserControlTemplate.Designer.cs">
       <DependentUpon>UserControlTemplate.cs</DependentUpon>
     </Compile>
-    <Compile Include="MainWindow.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="MainWindow.Designer.cs">
-      <DependentUpon>MainWindow.cs</DependentUpon>
-    </Compile>
-    <Compile Include="HubWindow.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="HubWindow.Designer.cs">
-      <DependentUpon>HubWindow.cs</DependentUpon>
-    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Guide\GuideWindow.resx">
@@ -152,9 +153,6 @@
     <EmbeddedResource Include="Guide\UserControlTemplate.resx">
       <DependentUpon>UserControlTemplate.cs</DependentUpon>
       <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="HubWindow.resx">
-      <DependentUpon>HubWindow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -224,12 +222,23 @@
     <EmbeddedResource Include="Images\expand.gif" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Controls\HubControl.resx">
+      <DependentUpon>HubControl.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\List.resx">
       <DependentUpon>List.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Controls\MessagePanel.resx">
+      <DependentUpon>MessagePanel.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Images\pen.gif" />
     <EmbeddedResource Include="Images\user.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Images\ignore.gif" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
