@@ -13,6 +13,7 @@ namespace ClientExample.Controls
     public partial class ExpandablePanel : UserControl
     {
         public event EventHandler<FmdcEventArgs<int, object>> ExpandedChanged;
+        protected delegate void Change();
 
         protected int intExpandedHeight = 0;
         protected bool bExpanded = true;
@@ -26,10 +27,15 @@ namespace ClientExample.Controls
             set
             {
                 bExpanded = value;
-                int h = this.Height;
-                ChangeSize();
-                ExpandedChanged(this, new FmdcEventArgs<int, object>(h, null));
+                Invoke(new Change(OnChangeSize));
             }
+        }
+
+        protected void OnChangeSize()
+        {
+            int h = this.Height;
+            ChangeSize();
+            ExpandedChanged(this, new FmdcEventArgs<int, object>(h, null));
         }
 
         public Label TopLabel
@@ -44,6 +50,7 @@ namespace ClientExample.Controls
 
         public ExpandablePanel()
         {
+            while (Handle == null) { }
             ExpandedChanged = new EventHandler<FmdcEventArgs<int, object>>(ExtendablePanel_ExpandedChanged);
             InitializeComponent();
             intExpandedHeight = this.Height;

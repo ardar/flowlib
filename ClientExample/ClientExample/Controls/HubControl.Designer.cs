@@ -46,7 +46,8 @@
             // 
             // label1
             // 
-            this.label1.Size = new System.Drawing.Size(101, 22);
+            this.label1.ForeColor = System.Drawing.Color.Gray;
+            this.label1.Size = new System.Drawing.Size(79, 22);
             // 
             // listView1
             // 

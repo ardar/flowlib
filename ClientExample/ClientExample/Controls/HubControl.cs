@@ -37,6 +37,12 @@ namespace ClientExample.Controls
             protected set;
         }
 
+        public string Name
+        {
+            get;
+            protected set;
+        }
+
         public HubSetting Setting
         {
             get { return setting; }
@@ -46,13 +52,26 @@ namespace ClientExample.Controls
                 if (connection == null)
                 {
                     Id = string.Format("{0}:{1}", setting.Address, setting.Port);
-                    connection = new Hub(setting, this);
-                    connection.Me.TagInfo.Version = "Xmple V:20080713";
-                    connection.Me.TagInfo.Slots = 2;
-                    connection.ProtocolChange += new FlowLib.Events.FmdcEventHandler(connection_ProtocolChange);
-                    connection.ConnectionStatusChange += new FmdcEventHandler(connection_ConnectionStatusChange);
-                    connection.Connect();
-                    this.TopLabel.Text = Id;
+                    Name = (setting.Name.Length > 0 ? setting.Name : Id);
+                    try
+                    {
+                        connection = new Hub(setting, this);
+                        connection.Me.TagInfo.Version = "Xmple V:20080713";
+                        connection.Me.TagInfo.Slots = 2;
+                        connection.ProtocolChange += new FlowLib.Events.FmdcEventHandler(connection_ProtocolChange);
+                        connection.ConnectionStatusChange += new FmdcEventHandler(connection_ConnectionStatusChange);
+                        if (setting.ContainsKey("Connect"))
+                        {
+                            switch (setting.Get("Connect").ToLower())
+                            {
+                                case "1":   // Auto connect to hub
+                                    connection.Connect();
+                                    break;
+                            }
+                        }
+                    }
+                    catch { /* Invalid addy */ }
+                    this.TopLabel.Text = Name;
                 }
                 else
                     throw new InvalidOperationException("HubSetting can only be set once");

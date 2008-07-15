@@ -135,7 +135,34 @@ namespace ClientExample.Guide.Import
                     clientFrom.Read(comboBox2.Text);
 
                     settings = clientFrom.Hubs;
-                    MessageBox.Show("Convertion has been done");
+
+                    foreach (HubSetting hub in settings)
+                    {
+                        List<string> keysToRemove = new List<string>();
+                        foreach (FlowKeyValuePair<string, string> keyValue in hub.Items)
+                        {
+                            switch (keyValue.Key)
+	                        {
+                                case "Connect":
+                                case "UserListState":
+                                    if (!keyValue.Value.Equals("1"))
+                                        keysToRemove.Add(keyValue.Key);
+                                    break;
+                                case "HeaderOrder":
+                                case "HeaderWidths":
+                                case "HeaderVisible":
+                                    break;
+                                default:
+                                    keysToRemove.Add(keyValue.Key);
+                                    break;
+	                        }
+                        }
+                        foreach (string key in keysToRemove)
+                        {
+                            hub.Remove(key);
+                        }
+                    }
+                    //MessageBox.Show("Convertion has been done");
                 }
             }
             catch (Exception ex)
