@@ -56,7 +56,7 @@ namespace ClientExample.Controls
                     try
                     {
                         connection = new Hub(setting, this);
-                        connection.Me.TagInfo.Version = "Xmple V:20080713";
+                        connection.Me.TagInfo.Version = "Xmple V:20080715";
                         connection.Me.TagInfo.Slots = 2;
                         connection.ProtocolChange += new FlowLib.Events.FmdcEventHandler(connection_ProtocolChange);
                         connection.ConnectionStatusChange += new FmdcEventHandler(connection_ConnectionStatusChange);
