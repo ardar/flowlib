@@ -37,6 +37,16 @@ namespace ClientExample.Guide.Connection
         static int hasPublicReceiveAccess = 0;
         string publicIP = null;
 
+        public string PublicIP
+        {
+            get { return publicIP; }
+        }
+
+        public int Port
+        {
+            get { return 6000; }
+        }
+
         public int Mode
         {
             get

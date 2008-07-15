@@ -41,30 +41,25 @@ namespace ClientExample.Client.Interface
 
             if (messages.Count > 0)
             {
-                MessagePanel panel = null;
-                //System.Windows.Forms.TabPage tab = null;
+                MessageTab tab = null;
                 Message msg = messages.Dequeue();
                 lock (tabControl1)
                 {
                     if (tabControl1.TabPages.ContainsKey(msg.GroupId))
                     {
-                        System.Windows.Forms.TabPage tab = tabControl1.TabPages[msg.GroupId];
-                        panel = tab.Tag as MessagePanel;
+                        tab = (MessageTab)tabControl1.TabPages[msg.GroupId];
                     }
                     else
                     {
-                        System.Windows.Forms.TabPage tab = new System.Windows.Forms.TabPage();
+                        tab = new MessageTab();
                         tab.Name = msg.GroupId;
                         tab.Text = msg.GroupName;
                         tabControl1.TabPages.Add(tab);
-                        tab.Controls.Add(panel = new MessagePanel());
-                        panel.Dock = System.Windows.Forms.DockStyle.Fill;
-                        tab.Tag = panel;
                     }
                 }
 
                 string str = string.Format("[{0}] <{1}> {2}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), msg.From, msg.Content);
-                panel.AddMessage(str);
+                tab.MessagePanel.AddMessage(str);
             }
 
             isUpdating = false;
@@ -86,6 +81,19 @@ namespace ClientExample.Client.Interface
                         return;
                     messages.Enqueue(msg);
                     break;
+                case 1000:      // Update Status
+                    OnlineStatus onlineStatus = e.Data as OnlineStatus;
+                    if (onlineStatus == null)
+                        return;
+                    if (tabControl1.TabPages.ContainsKey(onlineStatus.HubId + onlineStatus.UserId))
+                    {
+                        lock (tabControl1)
+                        {
+                            MessageTab tab = (MessageTab)tabControl1.TabPages[onlineStatus.HubId + onlineStatus.UserId];
+                            tab.OnlineStatus = onlineStatus.Status;
+                        }
+                    }
+                    break;
             }
         }
 
@@ -99,7 +107,9 @@ namespace ClientExample.Client.Interface
 
         private void MessageWindow_Load(object sender, EventArgs e)
         {
-
+            statusImageList.Images.Add(new Bitmap(typeof(Program), @"Images.connecting.gif"));
+            statusImageList.Images.Add(new Bitmap(typeof(Program), @"Images.online.gif"));
+            statusImageList.Images.Add(new Bitmap(typeof(Program), @"Images.offline.gif"));
         }
     }
 }

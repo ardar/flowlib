@@ -46,7 +46,7 @@
             // 
             // label1
             // 
-            this.label1.Size = new System.Drawing.Size(123, 22);
+            this.label1.Size = new System.Drawing.Size(101, 22);
             // 
             // listView1
             // 

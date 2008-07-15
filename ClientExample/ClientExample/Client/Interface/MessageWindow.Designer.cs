@@ -28,18 +28,27 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.statusImageList = new System.Windows.Forms.ImageList(this.components);
             this.SuspendLayout();
             // 
             // tabControl1
             // 
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabControl1.ImageList = this.statusImageList;
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Multiline = true;
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(512, 344);
             this.tabControl1.TabIndex = 0;
+            // 
+            // statusImageList
+            // 
+            this.statusImageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
+            this.statusImageList.ImageSize = new System.Drawing.Size(9, 9);
+            this.statusImageList.TransparentColor = System.Drawing.Color.Transparent;
             // 
             // MessageWindow
             // 
@@ -61,6 +70,7 @@
         #endregion
 
         protected System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.ImageList statusImageList;
 
     }
 }

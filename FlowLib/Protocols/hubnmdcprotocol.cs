@@ -122,7 +122,7 @@ namespace FlowLib.Protocols
 
         void Hub_RegModeUpdated(object sender, FmdcEventArgs e)
         {
-            if (sender != hub && !e.Handled)
+            if (sender != hub && !e.Handled && hub.RegMode >= 0)
             {
                 UpdateMyInfo();
             }
@@ -177,6 +177,7 @@ namespace FlowLib.Protocols
                     break;
             }
             Update(hub, new FmdcEventArgs(Actions.StatusChange, h));
+            hub.Userlist.Clear();
         }
         #endregion
 

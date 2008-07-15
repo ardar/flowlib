@@ -60,6 +60,7 @@ namespace FlowLib.Connections
         protected long keepAliveTicks = System.DateTime.Now.Ticks;
         protected Timer keepAliveTimer;
         protected Timer updateInfoTimer;
+        protected Thread worker = null;
         #region Connection
         protected int regMode = -1;
         #endregion
@@ -224,6 +225,9 @@ namespace FlowLib.Connections
 
         void Hub_ProtocolChange(object sender, FmdcEventArgs e)
         {
+            IProtocol prot = e.Data as IProtocol;
+            if (prot != null)
+                prot.Update -= OnProtocolUpdate;
             if (Protocol != null)
                 this.Protocol.Update += new FmdcEventHandler(OnProtocolUpdate);
         }
@@ -233,11 +237,46 @@ namespace FlowLib.Connections
         /// </summary>
         ~Hub()
         {
-            if (keepAliveTimer != null)
-                keepAliveTimer.Dispose();
+            Dispose();
         }
 
-
+        public override void Dispose()
+        {
+            if (!disposed)
+            {
+                Hub.RegModeUpdated -= Hub_RegModeUpdated;
+                UnknownProtocolId -= OnUnknownProtocolId;
+                ProtocolChange -= Hub_ProtocolChange;
+                base.Dispose();
+                if (updateInfoTimer != null)
+                {
+                    updateInfoTimer.Dispose();
+                    updateInfoTimer = null;
+                }
+                if (keepAliveTimer != null)
+                {
+                    keepAliveTimer.Dispose();
+                    keepAliveTimer = null;
+                }
+                if (worker != null)
+                {
+                    worker.Abort();
+                    worker = null;
+                }
+                if (userlist != null)
+                {
+                    userlist.Clear();
+                    userlist = null;
+                }
+                this.me = null;
+                if (share != null)
+                {
+                    share.LastModifiedChanged -= share_LastModifiedChanged;
+                    this.share = null;
+                }
+                this.fav = null;
+            }
+        }
 
         protected void UpdateShare()
         {
@@ -340,9 +379,9 @@ namespace FlowLib.Connections
                         break;
                 }
             }
-            Thread t = new Thread(new ThreadStart(base.Connect));
-            t.IsBackground = true;
-            t.Start();
+            worker = new Thread(new ThreadStart(base.Connect));
+            worker.IsBackground = true;
+            worker.Start();
         }
 
         public override void Disconnect(string msg)

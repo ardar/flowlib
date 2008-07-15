@@ -120,7 +120,12 @@ namespace ClientExample.Guide
                                 {
                                     allowTabChange = true;
                                 }
-                                Program.Settings.ConnectionMode = ucConnection1.Mode;
+                                Program.Settings.ConnectionMode = detectConnection.Mode;
+                                if (detectConnection.Mode == 2)
+                                {
+                                    Program.Settings.IP = detectConnection.PublicIP;
+                                    Program.Settings.TcpPort = detectConnection.Port;
+                                }
                                 Save();
                                 break;
                             case 1:

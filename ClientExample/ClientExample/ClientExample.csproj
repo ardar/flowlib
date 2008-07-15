@@ -53,11 +53,18 @@
     </Compile>
     <Compile Include="Containers\AppSetting.cs" />
     <Compile Include="Containers\Message.cs" />
+    <Compile Include="Containers\OnlineStatus.cs" />
     <Compile Include="Controls\ExpandablePanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Controls\ExpandablePanel.Designer.cs">
       <DependentUpon>ExpandablePanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\HardDriveInfo.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\HardDriveInfo.Designer.cs">
+      <DependentUpon>HardDriveInfo.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\HubControl.cs">
       <SubType>UserControl</SubType>
@@ -76,6 +83,9 @@
     </Compile>
     <Compile Include="Controls\MessagePanel.Designer.cs">
       <DependentUpon>MessagePanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\MessageTab.cs">
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Guide\Connection\Detect.cs">
       <SubType>Form</SubType>
@@ -101,6 +111,12 @@
     <Compile Include="Guide\Import\Search.Designer.cs">
       <DependentUpon>Search.cs</DependentUpon>
     </Compile>
+    <Compile Include="Guide\Storage\StorageView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Guide\Storage\StorageView.Designer.cs">
+      <DependentUpon>StorageView.cs</DependentUpon>
+    </Compile>
     <Compile Include="Guide\UCConnection.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -124,6 +140,12 @@
     </Compile>
     <Compile Include="Guide\UCInstallationMode.Designer.cs">
       <DependentUpon>UCInstallationMode.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Guide\UCStorageLocations.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Guide\UCStorageLocations.Designer.cs">
+      <DependentUpon>UCStorageLocations.cs</DependentUpon>
     </Compile>
     <Compile Include="Guide\UCWelcome.cs">
       <SubType>UserControl</SubType>
@@ -235,6 +257,14 @@
     <EmbeddedResource Include="Images\user.gif" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Controls\HardDriveInfo.resx">
+      <DependentUpon>HardDriveInfo.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Guide\UCStorageLocations.resx">
+      <DependentUpon>UCStorageLocations.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Images\ignore.gif" />
   </ItemGroup>
   <ItemGroup>
@@ -242,6 +272,19 @@
       <Project>{4C9A3F81-7660-4170-8D6B-62C239922C89}</Project>
       <Name>FlowLib</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Guide\Storage\StorageView.resx">
+      <DependentUpon>StorageView.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images\drive.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Images\away.gif" />
+    <EmbeddedResource Include="Images\connecting.gif" />
+    <EmbeddedResource Include="Images\offline.gif" />
+    <EmbeddedResource Include="Images\online.gif" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
