@@ -5,6 +5,12 @@
 
   _[Todo See Todo for changes still remaining before release]_
 
+  * *Other changes:*
+  * ADD		- Dispose function for TcpConnection and Hub. Disconnects and cleans resources. (You should call this if you dont want hub to reconnect or if you dont want to use the hub object anymore)
+  * FIX		- bug where TcpConnectionListener would throw an objectdisposed exception when calling Start.
+  * FIX		- bug where PM would be identified as MainChat message (ADC only).
+  * FIX		- bug where Userlist wouldnt be cleared when disconnected from hub.
+  * FIX		- bug where hub tried to send/update UserInfo(INF/MyINFO) when connection to hub was not usable.
 
 = 20080628 =
 
