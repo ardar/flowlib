@@ -46,7 +46,7 @@ namespace FlowLib.Connections
     /// <summary>
     /// Class represents a Tcp/Ip connection supporting diffrent protocols
     /// </summary>
-    public abstract class TcpConnection : IConnection
+    public abstract class TcpConnection : IConnection, IDisposable
     {
         /// <summary>
         /// A connection is trying to be made
@@ -88,6 +88,7 @@ namespace FlowLib.Connections
         protected byte[] buffer = new byte[1024];
         protected IProtocol protocol = null;
         protected bool first = true;
+        protected bool disposed = false;
 
 #if !COMPACT_FRAMEWORK
 // Security
@@ -233,7 +234,7 @@ namespace FlowLib.Connections
         }
 
         #endregion
-        #region Constructor(s)
+        #region Constructor(s)/Deconstructor/Dispose
         /// <summary>
         /// Creating TcpConnection
         /// </summary>
@@ -298,8 +299,39 @@ namespace FlowLib.Connections
         /// </summary>
         ~TcpConnection()
         {
-            if (socket != null)
-                socket.Close();
+            Dispose();
+        }
+
+        public virtual void Dispose()
+        {
+            if (!disposed)
+            {
+                ProtocolChange -= OnProtocolChanged;
+                ConnectionStatusChange -= OnConnectionStatusChanged;
+                SecureUpdate -= OnSecureUpdate;
+
+                allDone.Close();
+                buffer = null;
+                localAddress = null;
+                remoteAddress = null;
+                if (socket != null)
+                {
+                    socket.Close();
+                    socket = null;
+                }
+                if (protocol != null)
+                {
+                    protocol.Dispose();
+                    protocol = null;
+                }
+                if (secStream != null)
+                {
+                    secStream.Dispose();
+                    secStream = null;
+                }
+                GC.SuppressFinalize(this);
+                disposed = true;
+            }
         }
 
         #endregion

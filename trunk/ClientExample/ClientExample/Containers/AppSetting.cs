@@ -32,5 +32,17 @@ namespace ClientExample.Containers
             get;
             set;
         }
+
+        public string IP
+        {
+            get;
+            set;
+        }
+
+        public int TcpPort
+        {
+            get;
+            set;
+        }
     }
 }

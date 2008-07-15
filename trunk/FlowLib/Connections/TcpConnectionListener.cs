@@ -59,9 +59,13 @@ namespace FlowLib.Connections
 
         public void Start()
         {
-            // start listening
-            listenSocket.Listen(maximumDependingConnections);
-            SetupConnection(listenSocket);
+            try
+            {
+                // start listening
+                listenSocket.Listen(maximumDependingConnections);
+                SetupConnection(listenSocket);
+            }
+            catch (ObjectDisposedException) { /* End has been called */ }
         }
 
         public void End()

@@ -560,6 +560,7 @@ namespace FlowLib.Protocols.Adc
             if (param.Count >= 1)
             {
                 from = id;
+                to = idtwo;
                 content = param[0];
             }
             // Param

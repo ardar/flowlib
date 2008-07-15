@@ -19,6 +19,11 @@ namespace ClientExample
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+
+            //Guide.Storage.StorageView sv = new ClientExample.Guide.Storage.StorageView();
+            //sv.ShowDialog();
+            //return;
+
             bool hasSettings = true;
             try
             {
