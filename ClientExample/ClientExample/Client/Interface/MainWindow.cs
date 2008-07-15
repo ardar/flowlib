@@ -24,7 +24,10 @@ namespace ClientExample.Client.Interface
         {
             InitializeComponent();
 
-            savedHubs = new List<HubSetting>(Program.Settings.SavedHubs);
+            if (Program.Settings.SavedHubs != null)
+                savedHubs = new List<HubSetting>(Program.Settings.SavedHubs);
+            else
+                savedHubs = new List<HubSetting>();
             timer.Tick += new EventHandler(timer_Tick);
             timer.Interval = 200;
             timer.Start();
@@ -71,38 +74,6 @@ namespace ClientExample.Client.Interface
         private void MainWindow_Load(object sender, EventArgs e)
         {
             toolBtnMessages.Image = new Bitmap(typeof(Program), @"Images.pen.gif");
-            // Hub 1
-            //ClientExample.Controls.HubControl hub = new ClientExample.Controls.HubControl();
-            //msgWindow.AddHub(hub);
-            //list1.Items.Add(hub);
-            //HubSetting setting = new HubSetting();
-            //setting.DisplayName = "Xmpl1";
-            ////setting.Address = "mrmikejj.co.uk";
-            ////setting.Port = 1669;
-            ////setting.Protocol = "Nmdc";
-            //setting.Address = "127.0.0.1";
-            //setting.Port = 411;
-            //setting.Protocol = "Nmdc";
-            //hub.Setting = setting;
-            //hub.Expanded = !hub.Expanded;
-
-            //System.Threading.Thread.Sleep(1000);
-
-            //// Hub 2
-            //ClientExample.Controls.HubControl hub2 = new ClientExample.Controls.HubControl();
-            //msgWindow.AddHub(hub2);
-            //list1.Items.Add(hub2);
-            //HubSetting setting2 = new HubSetting();
-            //setting2.DisplayName = "Xmpl2";
-            ////setting2.Address = "devpublic.adcportal.com";
-            ////setting2.Port = 16591;
-            ////setting2.Protocol = "Adc";
-            //setting2.Address = "127.0.0.1";
-            //setting2.Port = 412;
-            //setting2.Protocol = "Nmdc";
-            //hub2.Setting = setting2;
-            //hub2.Expanded = !hub2.Expanded;
-
         }
 
         private void toolBtnMessages_Click(object sender, EventArgs e)
