@@ -13,6 +13,7 @@ namespace ClientExample.Controls
     public partial class List : UserControl
     {
         protected int intControlsHeight = 0;
+        protected delegate void ChangeItem(object obj);
 
         public ExpandableItems Items
         {
@@ -31,10 +32,30 @@ namespace ClientExample.Controls
         void Items_Added(object sender, FmdcEventArgs<int, ExpandablePanel> e)
         {
             ExpandablePanel panel = e.Data;
+            //ExpandablePanel panel = obj as ExpandablePanel;
             panel.Top = intControlsHeight;
             intControlsHeight += panel.Height;
             panel.ExpandedChanged += new EventHandler<FmdcEventArgs<int, object>>(panel_ExpandedChanged);
             flowLayoutPanel1.Controls.Add(panel);
+            UpdateScrollbarMax();
+            //Invoke(new ChangeItem(OnAdd), panel);
+        }
+
+        void OnAdd(object obj)
+        {
+            ExpandablePanel panel = obj as ExpandablePanel;
+            panel.Top = intControlsHeight;
+            intControlsHeight += panel.Height;
+            panel.ExpandedChanged += new EventHandler<FmdcEventArgs<int, object>>(panel_ExpandedChanged);
+            flowLayoutPanel1.Controls.Add(panel);
+            UpdateScrollbarMax();
+        }
+
+        void OnRemove(object obj)
+        {
+            ExpandablePanel panel = obj as ExpandablePanel;
+            flowLayoutPanel1.Controls.Remove(panel);
+            intControlsHeight -= panel.Height;
             UpdateScrollbarMax();
         }
 
@@ -57,9 +78,12 @@ namespace ClientExample.Controls
         void Items_Removed(object sender, FmdcEventArgs<int, ExpandablePanel> e)
         {
             e.Data.ExpandedChanged -= panel_ExpandedChanged;
-            Controls.Remove(e.Data);
-            intControlsHeight -= e.Data.Height;
+            ExpandablePanel panel = e.Data;
+            flowLayoutPanel1.Controls.Remove(panel);
+            intControlsHeight -= panel.Height;
             UpdateScrollbarMax();
+
+            //Invoke(new ChangeItem(OnRemove), e.Data);
         }
         protected void UpdateScrollbarMax()
         {
