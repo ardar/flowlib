@@ -4,7 +4,7 @@
 = Clients =
 
    * .Nothing.
-   * Xmpl
+   * [http://code.google.com/p/xmpl/ Xmpl]
 
 = Bots =
 
