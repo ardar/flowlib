@@ -314,6 +314,7 @@ namespace FlowLib.Connections
                 buffer = null;
                 localAddress = null;
                 remoteAddress = null;
+                Disconnect("Dispose");
                 if (socket != null)
                 {
                     socket.Close();
