@@ -89,6 +89,7 @@ namespace FlowLib.Connections
         protected IProtocol protocol = null;
         protected bool first = true;
         protected bool disposed = false;
+        protected bool disposing = false;
 
 #if !COMPACT_FRAMEWORK
 // Security
@@ -185,6 +186,16 @@ namespace FlowLib.Connections
 
         }
 #endif
+        public bool IsDisposed
+        {
+            get { return disposed; }
+        }
+
+        public bool IsDisposing
+        {
+            get { return disposing; }
+        }
+
         /// <summary>
         /// Sharing instance for this transfer
         /// </summary>
@@ -306,6 +317,7 @@ namespace FlowLib.Connections
         {
             if (!disposed)
             {
+                disposing = true;
                 ProtocolChange -= OnProtocolChanged;
                 ConnectionStatusChange -= OnConnectionStatusChanged;
                 SecureUpdate -= OnSecureUpdate;
@@ -332,6 +344,7 @@ namespace FlowLib.Connections
                 }
                 GC.SuppressFinalize(this);
                 disposed = true;
+                disposing = false;
             }
         }
 
