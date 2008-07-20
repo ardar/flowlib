@@ -7,11 +7,16 @@
 
   * *Other changes:*
   * ADD		- Dispose function for TcpConnection and Hub. Disconnects and cleans resources. (You should call this if you dont want hub to reconnect or if you dont want to use the hub object anymore)
+    * IsDisposed shows if object has been disposed or not.
+    * IsDisposing shows if object is about to be disposed (can be read on ConnectionStatusChange event).
+
   * FIX		- bug where TcpConnectionListener would throw an objectdisposed exception when calling Start.
   * FIX		- bug where PM would be identified as MainChat message (ADC only).
   * FIX		- bug where Userlist wouldnt be cleared when disconnected from hub.
   * FIX		- bug where hub tried to send/update UserInfo(INF/MyINFO) when connection to hub was not usable.
+
   * CHANGE	- Nmdc implementation so it is more like Adc implementation. When you send a PM you will receive the same message from hub. *(OBS! This may break your implementation)*
+
 
 = 20080628 =
 
