@@ -591,7 +591,9 @@ namespace FlowLib.Protocols
             else if (e.Action.Equals(Actions.PrivateMessage))
             {
                 Containers.PrivateMessage pm = (Containers.PrivateMessage)e.Data;
-                hub.Send(new To(hub, pm.To, pm.Content));
+                To to = null;
+                hub.Send(to = new To(hub, pm.To, pm.Content));
+                this.ParseRaw(to.Raw);
             }
             else if (e.Action.Equals(Actions.Password))
             {
