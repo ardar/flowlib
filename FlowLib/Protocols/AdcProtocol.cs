@@ -203,8 +203,9 @@ namespace FlowLib.Protocols
                 INF tmp = new INF(hub, hub.Me);
                 if (lastInf == null || (tmp.Raw != lastInf.Raw))
                 {
+                    INF computed = INF.MakeInfFromDifference(tmp, lastInf);
                     lastInf = tmp;
-                    hub.Send(lastInf);
+                    hub.Send(computed);
                     infLastUpdated = System.DateTime.Now.Ticks;
                     updateInfTimer.Change(Timeout.Infinite, Timeout.Infinite);
                 }

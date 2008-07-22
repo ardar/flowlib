@@ -881,6 +881,64 @@ namespace FlowLib.Protocols.Adc
             CreateRaw();
         }
 
+        /// <summary>
+        /// Compares 2 INF against eachother and then create a new one containing stuff that is different
+        /// </summary>
+        /// <param name="inf1"></param>
+        /// <param name="inf2"></param>
+        /// <returns></returns>
+        public static INF MakeInfFromDifference(INF inf1, INF inf2)
+        {
+            if (inf2 == null)
+                return inf1;
+            System.Text.StringBuilder sb = new System.Text.StringBuilder(inf1.Type + inf1.Action);
+            bool hasId = false;
+            bool hasId2 = false;
+            switch (inf1.Type)
+            {
+                case "B":       // Broadcast Message
+                case "U":       // UDP Message
+                    hasId = true;
+                    break;
+                case "E":       // Echo message
+                case "D":       // Direct message
+                    hasId = true;
+                    hasId2 = true;
+                    break;
+                case "C":       // Client Message
+                case "I":       // Info message
+                default:        // Unknown types
+                    break;
+            }
+            if (hasId)
+                sb.Append(" " + inf1.Id);
+            if (hasId2)
+                sb.Append(" " + inf1.IDTwo);
+
+            for (int x1 = 0; x1 < inf1.Param.Count; x1++)
+            {
+                bool found = false;
+                for (int x2 = 0; x2 < inf2.Param.Count; x2++)
+			    {
+                    if (inf1.Param[x1].Equals(inf2.Param[x2]))
+                    {
+                        found = true;
+                        break;
+                    }
+			    }
+
+                // We havnt found a match. Add this one.
+                if (!found)
+                    sb.Append(" " + inf1.Param[x1]);
+
+            }
+
+            sb.Append("\n");
+            // [20:37:58] BINF GQEH IDZE4ZCKFL5KEX7H7AXQW2Q7BCVLRG4AODPWJHP5Q PDAOY7W7NO2CEFQVEPQDIAP7UNNMI6L6VQSZPJY3I DE HN0 HO0 HR0 NIXmpl-633523558744590000 SL2 SF0 SS0 VEXmple\sV:20080720
+            // [20:44:00] BINF GQEH IDZE4ZCKFL5KEX7H7AXQW2Q7BCVLRG4AODPWJHP5Q PDAOY7W7NO2CEFQVEPQDIAP7UNNMI6L6VQSZPJY3I DE HN1 HO0 HR0 NIXmpl-633523558744590000 SL2 SF0 SS0 VEXmple\sV:20080720
+            return new INF(inf1.con, sb.ToString());
+        }
+
         private void CreateRaw()
         {
             if (info == null)
