@@ -11,3 +11,4 @@
    * SpeedBot _(1.0)_
    * FlowConverter
    * [http://cube3d.pikarde.com/website/dcsync.aspx dcSync]
+   * CapT Bot
