@@ -56,6 +56,7 @@ namespace FlowLib.Connections
         protected long interval = 120;
         protected User me = null;
         protected SortedList<string, User> userlist = new SortedList<string, User>();
+        protected IBaseUpdater baseUpdater = null;
         // For Connection Keepalive
         protected long keepAliveTicks = System.DateTime.Now.Ticks;
         protected Timer keepAliveTimer;
@@ -213,7 +214,10 @@ namespace FlowLib.Connections
             #endregion
             #region Event(s)
             if (gui != null)
+            {
                 gui.UpdateBase += new FmdcEventHandler(OnUpdateBase);
+                baseUpdater = gui;
+            }
             #endregion
             //FireUpdate(Actions.Name, new HubName(HubSetting.Address + ":" + HubSetting.Port.ToString()));
             #region Keep Alive
@@ -244,10 +248,12 @@ namespace FlowLib.Connections
         {
             if (!disposed)
             {
+                if (baseUpdater != null)
+                    baseUpdater.UpdateBase -= OnUpdateBase;
+                base.Dispose();
                 Hub.RegModeUpdated -= Hub_RegModeUpdated;
                 UnknownProtocolId -= OnUnknownProtocolId;
                 ProtocolChange -= Hub_ProtocolChange;
-                base.Dispose();
                 if (updateInfoTimer != null)
                 {
                     updateInfoTimer.Dispose();
