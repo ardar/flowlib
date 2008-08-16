@@ -402,9 +402,15 @@ namespace FlowLib.Protocols
             }
             else
             {
-                //if (ParseRaw(Encoding.GetString(b, 0, length)))
-                //    trans.Protocol.ParseRaw(b, length);
-                ParseRaw(Encoding.GetString(b, 0, length));
+                if (ParseRaw(Encoding.GetString(b, 0, length)))
+                {
+                    if (trans != null)
+                    {
+                        ITransfer tmpTrans = trans;
+                        trans.Protocol = new TransferNmdcProtocol(trans);
+                        tmpTrans.Protocol.ParseRaw(b, length);
+                    }
+                }
             }
         }
 
@@ -428,10 +434,6 @@ namespace FlowLib.Protocols
             {
                 if (trans != null)
                 {
-                    ITransfer tmpTrans = trans;
-                    byte[] bytes = Encoding.GetBytes(raw);
-                    trans.Protocol = new TransferNmdcProtocol(trans);
-                    tmpTrans.Protocol.ParseRaw(bytes, bytes.Length);
                     return true;
                 }
                 else if (hub != null)
@@ -1156,6 +1158,10 @@ namespace FlowLib.Protocols
             else if (e.Action.Equals(Actions.Password))
             {
                 hub.Send(new PAS(hub, this.gpaString, e.Data.ToString()));
+            }
+            else if (e.Action.Equals(Actions.Search) && hub != null)
+            {
+                hub.Send(new SCH(hub, (SearchInfo)e.Data, hub.Me.ID));
             }
             else if (e.Action.Equals(Actions.StartTransfer) && hub != null)
             {

@@ -433,6 +433,7 @@ namespace FlowLib.Connections
                     this.ConnectionStatusChange(this, new FmdcEventArgs(Disconnected));
                 }
             }
+            catch (ObjectDisposedException) { }
             catch (SocketException se)
             {
                 // Change Connection Status
