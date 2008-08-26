@@ -72,7 +72,18 @@ namespace FlowLib.Protocols
 
         public System.Text.Encoding Encoding
         {
-            get { return System.Text.Encoding.Default; }
+            //get { return System.Text.Encoding.Default; }
+            get
+			{
+				try {
+					return System.Text.Encoding.GetEncoding(1252);
+				} catch (System.Exception e) {
+					System.Console.WriteLine(e.ToString());
+					throw;
+				}
+				
+			}
+			// 
         }
         public string Seperator
         {
