@@ -27,6 +27,7 @@ namespace FlowLib.Containers
     {
         protected ContentInfo info = null;
         protected string userid = null;
+		protected string token = null;
 
         public ContentInfo Info
         {
@@ -39,11 +40,23 @@ namespace FlowLib.Containers
             get { return userid; }
             set { userid = value; }
         }
+		
+		public string Token
+		{
+			get { return token; }
+			set { token = value; }
+		}
 
         public SearchResultInfo(ContentInfo info, string userid)
         {
             this.info = info;
             this.userid = userid;
         }
+		
+		public SearchResultInfo(ContentInfo info, string userid, string token)
+			: this(info, userid)
+		{
+			this.token = token;
+		}
     }
 }
