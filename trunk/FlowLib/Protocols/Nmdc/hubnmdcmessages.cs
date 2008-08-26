@@ -328,7 +328,7 @@ namespace FlowLib.Protocols.HubNmdc
                 + tag
                 + "$ $"
                 + info.Connection
-                + System.Text.Encoding.ASCII.GetString(new byte[] { ConvertStatusFlagToByte(status) }) + "$"
+                + hub.Protocol.Encoding.GetString(new byte[] { ConvertStatusFlagToByte(status) }) + "$"
                 + info.Email + "$"
                 + info.Share
                 + "$|";
@@ -363,7 +363,7 @@ namespace FlowLib.Protocols.HubNmdc
             for (int i = 1; i < lck.Length; i++)
             {
                 //arrChar[i] = lck[i];
-                byte[] test = System.Text.Encoding.Default.GetBytes(new char[] { lck[i] });
+                byte[] test = hub.Protocol.Encoding.GetBytes(new char[] { lck[i] });
                 arrChar[i] = (char)test[0];
                 arrRet[i] = arrChar[i] ^ arrChar[i - 1];
             }
@@ -384,7 +384,7 @@ namespace FlowLib.Protocols.HubNmdc
                         sKey += string.Format("/%DCN{0:000}%/", j);
                         break;
                     default:
-                        sKey += System.Text.Encoding.Default.GetChars(new byte[] { System.Convert.ToByte((char)j) })[0];
+                        sKey += hub.Protocol.Encoding.GetChars(new byte[] { System.Convert.ToByte((char)j) })[0];
                         break;
                 }
             }
@@ -393,10 +393,10 @@ namespace FlowLib.Protocols.HubNmdc
                 IsValid = true;
         }
 
-        protected static char Chr(byte src)
-        {
-            return (System.Text.Encoding.Default.GetChars(new byte[] { src })[0]);
-        }
+    //    protected static char Chr(byte src)
+    //    {
+    //        return (hub.Protocol.Encoding.GetChars(new byte[] { src })[0]);
+    //    }
     }
     /// <summary>
     /// Class name is NOT a spell mistake.
