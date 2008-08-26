@@ -698,7 +698,7 @@ namespace FlowLib.Protocols
             else if (message is RES)
             {
                 RES res = (RES)message;
-                SearchResultInfo srinfo = new SearchResultInfo(res.Info, res.Id);
+                SearchResultInfo srinfo = new SearchResultInfo(res.Info, res.Id, res.Token);
                 if (hub != null)
                     Update(con, new FmdcEventArgs(Actions.SearchResult, srinfo));
             }
