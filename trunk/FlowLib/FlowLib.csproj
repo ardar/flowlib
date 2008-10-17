@@ -34,8 +34,6 @@
     <OutputType>Library</OutputType>
     <AssemblyName>FlowLib</AssemblyName>
     <RootNamespace>FlowLib</RootNamespace>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -52,8 +50,6 @@
     <AssemblyName>FlowLib</AssemblyName>
     <DebugSymbols>true</DebugSymbols>
     <RootNamespace>FlowLib</RootNamespace>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -200,6 +196,9 @@
     <Compile Include="Utils\StringOperations.cs" />
     <Compile Include="Utils\WebOperations.cs" />
     <Compile Include="Utils\Convert\Settings\Xmpl.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Utils\UPnP\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
