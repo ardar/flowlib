@@ -566,7 +566,10 @@ namespace FlowLib.Protocols
                 {
                     trans.DownloadItem.ContentInfo.Size = sending.Length;
                     trans.DownloadItem.SegmentSize = sending.Length;
-                    trans.CurrentSegment = trans.DownloadItem.GetAvailable();
+                    if ((trans.CurrentSegment = trans.DownloadItem.GetAvailable()).Index != -1)
+                    {
+                        trans.DownloadItem.Start(trans.CurrentSegment.Index, trans.Source);
+                    }
                 }
                 else if (trans.CurrentSegment.Length != sending.Length)
                 {
@@ -582,7 +585,10 @@ namespace FlowLib.Protocols
                 {
                     trans.DownloadItem.ContentInfo.Size = fileLength.Length;
                     trans.DownloadItem.SegmentSize = fileLength.Length;
-                    trans.CurrentSegment = trans.DownloadItem.GetAvailable();
+                    if ((trans.CurrentSegment = trans.DownloadItem.GetAvailable()).Index != -1)
+                    {
+                        trans.DownloadItem.Start(trans.CurrentSegment.Index, trans.Source);
+                    }
                 }
                 else if (trans.CurrentSegment.Length != fileLength.Length)
                 {
@@ -603,7 +609,10 @@ namespace FlowLib.Protocols
                 {
                     trans.DownloadItem.ContentInfo.Size = adcsnd.Length;
                     trans.DownloadItem.SegmentSize = adcsnd.Length;
-                    trans.CurrentSegment = trans.DownloadItem.GetAvailable();
+                    if ((trans.CurrentSegment = trans.DownloadItem.GetAvailable()).Index != -1)
+                    {
+                        trans.DownloadItem.Start(trans.CurrentSegment.Index, trans.Source);
+                    }
                 }
                 else if (trans.CurrentSegment.Length != adcsnd.Length)
                 {
