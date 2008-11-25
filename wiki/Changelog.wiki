@@ -23,7 +23,7 @@
   * ADD		- Token in SearchResultInfo (For Adc)
   * CHANGE/FIX		- We are now using codepage 1252 for encoding Nmdc messages (We used system default before. *This may break your implementation*). This means you need to have _codepage 1252_ installed to have Nmdc connection working (make sure you have _libmono-i18n2.0-cil_ installed if you are running Ubuntu+Mono)
   * ADD		- Converting hub settings to/from Xmpl client (http://code.google.com/p/xmpl/)
-
+  * CHANGE		- Encoding for protocols can now be set.
 
 
 
