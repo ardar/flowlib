@@ -90,12 +90,13 @@ namespace FlowLib.Interfaces
         bool OnSend(IConMessage msg);
         /// <summary>
         /// Gets/sets Encoding to use to for raw representation.
-        /// NMDC = Encoding.Default
+        /// NMDC = System.Text.Encoding.GetEncoding(1252)
         /// ADC  = Encoding.UTF8
         /// </summary>
         System.Text.Encoding Encoding
         {
             get;
+            set;
         }
         /// <summary>
         /// Gets/sets what string pattern that should indicate a new command.

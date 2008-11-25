@@ -50,6 +50,7 @@ namespace FlowLib.Protocols
         protected bool firstMsg = true;
         protected bool rawData = false;
         protected bool disposed = false;
+        protected Encoding currentEncoding = null;
 
         // INF updating
         protected long infLastUpdated = 0;
@@ -101,7 +102,18 @@ namespace FlowLib.Protocols
         }
         public System.Text.Encoding Encoding
         {
-            get { return System.Text.Encoding.UTF8; }
+            get
+            {
+                if (currentEncoding == null)
+                {
+                    currentEncoding = System.Text.Encoding.UTF8;
+                }
+                return currentEncoding;
+            }
+            set
+            {
+                currentEncoding = value;
+            }
         }
         public string Seperator
         {

@@ -41,6 +41,7 @@ namespace FlowLib.Protocols
         public event FmdcEventHandler MessageReceived;
         public event FmdcEventHandler MessageToSend;
         public event FmdcEventHandler Update;
+        protected System.Text.Encoding currentEncoding = null;
 
         public IConMessage KeepAliveCommand
         {
@@ -56,7 +57,26 @@ namespace FlowLib.Protocols
         }
         public Encoding Encoding
         {
-            get { return System.Text.Encoding.Default; }
+            //get { return System.Text.Encoding.Default; }
+            get
+            {
+                if (currentEncoding == null)
+                {
+                    try
+                    {
+                        currentEncoding = System.Text.Encoding.GetEncoding(1252);
+                    }
+                    catch (System.Exception e)
+                    {
+                        throw new System.NotSupportedException("Exception throwed when trying to retrieve Encoding page: 1252.", e);
+                    }
+                }
+                return currentEncoding;
+            }
+            set
+            {
+                currentEncoding = value;
+            }
         }
         public string Seperator
         {

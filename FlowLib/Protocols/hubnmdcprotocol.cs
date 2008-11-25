@@ -54,6 +54,7 @@ namespace FlowLib.Protocols
         protected Supports hubSupport = null;
         protected Timer updateMyInfoTimer;
         protected bool disposed = false;
+        protected Encoding currentEncoding = null;
         #endregion
         #region Properties
         public string Name
@@ -75,15 +76,20 @@ namespace FlowLib.Protocols
             //get { return System.Text.Encoding.Default; }
             get
 			{
-				try {
-					return System.Text.Encoding.GetEncoding(1252);
-				} catch (System.Exception e) {
-					System.Console.WriteLine(e.ToString());
-					throw;
-				}
-				
-			}
-			// 
+                if (currentEncoding == null)
+                {
+				    try {
+					    currentEncoding = System.Text.Encoding.GetEncoding(1252);
+				    } catch (System.Exception e) {
+                        throw new System.NotSupportedException("Exception throwed when trying to retrieve Encoding page: 1252.", e);
+				    }
+                }
+                return currentEncoding;
+            }
+            set
+            {
+                currentEncoding = value;
+            }
         }
         public string Seperator
         {
