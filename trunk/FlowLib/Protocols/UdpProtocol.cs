@@ -57,6 +57,7 @@ namespace FlowLib.Protocols
         public Encoding Encoding
         {
             get { return null; }
+            set { }
         }
         public string Seperator
         {
