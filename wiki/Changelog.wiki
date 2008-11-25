@@ -19,11 +19,12 @@
       * LAST INF:BINF GQEH IDZE4ZCKFL5KEX7H7AXQW2Q7BCVLRG4AODPWJHP5Q PDAOY7W7NO2CEFQVEPQDIAP7UNNMI6L6VQSZPJY3I DE HN0 HO0 HR0 NIXmpl-633523558744590000 SL2 SF0 SS0 VEXmple\sV:20080720
       * Current INF:BINF GQEH IDZE4ZCKFL5KEX7H7AXQW2Q7BCVLRG4AODPWJHP5Q PDAOY7W7NO2CEFQVEPQDIAP7UNNMI6L6VQSZPJY3I DE HN1 HO0 HR0 NIXmpl-633523558744590000 SL2 SF0 SS0 VEXmple\sV:20080720
       * Will give this new INF: BINF GQEH HN1
-  * FIX		- [http://code.google.com/p/flowlib/issues/detail?id=11 Issue 11]
+  * FIX		- Encoding problem when protocol was set to Auto. Thanks to arctic.bot for reporting. [http://code.google.com/p/flowlib/issues/detail?id=11 Issue 11]
   * ADD		- Token in SearchResultInfo (For Adc)
   * CHANGE/FIX		- We are now using codepage 1252 for encoding Nmdc messages (We used system default before. *This may break your implementation*). This means you need to have _codepage 1252_ installed to have Nmdc connection working (make sure you have _libmono-i18n2.0-cil_ installed if you are running Ubuntu+Mono)
   * ADD		- Converting hub settings to/from Xmpl client (http://code.google.com/p/xmpl/)
-  * CHANGE		- Encoding for protocols can now be set.
+  * FIX		- SegmentStarted event was not trigged for filelists and files with unknown size. Thanks hackward for reporting. [http://code.google.com/p/flowlib/issues/detail?id=14 Issue 14].
+  * CHANGE		- Encoding for protocols can now be set. Thanks hackward for reporting [http://code.google.com/p/flowlib/issues/detail?id=15 Issue 15].
 
 
 
