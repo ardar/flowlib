@@ -525,7 +525,8 @@ namespace FlowLib.Protocols
                 INF inf = (INF)message;
                 if (hub != null && inf.Type.Equals("I"))
                 {
-                    //if (inf.Hub.RegMode == -1)    // TODO : We shouldnt have RegMode == 0 here. Fix it.
+                    if (hub.RegMode < 0)
+                        hub.RegMode = 0;
                     UpdateInf();
                     Info = inf.UserInfo;
                     if (hub != null && Info.Description == null)
@@ -594,8 +595,6 @@ namespace FlowLib.Protocols
                         usr.UserInfo = inf.UserInfo;
                         Update(con, new FmdcEventArgs(Actions.UserInfoChange, usr.UserInfo));
                     }
-                    if (hub.RegMode < 0 && hub.Me.ID == inf.Id)
-                        Update(con, new FmdcEventArgs(Actions.RegMode, 0));
                 }
             }
             #endregion

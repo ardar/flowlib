@@ -590,7 +590,14 @@ namespace FlowLib.Protocols.HubNmdc
                 case FlowLib.Enums.ConnectionTypes.Direct:
                 case FlowLib.Enums.ConnectionTypes.UPnP:
                 case FlowLib.Enums.ConnectionTypes.Forward:
-                    id = string.Format("{0}:{1}", hub.LocalAddress.Address, hub.Share.Port);
+                    if (hub.Me.ContainsKey(UserInfo.IP))
+                    {
+                        id = string.Format("{0}:{1}", hub.Me.Get(UserInfo.IP), hub.Share.Port);
+                    }
+                    else
+                    {
+                        id = string.Format("{0}:{1}", hub.LocalAddress.Address, hub.Share.Port);
+                    }
                     break;
                 default:
                     id = string.Format("Hub:{0}", hub.Me.ID);
