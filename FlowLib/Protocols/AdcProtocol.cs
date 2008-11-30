@@ -602,7 +602,7 @@ namespace FlowLib.Protocols
             else if (message is MSG && hub != null)
             {
                 MSG msg = (MSG)message;
-                if (msg.To == null)
+                if (msg.PmGroup == null)
                 {
                     MainMessage main = new MainMessage(msg.From, msg.Content);
                     Update(con, new FmdcEventArgs(Actions.MainMessage, main));

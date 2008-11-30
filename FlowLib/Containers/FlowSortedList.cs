@@ -98,7 +98,8 @@ namespace FlowLib.Containers
         /// Adds an object to the list.
         /// </summary>
         /// <param name="item">The object to be added</param>
-        public void Add(T item)
+        /// <returns>returns pos it has been added on</returns>
+        public int Add(T item)
         {
             #region Checks where to add Item
             int pos = 0;
@@ -116,6 +117,7 @@ namespace FlowLib.Containers
             #endregion
             // TODO : Get pos where to add item.
             list1.Insert(pos, item);    // This will insert item before the current 0 item.
+            return pos;
         }
         /// <summary>
         /// Adds the elements of the specified collection.
@@ -136,13 +138,15 @@ namespace FlowLib.Containers
         /// Removes the first occurrence of a specific object
         /// </summary>
         /// <param name="item">The object to be removed</param>
-        public void Remove(T item)
+        /// <returns>returns -1 if item wasn't found. Else it will return pos where it removed item</returns>
+        public int Remove(T item)
         {
             int pos = Find(item);
             if (pos != -1)
             {
                 list1.RemoveAt(pos);
             }
+            return pos;
         }
         /// <summary>
         /// Removes the element at the specified index.
