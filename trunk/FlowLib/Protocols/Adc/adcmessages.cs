@@ -469,6 +469,13 @@ namespace FlowLib.Protocols.Adc
                     case "TO":
                         token = value;
                         break;
+                    case "TR":
+                        info.Set(ContentInfo.TTH, value);
+                        break;
+                    default:
+                        // We dont know this value but to allow developer to support this anyway we will store it.
+                        info.Set(key, value);
+                        break;
                 }
             }
         }
