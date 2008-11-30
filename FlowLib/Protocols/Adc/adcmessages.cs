@@ -354,7 +354,7 @@ namespace FlowLib.Protocols.Adc
                 string[] ext = info.Get(SearchInfo.EXTENTION).Split(' ');
                 foreach (string extention in ext)
                 {
-                    sb.Append(" EX" + extention);
+                    sb.Append(" EX" + AdcProtocol.ConvertOutgoing(extention));
                 }
             }
             #endregion
@@ -449,7 +449,7 @@ namespace FlowLib.Protocols.Adc
                 switch (key)
                 {
                     case "FN":
-                        info.Set(ContentInfo.VIRTUAL, value);
+                        info.Set(ContentInfo.VIRTUAL, AdcProtocol.ConvertIncomming(value));
                         valid = true;
                         break;
                     case "SI":
@@ -515,7 +515,7 @@ namespace FlowLib.Protocols.Adc
 
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
             if (info.ContainsKey(ContentInfo.VIRTUAL))
-                sb.Append(" FN" + info.Get(ContentInfo.VIRTUAL));
+                sb.Append(" FN" + AdcProtocol.ConvertOutgoing(info.Get(ContentInfo.VIRTUAL)));
             sb.Append(" SI" + info.Size.ToString());
             if (!string.IsNullOrEmpty(token))
                 sb.Append(" TO" + token);
