@@ -30,7 +30,8 @@
   * FIX		- ADC search results now includes TTH if available.
   * CHANGE		- All unknown params in search results are now stored so developer can add support for it even if FlowLib doesn't support it yet. (ADC only)
   * FIX		- Bug where search and search results wasn't converted to right format. (ADC Only)
-
+  * CHANGE		- FlowSortedList now returns position when a item is added/removed from list.
+  * FIX		- Bug where we used direct instead of echo messages for Private messages in ADC.
 
 
 
