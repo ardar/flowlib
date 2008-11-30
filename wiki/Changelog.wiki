@@ -25,7 +25,11 @@
   * ADD		- Converting hub settings to/from Xmpl client (http://code.google.com/p/xmpl/)
   * FIX		- SegmentStarted event was not trigged for filelists and files with unknown size. Thanks hackward for reporting. [http://code.google.com/p/flowlib/issues/detail?id=14 Issue 14].
   * CHANGE		- Encoding for protocols can now be set. Thanks hackward for reporting [http://code.google.com/p/flowlib/issues/detail?id=15 Issue 15].
-
+  * FIX		- Bug that made hub count wrong if you was just connected to one ADC hub. Thanks to ??? for reporting.
+  * FIX		- Bug that made active searches to send wrong ip to hub.
+  * FIX		- ADC search results now includes TTH if available.
+  * CHANGE		- All unknown params in search results are now stored so developer can add support for it even if FlowLib doesn't support it yet. (ADC only)
+  * FIX		- Bug where search and search results wasn't converted to right format. (ADC Only)
 
 
 
