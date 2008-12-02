@@ -32,9 +32,21 @@ namespace FlowLib.Containers
     /// <typeparam name="T"></typeparam>
     public class FlowSortedList<T> : System.Collections.Generic.IEnumerable<T>
     {
+        #region Delegates
+        public delegate void SingleChangedDelegate(int pos, T item);
+        public delegate void ClearedDelegate(int prevCount);
+        public delegate void SortedDelegate(IComparer<T> comp);
+        #endregion
         #region Variables
-        private List<T> list1 = new List<T>();
-        private IComparer<T> comparer;
+        protected List<T> list1 = new List<T>();
+        protected IComparer<T> comparer;
+        protected bool trigger = false;
+        #endregion
+        #region Events
+        public event SingleChangedDelegate ItemAdded;
+        public event SingleChangedDelegate ItemRemoved;
+        public event ClearedDelegate ItemsRemoved;
+        public event SortedDelegate ItemsSorted;
         #endregion
         #region Properties
         /// <summary>
@@ -53,6 +65,16 @@ namespace FlowLib.Containers
         {
             get { return list1.Count; }
         }
+        public bool TriggerEvents
+        {
+            get { return trigger; }
+            set { trigger = value; }
+        }
+
+        public IComparer<T> Comparer
+        {
+            get { return comparer; }
+        }
         #endregion
         #region Constructor
         /// <summary>
@@ -61,7 +83,17 @@ namespace FlowLib.Containers
         public FlowSortedList()
         {
             comparer = Comparer<T>.Default;
+            ItemAdded = new FlowSortedList<T>.SingleChangedDelegate(FlowSortedList_ItemAdded);
+            ItemRemoved = new FlowSortedList<T>.SingleChangedDelegate(FlowSortedList_ItemRemoved);
+            ItemsRemoved = new FlowSortedList<T>.ClearedDelegate(FlowSortedList_ItemsRemoved);
+            ItemsSorted = new FlowSortedList<T>.SortedDelegate(FlowSortedList_ItemsSorted);
         }
+
+        void FlowSortedList_ItemsSorted(IComparer<T> comp) {}
+        void FlowSortedList_ItemsRemoved(int prevCount) {}
+        void FlowSortedList_ItemRemoved(int pos, T item) {}
+        void FlowSortedList_ItemAdded(int pos, T item) { }
+
         /// <summary>
         /// Initializes a new instance of the FlowSortedList with the specified comparer.
         /// </summary>
@@ -70,10 +102,40 @@ namespace FlowLib.Containers
         /// elements, or null to use the default comparer System.Collections.Generic.Comparer<T>.Default.
         /// </param>
         public FlowSortedList(IComparer<T> comp)
+            : this()
         {
             if (comp == null)
                 comp = Comparer<T>.Default;
             comparer = comp;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the FlowSortedList
+        /// that contains elements copied from the specified collection and has sufficient
+        /// capacity to accommodate the number of elements copied.
+        /// </summary>
+        /// <param name="listToCopy">The collection whose elements are copied to the new list.</param>
+        /// <param name="comp">
+        /// The System.Collections.Generic.IComparer<T> implementation to use when comparing
+        /// elements, or null to use the default comparer System.Collections.Generic.Comparer<T>.Default.
+        /// </param>
+        public FlowSortedList(FlowSortedList<T> listToCopy)
+            : this()
+        {
+            list1 = new List<T>(listToCopy.list1);
+        }
+        /// <summary>
+        /// Initializes a new instance of the FlowSortedList
+        /// that contains elements copied from the specified collection and has sufficient
+        /// capacity to accommodate the number of elements copied.
+        /// </summary>
+        /// <param name="listToCopy">The collection whose elements are copied to the new list.</param>
+        public FlowSortedList(FlowSortedList<T> listToCopy,IComparer<T> comp)
+            : this(listToCopy)
+        {
+            if (comp == null)
+                comp = Comparer<T>.Default;
+            Sort(comp);
         }
         #endregion
         #region Functions
@@ -117,6 +179,8 @@ namespace FlowLib.Containers
             #endregion
             // TODO : Get pos where to add item.
             list1.Insert(pos, item);    // This will insert item before the current 0 item.
+            if (trigger)
+                ItemAdded(pos, item);
             return pos;
         }
         /// <summary>
@@ -145,6 +209,8 @@ namespace FlowLib.Containers
             if (pos != -1)
             {
                 list1.RemoveAt(pos);
+                if (trigger)
+                    ItemRemoved(pos, item);
             }
             return pos;
         }
@@ -164,7 +230,10 @@ namespace FlowLib.Containers
         /// </summary>
         public void Clear()
         {
+            int count = list1.Count;
             list1.Clear();
+            if (trigger)
+                ItemsRemoved(count);
         }
         /// <summary>
         /// Searches for an object and returns the pos in list.
@@ -176,10 +245,8 @@ namespace FlowLib.Containers
             int pos = Find(item, 0, list1.Count);
             if (pos >= 0 && pos < list1.Count)
             {
-                if (list1[pos].Equals(item))
-                {
+                if (comparer.Compare(list1[pos], item) == 0)
                     return pos;
-                }
             }
             return -1;
         }
@@ -191,7 +258,7 @@ namespace FlowLib.Containers
         /// <param name="start">Start pos of range</param>
         /// <param name="end">End pos of range</param>
         /// <returns>Pos where object is or should be</returns>
-        private int Find(T finditem, int start, int end)
+        protected int Find(T finditem, int start, int end)
         {
             // Is Range Valid?
             if ((start <= list1.Count && start >= 0) &&
@@ -283,6 +350,8 @@ namespace FlowLib.Containers
                 comp = Comparer<T>.Default;
             comparer = comp;
             list1.Sort(comparer);
+            if (trigger)
+                ItemsSorted(comparer);
         }
         /// <summary>
         /// Reverses the order of the elements in the entire list.
