@@ -13,6 +13,8 @@ _Note that just because it is on this list it is not a promise that it will be d
   * Statistics support (Show how much of X traffic that has been transfered and what kind of traffic. You will of course be able to declare your own matching objects.)
 
 = Release ? =
+  * Make script for making different release packages for PC and Mobile platform.
+  * Make test project (This is so i can test that base functionality still works before releasing)
   * Verify downloaded content
     # Full TIGR extention support
   * Partial File Sharing (http://strongdc.sourceforge.net/forum/viewtopic.php?f=12&t=5665)
