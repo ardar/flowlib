@@ -21,6 +21,8 @@
 
 using System.Text;
 using System.Threading;
+using System.Globalization;
+
 
 using FlowLib.Interfaces;
 using FlowLib.Protocols.Adc;
@@ -785,7 +787,7 @@ namespace FlowLib.Protocols
                 {
                     try
                     {
-                        version = double.Parse(ctm.Protocol.Substring( ctm.Protocol.IndexOf("/") +1 ).Replace(".", ","));
+                        version = double.Parse(ctm.Protocol.Substring( ctm.Protocol.IndexOf("/") +1), CultureInfo.GetCultureInfo("en-GB").NumberFormat);
                     }
                     catch { }
                 }
@@ -838,7 +840,7 @@ namespace FlowLib.Protocols
                         {
                             try
                             {
-                                version = double.Parse(rcm.Protocol.Substring( rcm.Protocol.IndexOf("/") +1 ).Replace(".", ","));
+                                version = double.Parse(rcm.Protocol.Substring(rcm.Protocol.IndexOf("/") + 1), CultureInfo.GetCultureInfo("en-GB").NumberFormat);
                             }
                             catch { }
                             if (version <= 1.0)
