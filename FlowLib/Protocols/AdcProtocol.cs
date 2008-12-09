@@ -599,19 +599,23 @@ namespace FlowLib.Protocols
                     if (hub.Me.ID.Equals(inf.Id))
                     {
                         // Should we be marked with key?
+                        bool regmodeChanged = false;
                         if (hub.RegMode < 2)
                         {
                             if (((UserInfo.ACCOUNT_FLAG_OPERATOR | inf.UserInfo.Account) == UserInfo.ACCOUNT_FLAG_OPERATOR))
                             {
                                 hub.RegMode = 2;
+                                regmodeChanged = true;
                             }
                             else if (((UserInfo.ACCOUNT_FLAG_SUPERUSER | inf.UserInfo.Account) == UserInfo.ACCOUNT_FLAG_SUPERUSER))
                             {
                                 hub.RegMode = 2;
+                                regmodeChanged = true;
                             }
                             else if (((UserInfo.ACCOUNT_FLAG_HUBOWNER | inf.UserInfo.Account) == UserInfo.ACCOUNT_FLAG_HUBOWNER))
                             {
                                 hub.RegMode = 2;
+                                regmodeChanged = true;
                             }
                         }
                         // Should we be marked as reg?
@@ -620,9 +624,12 @@ namespace FlowLib.Protocols
                             if (((UserInfo.ACCOUNT_FLAG_REGISTERED | inf.UserInfo.Account) == UserInfo.ACCOUNT_FLAG_REGISTERED))
                             {
                                 hub.RegMode = 1;
+                                regmodeChanged = true;
                             }
 
                         }
+                        if (regmodeChanged)
+                            UpdateInf();
                     }
                 }
             }
