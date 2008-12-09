@@ -38,6 +38,7 @@
   * FIX		- Bug where we used direct instead of echo messages for Private messages in ADC.
   * FIX		- Bug that made tag not being updated with registered and above hub count (ADC Only). Thanks Spookie for reporting.
   * FIX		- Fixed so RCM was sent correctly in ADC. Thanks fadil.khodabuccus for reporting [http://code.google.com/p/flowlib/issues/detail?id=16 Issue 16]
+  * FIX		- Bug that made it impossible to parse protocol version on some systems. Thanks fadil.khodabuccus for reporting [http://code.google.com/p/flowlib/issues/detail?id=17 Issue 17]
 
 
 
