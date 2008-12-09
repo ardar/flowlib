@@ -595,6 +595,35 @@ namespace FlowLib.Protocols
                         usr.UserInfo = inf.UserInfo;
                         Update(con, new FmdcEventArgs(Actions.UserInfoChange, usr.UserInfo));
                     }
+                    // This is so we update our own reg/op hub count.
+                    if (hub.Me.ID.Equals(inf.Id))
+                    {
+                        // Should we be marked with key?
+                        if (hub.RegMode < 2)
+                        {
+                            if (((UserInfo.ACCOUNT_FLAG_OPERATOR | inf.UserInfo.Account) == UserInfo.ACCOUNT_FLAG_OPERATOR))
+                            {
+                                hub.RegMode = 2;
+                            }
+                            else if (((UserInfo.ACCOUNT_FLAG_SUPERUSER | inf.UserInfo.Account) == UserInfo.ACCOUNT_FLAG_SUPERUSER))
+                            {
+                                hub.RegMode = 2;
+                            }
+                            else if (((UserInfo.ACCOUNT_FLAG_HUBOWNER | inf.UserInfo.Account) == UserInfo.ACCOUNT_FLAG_HUBOWNER))
+                            {
+                                hub.RegMode = 2;
+                            }
+                        }
+                        // Should we be marked as reg?
+                        if (hub.RegMode < 1)
+                        {
+                            if (((UserInfo.ACCOUNT_FLAG_REGISTERED | inf.UserInfo.Account) == UserInfo.ACCOUNT_FLAG_REGISTERED))
+                            {
+                                hub.RegMode = 1;
+                            }
+
+                        }
+                    }
                 }
             }
             #endregion
@@ -1210,9 +1239,9 @@ namespace FlowLib.Protocols
                             // TODO : We should really use something else as token
                             Update(con, new FmdcEventArgs(Actions.TransferRequest, new TransferRequest(usr.ID, hub, usr.UserInfo, true)));
                             if (usr.UserInfo.ContainsKey(UserInfo.SECURE))
-                                hub.Send(new RCM(usr.ID, hub, hub.Me.ID, usr.ID));
-                            else
                                 hub.Send(new RCM(usr.ID, hub, "ADCS/0.10", hub.Me.ID, usr.ID));
+                            else
+                                hub.Send(new RCM(usr.ID, hub, hub.Me.ID, usr.ID));
                             break;
                     }
                 }
