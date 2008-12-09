@@ -36,7 +36,8 @@
     # Changed Access level for variables and methods from private to protected.
     # Changed public Find method so it now uses the Comparer object to determine if it is the same object or not.
   * FIX		- Bug where we used direct instead of echo messages for Private messages in ADC.
-
+  * FIX		- Bug that made tag not being updated with registered and above hub count (ADC Only). Thanks Spookie for reporting.
+  * FIX		- Fixed so RCM was sent correctly in ADC. Thanks fadil.khodabuccus for reporting [http://code.google.com/p/flowlib/issues/detail?id=16 Issue 16]
 
 
 
