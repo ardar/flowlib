@@ -79,7 +79,7 @@ namespace FlowLib.Containers
         /// User account status
         /// Available flags are ACCOUNT_FLAG_*
         /// To know if super user use this:
-        /// ((ACCOUNT_FLAG_SUPERUSER | value) == ACCOUNT_FLAG_SUPERUSER)
+        /// ((ACCOUNT_FLAG_SUPERUSER & value) == ACCOUNT_FLAG_SUPERUSER)
         /// To set super user:
         /// value |= UserInfo.ACCOUNT_FLAG_SUPERUSER
         /// To remove super user:
