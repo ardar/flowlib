@@ -604,17 +604,17 @@ namespace FlowLib.Protocols
                         bool regmodeChanged = false;
                         if (hub.RegMode < 2)
                         {
-                            if (((UserInfo.ACCOUNT_FLAG_OPERATOR | inf.UserInfo.Account) == UserInfo.ACCOUNT_FLAG_OPERATOR))
+                            if (((UserInfo.ACCOUNT_FLAG_OPERATOR & inf.UserInfo.Account) == UserInfo.ACCOUNT_FLAG_OPERATOR))
                             {
                                 hub.RegMode = 2;
                                 regmodeChanged = true;
                             }
-                            else if (((UserInfo.ACCOUNT_FLAG_SUPERUSER | inf.UserInfo.Account) == UserInfo.ACCOUNT_FLAG_SUPERUSER))
+                            else if (((UserInfo.ACCOUNT_FLAG_SUPERUSER & inf.UserInfo.Account) == UserInfo.ACCOUNT_FLAG_SUPERUSER))
                             {
                                 hub.RegMode = 2;
                                 regmodeChanged = true;
                             }
-                            else if (((UserInfo.ACCOUNT_FLAG_HUBOWNER | inf.UserInfo.Account) == UserInfo.ACCOUNT_FLAG_HUBOWNER))
+                            else if (((UserInfo.ACCOUNT_FLAG_HUBOWNER & inf.UserInfo.Account) == UserInfo.ACCOUNT_FLAG_HUBOWNER))
                             {
                                 hub.RegMode = 2;
                                 regmodeChanged = true;
@@ -623,7 +623,7 @@ namespace FlowLib.Protocols
                         // Should we be marked as reg?
                         if (hub.RegMode < 1)
                         {
-                            if (((UserInfo.ACCOUNT_FLAG_REGISTERED | inf.UserInfo.Account) == UserInfo.ACCOUNT_FLAG_REGISTERED))
+                            if (((UserInfo.ACCOUNT_FLAG_REGISTERED & inf.UserInfo.Account) == UserInfo.ACCOUNT_FLAG_REGISTERED))
                             {
                                 hub.RegMode = 1;
                                 regmodeChanged = true;

@@ -160,6 +160,7 @@
     <Compile Include="Utils\Compression\ZLibSubMethods\ZipInputStream.cs" />
     <Compile Include="Utils\Compression\ZLibSubMethods\ZipNameTransform.cs" />
     <Compile Include="Utils\Compression\ZLibSubMethods\ZipOutputStream.cs" />
+    <Compile Include="Utils\Connection\Detect.cs" />
     <Compile Include="Utils\Convert\Base32.cs" />
     <Compile Include="Utils\Convert\Environment.cs" />
     <Compile Include="Utils\Convert\General.cs" />
