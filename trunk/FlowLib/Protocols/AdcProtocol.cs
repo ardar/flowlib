@@ -598,7 +598,7 @@ namespace FlowLib.Protocols
                         Update(con, new FmdcEventArgs(Actions.UserInfoChange, usr.UserInfo));
                     }
                     // This is so we update our own reg/op hub count.
-                    if (hub.Me.ID.Equals(inf.Id))
+                    if (string.Equals(hub.Me.ID,inf.Id))
                     {
                         // Should we be marked with key?
                         bool regmodeChanged = false;

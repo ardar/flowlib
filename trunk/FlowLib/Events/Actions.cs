@@ -126,8 +126,6 @@ namespace FlowLib.Events
         /// </summary>
         public const int StartTransfer = 21;
 
-
-
 #if !COMPACT_FRAMEWORK
         /// <summary>
         /// Used when validating a remote certificate in a secure connection.
@@ -145,5 +143,28 @@ namespace FlowLib.Events
         /// </summary>
         public const int SecurityAuthenticationError = 1002;
 #endif
+
+        /// <summary>
+        /// Used when UPnP device has been found.
+        /// object is UPnPDevice
+        /// </summary>
+        public const int UPnPRootDeviceFound = 2000;
+        /// <summary>
+        /// Used to tell UPnP protocol that you want to get UPnP Device description for a UPnPDevice.
+        /// object is a string representation of UPnPDevice.Information.Sender.
+        /// </summary>
+        public const int UPnPDeviceDescription = 2001;
+        /// <summary>
+        /// Used when a UPnPDevice has been updated with new information.
+        /// object is UPnPDevice
+        /// </summary>
+        public const int UPnPDeviceUpdated = 2002;
+        /// <summary>
+        /// Used when you want to call a function/action for a service.
+        /// Look at the WANIPConnectionService if you want to know how it can be used.
+        /// object is UPnPFunction
+        /// </summary>
+        public const int UPnPFunctionCall = 2003;
+
     }
 }

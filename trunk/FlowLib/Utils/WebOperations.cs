@@ -178,8 +178,6 @@ namespace FlowLib.Utils
                 StreamReader reader = new StreamReader(respStream, Encoding.UTF8);
                 tmp = reader.ReadToEnd();
 
-                System.Console.WriteLine("Cookies:" + wReq.CookieContainer.ToString());
-
                 responseHeaders = wResp.Headers;
 
                 // Close the response and response stream.
