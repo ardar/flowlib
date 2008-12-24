@@ -28,9 +28,8 @@ namespace FlowLib.Connections
     public class UdpConnection
     {
         protected IProtocolUdp protocol;
-        UdpClient connection = null;
-        bool listen = false;
-
+        protected UdpClient connection = null;
+        protected bool listen = false;
 
         public IProtocolUdp Protocol
         {
@@ -44,8 +43,15 @@ namespace FlowLib.Connections
             set { listen = value; }
         }
 
+        public System.Net.IPEndPoint EndPoint
+        {
+            get;
+            set;
+        }
+
         public UdpConnection(System.Net.IPEndPoint ip)
         {
+            EndPoint = ip;
             connection = new UdpClient(ip);
             connection.DontFragment = true;
             StartListen();
@@ -65,7 +71,7 @@ namespace FlowLib.Connections
 
         protected void StartListen()
         {
-            listen = true;
+            IsListening = true;
             System.Threading.Thread t =  new System.Threading.Thread(new System.Threading.ThreadStart(OnListen));
             t.IsBackground = true;
             t.Start();

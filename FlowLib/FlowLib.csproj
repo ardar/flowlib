@@ -90,6 +90,8 @@
     <Compile Include="Containers\Source.cs" />
     <Compile Include="Containers\TagInfo.cs" />
     <Compile Include="Containers\TransferRequest.cs" />
+    <Compile Include="Utils\UPnP\Services\WANIPConnectionService.cs" />
+    <Compile Include="Containers\UPnP\UPnPFunction.cs" />
     <Compile Include="Containers\User.cs" />
     <Compile Include="Containers\UserInfo.cs" />
     <Compile Include="Containers\VirtualDir.cs" />
@@ -107,8 +109,11 @@
     <Compile Include="Interfaces\IProtocolHub.cs" />
     <Compile Include="Interfaces\IProtocolTransfer.cs" />
     <Compile Include="Interfaces\IProtocolUdp.cs" />
+    <Compile Include="Interfaces\IProtocolUPnP.cs" />
     <Compile Include="Interfaces\ITransfer.cs" />
     <Compile Include="Interfaces\IUpdate.cs" />
+    <Compile Include="Interfaces\IUPnP.cs" />
+    <Compile Include="Interfaces\IUPnPUpdater.cs" />
     <Compile Include="Managers\DownloadManager.cs" />
     <Compile Include="Managers\EventManager.cs" />
     <Compile Include="Managers\sharemanager.cs" />
@@ -124,6 +129,12 @@
     <Compile Include="Protocols\transfernmdcprotocol.cs" />
     <Compile Include="Protocols\UdpNmdcProtocol.cs" />
     <Compile Include="Protocols\UdpProtocol.cs" />
+    <Compile Include="Protocols\UPnPProtocol.cs" />
+    <Compile Include="Containers\UPnP\DeviceInformation.cs" />
+    <Compile Include="Containers\UPnP\ServiceBase.cs" />
+    <Compile Include="Containers\UPnP\ServiceInformation.cs" />
+    <Compile Include="Containers\UPnP\SpecificationVersion.cs" />
+    <Compile Include="Containers\UPnP\UPnPDevice.cs" />
     <Compile Include="Utils\Compression\Bz2.cs" />
     <Compile Include="Utils\Compression\Bz2SubMethods\BZip2Constants.cs" />
     <Compile Include="Utils\Compression\Bz2SubMethods\BZip2Exception.cs" />
@@ -183,6 +194,7 @@
     <Compile Include="Utils\Convert\Settings\XmlClient.cs" />
     <Compile Include="Utils\Convert\Settings\ZionBlue.cs" />
     <Compile Include="Utils\Convert\Settings\zK.cs" />
+    <Compile Include="Connections\UPnP.cs" />
     <Compile Include="Utils\ErrorHandling\ErrorReporting.cs" />
     <Compile Include="Utils\FileLists\BaseFilelist.cs" />
     <Compile Include="Utils\FileLists\FilelistMyList.cs" />
@@ -197,9 +209,6 @@
     <Compile Include="Utils\StringOperations.cs" />
     <Compile Include="Utils\WebOperations.cs" />
     <Compile Include="Utils\Convert\Settings\Xmpl.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Utils\UPnP\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

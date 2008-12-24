@@ -30,10 +30,13 @@ using FlowLib.Containers;
 using FlowLib.Managers;
 using FlowLib.Protocols;
 using FlowLib.Events;
+using FlowLib.Interfaces;
+using FlowLib.Containers.UPnP;
+using FlowLib.Containers.UPnP.Services;
 
 namespace FlowLib.Utils.Connection
 {
-    public class Detect
+    public class Detect : IUPnPUpdater
     {
 		public delegate void ProgressChange(Detect sender, Functions prog);
 
@@ -73,17 +76,20 @@ namespace FlowLib.Utils.Connection
             UPnPExternalIp = 128,
             UPnPAddMapping = 256,
             UPnPGetMapping = 512,
-            End = 1024
+            UPnPDeleteMapping = 1024,
+            End = 2048
         }
 
         #region Variables/Properties
 		public event ProgressChange ProgressChanged;
 		public event ProgressChange SuccessChanged;
+        public event FmdcEventHandler UpdateBase;
         protected Thread workingThread = null;
         protected TcpConnectionListener tcpListener;
         protected TransferManager transferManager = new TransferManager();
 		protected Functions fSuccess = Functions.Start;
 		protected Functions fProgress = Functions.Start;
+        protected IUPnP upnp = null;
 
         public Functions Success
         {
@@ -131,13 +137,22 @@ namespace FlowLib.Utils.Connection
         {
 			ProgressChanged = new ProgressChange(OnProgressChanged);
 			SuccessChanged = new ProgressChange(OnSuccessChanged);
+            UpdateBase = new FmdcEventHandler(OnUpdateBase);
+            upnp = new UPnP(this);
+            upnp.ProtocolUPnP.Update += new FmdcEventHandler(OnUPnPUpdate);
             Port = 31773;
         }
 
+
+        void OnUpdateBase(object sender, FmdcEventArgs e) { }
 		protected void OnProgressChanged(Detect sender, Detect.Functions prog) { }
 		protected void OnSuccessChanged(Detect sender, Detect.Functions prog) { }
+        public void FireUpdateBase(FmdcEventArgs e)
+        {
+            UpdateBase(this, e);
+        }
 
-		/// <summary>
+        /// <summary>
 		/// Start detection on a background thread
 		/// </summary>
 		public void Start()
@@ -208,19 +223,10 @@ namespace FlowLib.Utils.Connection
                     DoExternalRecieveAccess();
                     break;
                 case Functions.UPnPDevices:
-                    Progress = Functions.UPnPIGD;
+                    DoUPnPDevices();
                     break;
                 case Functions.UPnPIGD:
-                    Progress = Functions.UPnPExternalIp;
-                    break;
-                case Functions.UPnPExternalIp:
-                    Progress = Functions.UPnPAddMapping;
-                    break;
-                case Functions.UPnPAddMapping:
-                    Progress = Functions.UPnPGetMapping;
-                    break;
-                case Functions.UPnPGetMapping:
-                    Progress = Functions.End;
+                    DoUPnPIGD();
                     break;
                 case Functions.End:
                     break;
@@ -361,6 +367,126 @@ namespace FlowLib.Utils.Connection
                 {
                     Progress = Functions.UPnPDevices;
                 }
+            }
+        }
+
+        protected void OnUPnPUpdate(object sender, FmdcEventArgs e)
+        {
+            IUPnP upnp = sender as IUPnP;
+            FlowLib.Containers.UPnP.UPnPDevice device = e.Data as FlowLib.Containers.UPnP.UPnPDevice;
+            if (upnp != null && device != null)
+            {
+                switch (e.Action)
+                {
+                    case Actions.UPnPRootDeviceFound:
+                        Success |= Functions.UPnPDevices;
+                        break;
+                    case Actions.UPnPDeviceUpdated:
+                        foreach (ServiceBase service in device.Services)
+                        {
+                            if (WANIPConnectionService.IsMatching(service))
+                            {
+                                Success |= Functions.UPnPIGD;
+                                WANIPConnectionService wanipService = new WANIPConnectionService(service);
+                                #region GetExternalIPAddress
+                                try
+                                {
+                                    Progress = Functions.UPnPExternalIp;
+                                    IPAddress tmpAddress = wanipService.GetExternalIPAddress(this);
+                                    if (tmpAddress != null)
+                                    {
+                                        ExternalIP = tmpAddress;
+                                        Success |= Functions.UPnPExternalIp;
+                                    }
+                                }
+                                catch { }
+                                #endregion
+                                #region AddPortMapping
+                                Progress = Functions.UPnPAddMapping;
+                                WANIPConnectionService.PortMapping mapping = new WANIPConnectionService.PortMapping(
+                                    string.Empty,
+                                    Port,
+                                    "TCP",
+                                    Port,
+                                    string.Empty,
+                                    true,
+                                    /*"FlowLibPowered - Connection Detection",*/
+                                    "FlowLibPowered",
+                                    0
+                                    );
+                                bool hasAddPortMapping = false;
+                                if (hasAddPortMapping = wanipService.AddPortMapping(this, mapping))
+                                {
+                                    Success |= Functions.UPnPAddMapping;
+                                    
+                                }
+                                #endregion
+                                #region GetSpecificPortMappingEntry
+                                Progress = Functions.UPnPGetMapping;
+                                if (hasAddPortMapping)
+                                {
+                                    if (wanipService.GetSpecificPortMappingEntry(this, ref mapping))
+                                    {
+                                        Success |= Functions.UPnPGetMapping;
+                                    }
+                                }
+                                #endregion
+                                #region DeletePortMapping
+                                Progress = Functions.UPnPDeleteMapping;
+                                if (hasAddPortMapping)
+                                {
+                                    if (wanipService.DeletePortMapping(this, mapping))
+                                    {
+                                        Success |= Functions.UPnPDeleteMapping;
+                                    }
+                                }
+                                #endregion
+                            }
+                        }
+                        break;
+                }
+            }
+        }
+
+        protected void DoUPnPDevices()
+        {
+            try
+            {
+                // Wait 10 seconds before continue
+                int i = 0;
+                do
+                {
+                    upnp.Discover();
+                    Thread.Sleep(1 * 1000);
+                } while (((Functions.UPnPDevices & Success) != Functions.UPnPDevices) && i++ > 10);
+            }
+            finally
+            {
+                if ((Functions.UPnPDevices & Success) == Functions.UPnPDevices)
+                {
+                    Progress = Functions.End;
+                }
+                else
+                {
+                    Progress = Functions.UPnPIGD;
+                }
+            }
+        }
+
+        protected void DoUPnPIGD()
+        {
+            try
+            {
+                System.Collections.Generic.SortedList<string, UPnPDevice> tmpDevices = new System.Collections.Generic.SortedList<string, UPnPDevice>(upnp.RootDevices);
+                foreach (System.Collections.Generic.KeyValuePair<string, UPnPDevice> devicePair in tmpDevices)
+                {
+                    FlowLib.Events.FmdcEventArgs e = new FlowLib.Events.FmdcEventArgs(Actions.UPnPDeviceDescription, devicePair.Key);
+                    UpdateBase(this, e);
+                }
+            }
+            finally
+            {
+                Progress = Functions.End;
             }
         }
 
