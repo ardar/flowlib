@@ -92,7 +92,7 @@ namespace FlowLib.Utils.Statistics
             IConMessage msg = e.Data as IConMessage;
             if (msg != null)
             {
-                HandleReceived(msg);
+                HandleSend(msg);
             }
         }
 
