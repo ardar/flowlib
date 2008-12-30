@@ -117,6 +117,11 @@ namespace FlowLib.Protocols
         {
             get { return "|"; }
         }
+
+        public bool IsDisposed
+        {
+            get { return disposed; }
+        }
         #endregion
         #region Constructor(s)
         public TransferNmdcProtocol(ITransfer trans)

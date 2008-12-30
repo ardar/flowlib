@@ -31,6 +31,12 @@ namespace FlowLib.Containers.UPnP
             set;
         }
 
+        public string URLBase
+        {
+            get;
+            set;
+        }
+
         public string DeviceType
         {
             get;

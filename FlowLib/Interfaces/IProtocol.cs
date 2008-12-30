@@ -64,6 +64,13 @@ namespace FlowLib.Interfaces
         {
             get;
         }
+        /// <summary>
+        /// Indicates if connection has been disposed or not.
+        /// </summary>
+        bool IsDisposed
+        {
+            get;
+        }
 
         /// <summary>
         /// Parsing raw command into a Inherit class of HubMessage
