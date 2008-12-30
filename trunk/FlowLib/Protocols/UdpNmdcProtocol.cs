@@ -82,6 +82,13 @@ namespace FlowLib.Protocols
         {
             get { return "|"; }
         }
+        /// <summary>
+        /// This is not implemented for the UdpNmdc Protocol
+        /// </summary>
+        public bool IsDisposed
+        {
+            get { return false; }
+        }
 
         public UdpNmdcProtocol()
         {

@@ -63,6 +63,13 @@ namespace FlowLib.Protocols
         {
             get { return null; }
         }
+        /// <summary>
+        /// This is not implemented for the UDP Protocol
+        /// </summary>
+        public bool IsDisposed
+        {
+            get { return false; }
+        }
 
         public UdpProtocol()
         {

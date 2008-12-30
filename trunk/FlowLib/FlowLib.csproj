@@ -90,6 +90,11 @@
     <Compile Include="Containers\Source.cs" />
     <Compile Include="Containers\TagInfo.cs" />
     <Compile Include="Containers\TransferRequest.cs" />
+    <Compile Include="Interfaces\IProtocolDataCollector.cs" />
+    <Compile Include="Utils\Statistics\BaseProtocolDataCollector.cs" />
+    <Compile Include="Utils\Statistics\BinaryMessagesDataCollector.cs" />
+    <Compile Include="Utils\Statistics\GeneralProtocolDataCollector.cs" />
+    <Compile Include="Utils\Statistics\ProtocolMessagesDataCollector.cs" />
     <Compile Include="Utils\UPnP\Services\WANIPConnectionService.cs" />
     <Compile Include="Containers\UPnP\UPnPFunction.cs" />
     <Compile Include="Containers\User.cs" />

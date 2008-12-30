@@ -33,7 +33,7 @@ using FlowLib.Enums;
 
 namespace FlowLib.Interfaces
 {
-    public interface IConnection
+    public interface IConnection : System.IDisposable
     {
         #region Events
         event FmdcEventHandler ProtocolChange;
@@ -44,6 +44,14 @@ namespace FlowLib.Interfaces
 #endif
         #endregion
         #region Properties
+        /// <summary>
+        /// Indicates if connection has been disposed or not.
+        /// </summary>
+        bool IsDisposed
+        {
+            get;
+        }
+
         /// <summary>
         /// Protocol that hub should use to understand messages that is received.
         /// </summary>

@@ -121,6 +121,11 @@ namespace FlowLib.Protocols
         {
             get { return "\n"; }
         }
+
+        public bool IsDisposed
+        {
+            get { return disposed; }
+        }
         #endregion
         #region Constructor(s)
         public AdcProtocol()

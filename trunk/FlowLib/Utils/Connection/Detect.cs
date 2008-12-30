@@ -57,12 +57,6 @@ namespace FlowLib.Utils.Connection
             DirectConnection = 4
         }
 		[Flags]
-        public enum Problems
-        {
-            None = 0,
-            DifferentPage = 1 /* Do you need to login to access internet? */
-        }
-		[Flags]
         public enum Functions
         {
             Start = 0,
@@ -77,7 +71,8 @@ namespace FlowLib.Utils.Connection
             UPnPAddMapping = 256,
             UPnPGetMapping = 512,
             UPnPDeleteMapping = 1024,
-            End = 2048
+            UPnPExternalRecieveAccess = 2048,
+            End = 4096
         }
 
         #region Variables/Properties
@@ -90,6 +85,8 @@ namespace FlowLib.Utils.Connection
 		protected Functions fSuccess = Functions.Start;
 		protected Functions fProgress = Functions.Start;
         protected IUPnP upnp = null;
+        protected WANIPConnectionService wanipService = null;
+        protected WANIPConnectionService.PortMapping mapping = null;
 
         public Functions Success
         {
@@ -117,8 +114,20 @@ namespace FlowLib.Utils.Connection
             protected set;
         }
 
+        public IPAddress ExternalIPUPnP
+        {
+            get;
+            protected set;
+        }
+
+        public IPAddress InternalIP
+        {
+            get;
+            set;
+        }
+
         /// <summary>
-        /// Default Port = 31773
+        /// Default Port = 31173
         /// </summary>
         public int Port
         {
@@ -131,6 +140,52 @@ namespace FlowLib.Utils.Connection
 			get;
 			protected set;
 		}
+
+        /// <summary>
+        /// 0 = No Internet access?
+        /// 1 = Passive mode
+        /// 2 = Active mode
+        /// 4 = Active mode through UPnP
+        /// </summary>
+        public int ConnectionType
+        {
+            get
+            {
+                if
+                    (
+                    (Functions.ExternalRecieveAccess & Success) == Functions.ExternalRecieveAccess
+                    && (Functions.InternalListenAccess & Success) == Functions.InternalListenAccess
+                    && (Functions.InternalRecieveAccess & Success) == Functions.InternalRecieveAccess
+                    && (Functions.ExternalIp & Success) == Functions.ExternalIp
+                    && (Functions.InternetAccess & Success) == Functions.InternetAccess
+                    )
+                {
+                    return 2;   // Active
+                }
+                else if 
+                    (
+                    (Functions.UPnPDevices & Success) == Functions.UPnPDevices
+                    && (Functions.UPnPIGD & Success) == Functions.UPnPIGD
+                    && (Functions.UPnPExternalIp & Success) == Functions.UPnPExternalIp
+                    && (Functions.UPnPAddMapping & Success) == Functions.UPnPAddMapping
+                    && (Functions.UPnPGetMapping & Success) == Functions.UPnPGetMapping
+                    && (Functions.UPnPDeleteMapping & Success) == Functions.UPnPDeleteMapping
+                    && (Functions.UPnPExternalRecieveAccess & Success) == Functions.UPnPExternalRecieveAccess
+                    )
+                {
+                    return 4;   // UPnP Active
+                }
+                else if ((Functions.InternetAccess & Success) == Functions.InternetAccess)
+                {
+                    return 1;   // Passive
+                }
+                else
+                {
+                    return 0;   // No internet access
+                }
+            }
+        }
+
         #endregion
 
         public Detect()
@@ -140,7 +195,7 @@ namespace FlowLib.Utils.Connection
             UpdateBase = new FmdcEventHandler(OnUpdateBase);
             upnp = new UPnP(this);
             upnp.ProtocolUPnP.Update += new FmdcEventHandler(OnUPnPUpdate);
-            Port = 31773;
+            Port = 31173;
         }
 
 
@@ -228,12 +283,15 @@ namespace FlowLib.Utils.Connection
                 case Functions.UPnPIGD:
                     DoUPnPIGD();
                     break;
+                case Functions.UPnPExternalRecieveAccess:
+                    DoUPnPExternalRecieveAccess();
+                    break;
                 case Functions.End:
                     break;
             }
         }
 
-        protected void DoInternetAccess()
+        protected virtual void DoInternetAccess()
         {
             try
             {
@@ -248,7 +306,7 @@ namespace FlowLib.Utils.Connection
                 Progress = Functions.InternalListenAccess;
             }
         }
-        protected void DoInternalListenRecieveAccess()
+        protected virtual void DoInternalListenRecieveAccess()
         {
             try
             {
@@ -296,7 +354,7 @@ namespace FlowLib.Utils.Connection
                 Progress = Functions.ExternalIp;
             }
         }
-        protected void DoExternalIp()
+        protected virtual void DoExternalIp()
         {
             try
             {
@@ -321,7 +379,7 @@ namespace FlowLib.Utils.Connection
                 Progress = Functions.ExternalRecieveAccess;
             }
         }
-        protected void DoExternalRecieveAccess()
+        protected virtual void DoExternalRecieveAccess()
         {
             try
             {
@@ -345,15 +403,15 @@ namespace FlowLib.Utils.Connection
                     transferManager.StartTransfer(transfer);
                 }
 
-                // Wait 10 seconds before continue
+                // Wait 30 seconds before continue
                 int i = 0;
                 do
                 {
                     Thread.Sleep(50);
-                } while (((Functions.ExternalRecieveAccess & Success) != Functions.ExternalRecieveAccess) && i++ > 200);
+                } while (((Functions.ExternalRecieveAccess & Success) != Functions.ExternalRecieveAccess) && i++ > 600);
 
                 // clean;
-                tcpListener.Update -= DoInternalListenAccess_Update;
+                tcpListener.Update -= DoExternalRecieveAccess_Update;
                 tcpListener.End();
                 tcpListener = null;
             }
@@ -370,7 +428,7 @@ namespace FlowLib.Utils.Connection
             }
         }
 
-        protected void OnUPnPUpdate(object sender, FmdcEventArgs e)
+        protected virtual void OnUPnPUpdate(object sender, FmdcEventArgs e)
         {
             IUPnP upnp = sender as IUPnP;
             FlowLib.Containers.UPnP.UPnPDevice device = e.Data as FlowLib.Containers.UPnP.UPnPDevice;
@@ -379,6 +437,8 @@ namespace FlowLib.Utils.Connection
                 switch (e.Action)
                 {
                     case Actions.UPnPRootDeviceFound:
+                        //FlowLib.Events.FmdcEventArgs e3 = new FlowLib.Events.FmdcEventArgs(Actions.UPnPDeviceDescription, device.Information.Sender.ToString());
+                        //UpdateBase(this, e3);
                         Success |= Functions.UPnPDevices;
                         break;
                     case Actions.UPnPDeviceUpdated:
@@ -386,97 +446,145 @@ namespace FlowLib.Utils.Connection
                         {
                             if (WANIPConnectionService.IsMatching(service))
                             {
-                                Success |= Functions.UPnPIGD;
-                                WANIPConnectionService wanipService = new WANIPConnectionService(service);
-                                #region GetExternalIPAddress
-                                try
+                                #region Retreive internal ip
+                                if (this.InternalIP == null)
                                 {
-                                    Progress = Functions.UPnPExternalIp;
-                                    IPAddress tmpAddress = wanipService.GetExternalIPAddress(this);
-                                    if (tmpAddress != null)
+                                    string routerIP = ((IPEndPoint)device.Information.Sender).Address.ToString();
+                                    string[] secRouter = routerIP.Split('.', ':');
+                                    System.Net.IPHostEntry hostEntry = System.Net.Dns.GetHostEntry(System.Net.Dns.GetHostName());
+                                    if (hostEntry != null)
                                     {
-                                        ExternalIP = tmpAddress;
-                                        Success |= Functions.UPnPExternalIp;
+                                        System.Net.IPAddress[] collectionOfIPs = hostEntry.AddressList;
+                                        for (int i = 0; i < collectionOfIPs.Length; i++)
+                                        {
+                                            System.Net.IPAddress ip = collectionOfIPs[i];
+                                            string[] secIP = ip.ToString().Split('.', ':');
+                                            bool found = true;
+
+                                            for (int y = 0; y < secRouter.Length - 1; y++)
+                                            {
+                                                if (secIP.Length > y)
+                                                {
+                                                    if (!secRouter[y].Equals(secIP[y]))
+                                                    {
+                                                        found = false;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                            if (found)
+                                            {
+                                                InternalIP = ip;
+                                            }
+                                        }
                                     }
-                                }
-                                catch { }
-                                #endregion
-                                #region AddPortMapping
-                                Progress = Functions.UPnPAddMapping;
-                                WANIPConnectionService.PortMapping mapping = new WANIPConnectionService.PortMapping(
-                                    string.Empty,
-                                    Port,
-                                    "TCP",
-                                    Port,
-                                    string.Empty,
-                                    true,
-                                    /*"FlowLibPowered - Connection Detection",*/
-                                    "FlowLibPowered",
-                                    0
-                                    );
-                                bool hasAddPortMapping = false;
-                                if (hasAddPortMapping = wanipService.AddPortMapping(this, mapping))
-                                {
-                                    Success |= Functions.UPnPAddMapping;
-                                    
+
                                 }
                                 #endregion
-                                #region GetSpecificPortMappingEntry
-                                Progress = Functions.UPnPGetMapping;
-                                if (hasAddPortMapping)
+                                if (InternalIP != null)
                                 {
-                                    if (wanipService.GetSpecificPortMappingEntry(this, ref mapping))
+                                    wanipService = new WANIPConnectionService(service);
+                                    #region GetExternalIPAddress
+                                    try
                                     {
-                                        Success |= Functions.UPnPGetMapping;
+                                        Progress = Functions.UPnPExternalIp;
+                                        IPAddress tmpAddress = wanipService.GetExternalIPAddress(this);
+                                        if (tmpAddress != null)
+                                        {
+                                            // Is ExternalIP different then the one we got from router?
+                                            ExternalIPUPnP = tmpAddress;
+                                            if (ExternalIP == null)
+                                                ExternalIP = ExternalIPUPnP;
+                                            Success |= Functions.UPnPExternalIp;
+                                        }
                                     }
-                                }
-                                #endregion
-                                #region DeletePortMapping
-                                Progress = Functions.UPnPDeleteMapping;
-                                if (hasAddPortMapping)
-                                {
-                                    if (wanipService.DeletePortMapping(this, mapping))
+                                    catch { }
+                                    #endregion
+                                    #region AddPortMapping
+                                    Progress = Functions.UPnPAddMapping;
+                                    mapping = new WANIPConnectionService.PortMapping(
+                                        string.Empty,
+                                        Port,
+                                        "TCP",
+                                        Port,
+                                        InternalIP.ToString(),
+                                        true,
+                                        "FlowLibPowered - Connection Detection",
+                                        /*"FlowLibPowered",*/
+                                        0
+                                        );
+                                    bool hasAddPortMapping = false;
+                                    if (hasAddPortMapping = wanipService.AddPortMapping(this, mapping))
                                     {
-                                        Success |= Functions.UPnPDeleteMapping;
+                                        Success |= Functions.UPnPAddMapping;
+
                                     }
+                                    #endregion
+                                    #region GetSpecificPortMappingEntry
+                                    Progress = Functions.UPnPGetMapping;
+                                    if (hasAddPortMapping)
+                                    {
+                                        if (wanipService.GetSpecificPortMappingEntry(this, ref mapping))
+                                        {
+                                            Success |= Functions.UPnPGetMapping;
+                                        }
+                                    }
+                                    #endregion
+                                    #region DeletePortMapping
+                                    Progress = Functions.UPnPDeleteMapping;
+                                    if (hasAddPortMapping)
+                                    {
+                                        if (wanipService.DeletePortMapping(this, mapping))
+                                        {
+                                            Success |= Functions.UPnPDeleteMapping;
+                                        }
+                                    }
+                                    #endregion
                                 }
-                                #endregion
                             }
+                            Success |= Functions.UPnPIGD;
+                            Progress = Functions.End;
                         }
                         break;
                 }
             }
         }
 
-        protected void DoUPnPDevices()
+        protected virtual void DoUPnPDevices()
         {
             try
             {
-                // Wait 10 seconds before continue
+                // Wait 20 seconds before continue
                 int i = 0;
                 do
                 {
                     upnp.Discover();
                     Thread.Sleep(1 * 1000);
-                } while (((Functions.UPnPDevices & Success) != Functions.UPnPDevices) && i++ > 10);
+                } while (((Functions.UPnPDevices & Success) != Functions.UPnPDevices) && i++ > 20);
             }
             finally
             {
-                if ((Functions.UPnPDevices & Success) == Functions.UPnPDevices)
-                {
-                    Progress = Functions.End;
-                }
-                else
-                {
+                //if ((Functions.UPnPDevices & Success) == Functions.UPnPDevices)
+                //{
                     Progress = Functions.UPnPIGD;
-                }
+                //}
+                //else
+                //{
+                //    Progress = Functions.End;
+                //}
             }
         }
 
-        protected void DoUPnPIGD()
+        protected virtual void DoUPnPIGD()
         {
             try
             {
+                // Wait 20 seconds before continue
+                int i = 0;
+                do
+                {
+                    Thread.Sleep(1 * 1000);
+                } while (((Functions.UPnPIGD & Success) != Functions.UPnPIGD) && i++ > 20);
                 System.Collections.Generic.SortedList<string, UPnPDevice> tmpDevices = new System.Collections.Generic.SortedList<string, UPnPDevice>(upnp.RootDevices);
                 foreach (System.Collections.Generic.KeyValuePair<string, UPnPDevice> devicePair in tmpDevices)
                 {
@@ -486,11 +594,111 @@ namespace FlowLib.Utils.Connection
             }
             finally
             {
-                Progress = Functions.End;
+                //if ((Functions.UPnPIGD & Success) == Functions.UPnPIGD)
+                //{
+                    Progress = Functions.UPnPExternalRecieveAccess;
+                //}
+                //else
+                //{
+                //    Progress = Functions.End;
+                //}
             }
         }
 
-        void DoExternalRecieveAccess_Update(object sender, FmdcEventArgs e)
+        protected virtual void DoUPnPExternalRecieveAccess()
+        {
+            try
+            {
+                tcpListener = new TcpConnectionListener(Port);
+                tcpListener.Update += new FmdcEventHandler(DoUPnPExternalRecieveAccess_Update);
+                tcpListener.Start();
+
+                // Don't do this if we don't have external ip
+                if (
+                    (Functions.UPnPDevices & Success) == Functions.UPnPDevices
+                    && (Functions.UPnPIGD & Success) == Functions.UPnPIGD
+                    && (Functions.UPnPExternalIp & Success) == Functions.UPnPExternalIp
+                    && (Functions.UPnPAddMapping & Success) == Functions.UPnPAddMapping
+                    && (Functions.UPnPGetMapping & Success) == Functions.UPnPGetMapping
+                    && (Functions.UPnPDeleteMapping & Success) == Functions.UPnPDeleteMapping
+                    )
+                {
+                    bool hasAddPortMapping = false;
+                    if (hasAddPortMapping = wanipService.AddPortMapping(this, mapping))
+                    {
+
+                        //Transfer transfer = new Transfer(ExternalIPUPnP.ToString(), Port);
+                        Transfer transfer = new Transfer(ExternalIP.ToString(), Port);
+                        UserInfo me = new UserInfo();
+                        me.DisplayName = "upnp";
+                        me.TagInfo.Version = "FlowLibPowered";
+                        transfer.Share = new Share("temp");
+                        transfer.Me = me;
+                        transfer.Source = new Source(ExternalIP.ToString(), "upnp");
+                        transferManager.AddTransferReq(new TransferRequest("upnp", null, new UserInfo()));
+
+                        transfer.Protocol = new TransferNmdcProtocol(transfer);
+                        transferManager.StartTransfer(transfer);
+
+                        // Wait 60 seconds before continue
+                        int i = 0;
+                        do
+                        {
+                            Thread.Sleep(50);
+                        } while (((Functions.UPnPExternalRecieveAccess & Success) != Functions.UPnPExternalRecieveAccess) && i++ > 1200);
+
+                        // clean;
+                        wanipService.DeletePortMapping(this, mapping);
+                    }
+                }
+
+                tcpListener.Update -= DoUPnPExternalRecieveAccess_Update;
+                tcpListener.End();
+                tcpListener = null;
+            }
+            finally
+            {
+                Progress = Functions.End;
+            }
+        }
+        protected void DoUPnPExternalRecieveAccess_Update(object sender, FmdcEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case Actions.TransferStarted:
+                    Transfer trans = e.Data as Transfer;
+                    if (trans != null)
+                    {
+                        if (trans.Protocol == null)
+                        {
+                            trans.Protocol = new FlowLib.Protocols.TransferNmdcProtocol(trans);
+                            trans.Listen();
+                            transferManager.AddTransfer(trans);
+                        }
+                        trans.Protocol.RequestTransfer += new FmdcEventHandler(DoUPnPExternalRecieveAccess_RequestTransfer);
+                        e.Handled = true;
+                    }
+                    break;
+            }
+        }
+
+        protected virtual void DoUPnPExternalRecieveAccess_RequestTransfer(object sender, FmdcEventArgs e)
+        {
+            TransferRequest req = e.Data as TransferRequest;
+            req = transferManager.GetTransferReq(req.Key);
+            if (req != null)
+            {
+                switch (req.Key)
+                {
+                    case "upnp":
+                        Success |= Functions.UPnPExternalRecieveAccess;
+                        break;
+                }
+                transferManager.RemoveTransferReq(req.Key);
+            }
+        }
+
+        protected void DoExternalRecieveAccess_Update(object sender, FmdcEventArgs e)
         {
             switch (e.Action)
             {
@@ -510,7 +718,8 @@ namespace FlowLib.Utils.Connection
                     break;
             }
         }
-        void DoExternalRecieveAccess_RequestTransfer(object sender, FmdcEventArgs e)
+
+        protected virtual void DoExternalRecieveAccess_RequestTransfer(object sender, FmdcEventArgs e)
         {
             TransferRequest req = e.Data as TransferRequest;
             req = transferManager.GetTransferReq(req.Key);
@@ -525,7 +734,7 @@ namespace FlowLib.Utils.Connection
                 transferManager.RemoveTransferReq(req.Key);
             }
         }
-        void DoInternalListenAccess_Update(object sender, FlowLib.Events.FmdcEventArgs e)
+        protected virtual void DoInternalListenAccess_Update(object sender, FlowLib.Events.FmdcEventArgs e)
         {
             switch (e.Action)
             {
@@ -546,7 +755,8 @@ namespace FlowLib.Utils.Connection
                     break;
             }
         }
-        void DoInternalListenAccess_RequestTransfer(object sender, FmdcEventArgs e)
+
+        protected virtual void DoInternalListenAccess_RequestTransfer(object sender, FmdcEventArgs e)
         {
             TransferRequest req = e.Data as TransferRequest;
             req = transferManager.GetTransferReq(req.Key);
@@ -564,7 +774,8 @@ namespace FlowLib.Utils.Connection
 
         public void Stop()
         {
-            workingThread.Abort();
+            if (workingThread != null)
+                workingThread.Abort();
         }
     }
 }

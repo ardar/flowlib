@@ -80,16 +80,6 @@ namespace FlowLib.Protocols
                     );
                 msg.Bytes = Encoding.GetBytes(msg.Raw);
                 return msg;
-                //return new StrMessage(
-                //    null, 
-                //    "M-SEARCH * HTTP/1.1\r\n" +
-                //    "Host:" + con.EndPoint.Address.ToString() + ":" + con.EndPoint.Port.ToString() + "\r\n" +
-                //     "ST:upnp:rootdevice\r\n" +
-                //    "Man:\"ssdp:discover\"\r\n" +
-                //    "MX:3\r\n" +
-                //     "\r\n" +
-                //    "\r\n"
-                //    );
             }
         }
 
@@ -179,6 +169,8 @@ namespace FlowLib.Protocols
                             break;
                         case "location":
                             device.Information.DescriptionURL = value;
+                            System.Uri uri = new System.Uri(value);
+                            device.Information.URLBase = uri.Host + ":" + uri.Port;
                             break;
                         case "cache-control":
                             if (value.StartsWith("max-age="))
@@ -383,7 +375,7 @@ namespace FlowLib.Protocols
                         {
                             #region Create Envelope
                             System.Text.StringBuilder sb = new System.Text.StringBuilder();
-                            sb.Append("<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/ \" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/ \">");
+                            sb.Append("<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">");
                             sb.Append("<s:Body>");
                             sb.Append("<u:" + func.Name + " xmlns:u=\"" + func.Service.Information.serviceType + "\">");
                             foreach (KeyValuePair<string, string> argument in func.Arguments)
@@ -395,16 +387,12 @@ namespace FlowLib.Protocols
                             sb.Append("</s:Envelope>");
                             #endregion
                             #region Create Request
-                            byte[] body =
-                            System.Text.UTF8Encoding.ASCII.GetBytes(sb.ToString());
+                            byte[] body = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
                             string url = null;
                             // Is ControlURL relative or absolute?
                             if (func.Service.Information.ControlURL.StartsWith("/"))
                             {
-                                // TODO: Ericsson Routers uses func.Service.Device.Information.Sender with ports included. Lookup a way to work.
-                                //url = "http://192.168.1.1:49153" + func.Service.Information.ControlURL;
-                                url = "http://" + ((IPEndPoint)func.Service.Device.Information.Sender).Address.ToString() + func.Service.Information.ControlURL;
-                                //url = "http://" + ((IPEndPoint)func.Service.Device.Information.Sender).ToString() + func.Service.Information.ControlURL;
+                                url = "http://" + func.Service.Device.Information.URLBase + func.Service.Information.ControlURL;
                             }
                             else
                             {
@@ -412,10 +400,11 @@ namespace FlowLib.Protocols
                             }
 
                             WebRequest wr = WebRequest.Create(url);//+ controlUrl);
+                            wr.Headers.Clear();
                             wr.Method = "POST";
+                            wr.ContentType = "text/xml; charset=\"utf-8\"";
                             wr.Headers.Add("SOAPAction", "\"" + func.Service.Information.serviceType +
                             "#" + func.Name + "\"");
-                            wr.ContentType = "text/xml;charset=\"utf-8\"";
                             wr.ContentLength = body.Length;
                             #endregion
                             #region Call Service function
