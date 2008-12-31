@@ -11,6 +11,9 @@
   * Statistics support (Show how much of X traffic that has been transferred and what kind of traffic. You will of course be able to declare your own matching objects.)
   * Connection detection (Code comes from Xmpl). It will make it possible to determine what type of connection user can get without setting some firewall rules up (None, Passive, Active through UPnP, Active).
 
+
+
+
   * *Other changes:*
   * ADD		- Dispose function for TcpConnection and Hub. Disconnects and cleans resources. (You should call this if you dont want hub to reconnect or if you dont want to use the hub object anymore)
     * IsDisposed shows if object has been disposed or not.
@@ -45,7 +48,10 @@
   * FIX		- Bug that made tag not being updated with registered and above hub count (ADC Only). Thanks Spookie for reporting.
   * FIX		- Fixed so RCM was sent correctly in ADC. Thanks fadil.khodabuccus for reporting [http://code.google.com/p/flowlib/issues/detail?id=16 Issue 16]
   * FIX		- Bug that made it impossible to parse protocol version on some systems. Thanks fadil.khodabuccus for reporting [http://code.google.com/p/flowlib/issues/detail?id=17 Issue 17]
+  * ADD		- EndPoint property to UdpConnection and made properties protected instead of private.
+  * CHANGE		- IConnection and IProtocols now implements System.IDisposable and a property called IsDisposed (All objects using them already had them implemented).
 
+  
 
 
 
