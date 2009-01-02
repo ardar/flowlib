@@ -50,7 +50,7 @@
   * FIX		- Bug that made it impossible to parse protocol version on some systems. Thanks fadil.khodabuccus for reporting [http://code.google.com/p/flowlib/issues/detail?id=17 Issue 17]
   * ADD		- EndPoint property to UdpConnection and made properties protected instead of private.
   * CHANGE		- IConnection and IProtocols now implements System.IDisposable and a property called IsDisposed (All objects using them already had them implemented).
-
+  * CHANGE		- Info that is saved in UserInfo.STOREID for nmdc hubs. This id is now unique between hubs. It is created in this format: Hub.HubSetting.Address + Hub.HubSetting.Port + UserInfo.DisplayName. (IF you have saved any stuff with UserInfo.STOREID as key *this may break your implementation. NMDC ONLY*)
   
 
 
