@@ -6,6 +6,8 @@
   _[Todo See Todo for changes still remaining before release]_
 
 
+= 20090102 =
+
   * *Changes from TODO:*
   * UPnP Support (Rewritten and implemented small parts of my UPnPSharp library to fit FlowLib)
   * Statistics support (Show how much of X traffic that has been transferred and what kind of traffic. You will of course be able to declare your own matching objects.)
@@ -51,6 +53,15 @@
   * ADD		- EndPoint property to UdpConnection and made properties protected instead of private.
   * CHANGE		- IConnection and IProtocols now implements System.IDisposable and a property called IsDisposed (All objects using them already had them implemented).
   * CHANGE		- Info that is saved in UserInfo.STOREID for nmdc hubs. This id is now unique between hubs. It is created in this format: Hub.HubSetting.Address + Hub.HubSetting.Port + UserInfo.DisplayName. (IF you have saved any stuff with UserInfo.STOREID as key *this may break your implementation. NMDC ONLY*)
+  * ADD		- Code Example - What Connection is Possible.
+  * ADD		- Code Example - Collect Transfered Information.
+  * ADD		- Support for double in General.FormatBytes
+  * FIX		- Bug where FlowLib would try to start a secure transfer even if we don't support secure transfers (Only looked at other user before).
+  * FIX		- Bugs where User.Id where used instead of User.StoreId in some code examples.
+
+
+
+
   
 
 
