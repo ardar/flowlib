@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2008 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -60,6 +60,25 @@ namespace FlowLib.Utils.Convert
         {
             return FormatBytes(bytes, 2, out bp);
         }
+
+        /// <summary>
+        /// Formats a long to the highest binary prefix accourding to IEEE 1541 standard.
+        /// http://en.wikipedia.org/wiki/IEEE_1541
+        /// </summary>
+        /// <example>The above code will give you:227,54 MiB
+        /// <code>
+        /// Util.Convert.BinaryPrefixes bp;
+        /// string f = string.Format("{0} {1}", Util.Convert.FormatBytes(238594534, out bp), bp);
+        /// </code>
+        /// </example>
+        /// <param name="bytes">double representation as bytes</param>
+        /// <param name="bp">BinaryPrefix object that will show what prefix type returned data is of</param>
+        /// <returns>formated bytes after conversion with 2 decimals. Look at bp for prefix type</returns>
+        public static double FormatBytes(double bytes, out BinaryPrefixes bp)
+        {
+            return FormatBytes(bytes, 2, out bp);
+        }
+
         /// <summary>
         /// Formats a long to the highest binary prefix accourding to IEEE 1541 standard.
         /// http://en.wikipedia.org/wiki/IEEE_1541
@@ -76,18 +95,35 @@ namespace FlowLib.Utils.Convert
         /// <returns>formated bytes after conversion. Look at bp for prefix type</returns>
         public static double FormatBytes(long bytes, int decimals, out BinaryPrefixes bp)
         {
-            bp = 0;
-            double db = (double)bytes;
-            while ((db / 1024d) > 1)
-            {
-                db /= 1024d;
-                bp++;
-            }
-            Decimal des = new Decimal(db);
-            db = Decimal.ToDouble(Decimal.Round(des, 2));
-            return db;
+            return FormatBytes((double)bytes, decimals, out bp);
         }
 
+        /// <summary>
+        /// Formats a long to the highest binary prefix accourding to IEEE 1541 standard.
+        /// http://en.wikipedia.org/wiki/IEEE_1541
+        /// </summary>
+        /// <example>The above code will give you:227,54 MiB
+        /// <code>
+        /// Util.Convert.BinaryPrefixes bp;
+        /// string f = string.Format("{0} {1}", Util.Convert.FormatBytes(238594534, out bp), bp);
+        /// </code>
+        /// </example>
+        /// <param name="bytes">double representation as bytes</param>
+        /// <param name="decimals">Number of decimals the return data should have</param>
+        /// <param name="bp">BinaryPrefix object that will show what prefix type returned data is of</param>
+        /// <returns>formated bytes after conversion. Look at bp for prefix type</returns>
+        public static double FormatBytes(double bytes, int decimals, out BinaryPrefixes bp)
+        {
+            bp = 0;
+            while ((bytes / 1024d) > 1)
+            {
+                bytes /= 1024d;
+                bp++;
+            }
+            Decimal des = new Decimal(bytes);
+            bytes = Decimal.ToDouble(Decimal.Round(des, 2));
+            return bytes;
+        }
         /// <summary>
         /// Decodes a base64 string
         /// </summary>
