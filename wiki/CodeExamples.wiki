@@ -23,3 +23,4 @@ Every example will have a description to tell little about what problem it solve
 || [CodeExampleEncryptedTraffic Encrypted Communicaion] ||
 || [CodeExampleWhatConnectionIsPossible What connection mode can user have?] ||
 || [CodeExamplesCollectTransferedInformationFromActiveDownloadFilelistFromUser Want to get transferred byte count or connection speed? (Transfer)] ||
+|| [CollectTransferedInformationForHub Want to know how much data is transfered both ways when connected to a hub?] ||
