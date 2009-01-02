@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2008 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -555,7 +555,7 @@ namespace FlowLib.Protocols
                 // Protocol has to be set last.
                 trans.Protocol = new TransferNmdcProtocol(trans);
 #if !COMPACT_FRAMEWORK
-                if (conToMe.TLS)
+                if (conToMe.TLS && hub.Me.ContainsKey(UserInfo.SECURE))
                     trans.SecureProtocol = SecureProtocols.TLS;
 #endif
                 Update(hub, new FmdcEventArgs(Actions.TransferStarted, trans));
