@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2008 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -156,13 +156,13 @@ namespace ConsoleDemo.Examples
                     if (!sentRequest && hasMe)
                     {
                         User usr = null;
-                        if ((usr = hub.GetUserById("DCpp706")) != null)
+                        if ((usr = hub.GetUserByNick("DCpp706")) != null)
                         {
                             // Adding filelist of unknown type to download manager.
-                            // to the user Flow84
+                            // to the user DCpp706
                             ContentInfo info = new ContentInfo(ContentInfo.FILELIST, BaseFilelist.UNKNOWN);
-                            info.Set(ContentInfo.STORAGEPATH, currentDir + "Filelists\\" + usr.ID + ".filelist");
-                            downloadManager.AddDownload(new DownloadItem(info), new Source(hub.RemoteAddress.ToString(), usr.ID));
+                            info.Set(ContentInfo.STORAGEPATH, currentDir + "Filelists\\" + usr.StoreID + ".filelist");
+                            downloadManager.AddDownload(new DownloadItem(info), new Source(hub.RemoteAddress.ToString(), usr.StoreID));
                             // Start transfer to user
                             UpdateBase(this, new FmdcEventArgs(Actions.StartTransfer, usr));
                             sentRequest = true;

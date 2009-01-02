@@ -28,8 +28,8 @@ namespace FlowLib.Utils.Statistics
     {
         protected long lastReceivedBytes = 0;
         protected long lastSendBytes = 0;
-        protected long lastCalcReceivedSpeed = 0;
-        protected long lastCalcSendSpeed = 0;
+        protected long lastCalcReceivedSpeed = DateTime.Now.Ticks;
+        protected long lastCalcSendSpeed = DateTime.Now.Ticks;
 
         public long TotalBytesSent
         {
@@ -69,8 +69,15 @@ namespace FlowLib.Utils.Statistics
                 TimeSpan tmpTime = new TimeSpan(now - lastCalcReceivedSpeed);
                 // Store current time until next time
                 lastCalcReceivedSpeed = now;
-                // Should we set new min/max values?
+                // Insanity check
+                if (tmpBytes <= 0)
+                    return 0;   // No new data
                 double value = tmpBytes / tmpTime.TotalSeconds;
+                if (double.IsInfinity(value))
+                {
+                    return -1;
+                }
+                // Should we set new min/max values?
                 if (value > MaximumReceiveSpeed)
                     MaximumReceiveSpeed = value;
                 if (MinimumReceiveSpeed == 0 || value < MinimumReceiveSpeed)
@@ -99,15 +106,22 @@ namespace FlowLib.Utils.Statistics
                 // Get how many bytes has been transfered since last time
                 long tmpBytes = TotalBytesSent - lastSendBytes;
                 // Store current total bytes until next time
-                lastReceivedBytes = TotalBytesSent;
+                lastSendBytes = TotalBytesSent;
                 // Get current time in ticks
                 long now = DateTime.Now.Ticks;
                 // Get how long time has pased since last time
                 TimeSpan tmpTime = new TimeSpan(now - lastCalcSendSpeed);
                 // Store current time until next time
                 lastCalcSendSpeed = now;
-                // Should we set new min/max values?
+                // Insanity check
+                if (tmpBytes <= 0)
+                    return 0;   // No new data
                 double value = tmpBytes / tmpTime.TotalSeconds;
+                if (double.IsInfinity(value))
+                {
+                    return -1;
+                }
+                // Should we set new min/max values?
                 if (value > MaximumSendSpeed)
                     MaximumSendSpeed = value;
                 if (MinimumSendSpeed == 0 || value < MinimumSendSpeed)

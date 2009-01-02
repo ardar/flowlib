@@ -1,4 +1,4 @@
-
+﻿
 /*
  *
  * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
@@ -19,6 +19,7 @@
  *
  */
 
+using System;
 using FlowLib.Connections;
 using FlowLib.Containers;
 using FlowLib.Protocols;
@@ -26,46 +27,124 @@ using FlowLib.Events;
 using FlowLib.Interfaces;
 using FlowLib.Managers;
 using FlowLib.Utils.FileLists;
-
-#if !COMPACT_FRAMEWORK
-// Security, Windows Mobile doesnt support SSLStream so we disable this feature for it.
-using FlowLib.Containers.Security;
-using System.Security.Cryptography.X509Certificates;
-#endif
+using FlowLib.Utils.Statistics;
 
 namespace ConsoleDemo.Examples
 {
-    public class PassiveDownloadFilelistFromUserUsingTLS : IBaseUpdater
+    public class CollectTransferedInformationFromFilelistDownload : IBaseUpdater
     {
         public event FmdcEventHandler UpdateBase;
 
         TransferManager transferManager = new TransferManager();
         DownloadManager downloadManager = new DownloadManager();
+        TcpConnectionListener incomingConnectionListener = null;
+        GeneralProtocolDataCollector stats = null;
+
         //string currentDir = @"C:\Temp\";
         string currentDir = System.AppDomain.CurrentDomain.BaseDirectory;
         bool sentRequest = false;
 
-        public PassiveDownloadFilelistFromUserUsingTLS()
+        public CollectTransferedInformationFromFilelistDownload()
         {
             UpdateBase = new FmdcEventHandler(PassiveConnectToUser_UpdateBase);
 
             // Creates a empty share
             Share share = new Share("Testing");
+            // Port to listen for incomming connections on
+            share.Port = 12345;
+
+            incomingConnectionListener = new TcpConnectionListener(share.Port);
+            incomingConnectionListener.Update += new FmdcEventHandler(Connection_Update);
+            incomingConnectionListener.Start();
+
             // Adds common filelist to share
             AddFilelistsToShare(share);
 
             HubSetting setting = new HubSetting();
             setting.Address = "127.0.0.1";
             setting.Port = 411;
-            setting.DisplayName = "FlowLibPassiveTLS";
+            setting.DisplayName = "FlowLib";
             setting.Protocol = "Auto";
 
             Hub hubConnection = new Hub(setting, this);
             hubConnection.ProtocolChange += new FmdcEventHandler(hubConnection_ProtocolChange);
             // Adds share to hub
             hubConnection.Share = share;
-            hubConnection.Me.Set(UserInfo.SECURE, "");
+            //hubConnection.Me.Mode = FlowLib.Enums.ConnectionTypes.Direct;
+            hubConnection.Me.TagInfo.Slots = 2;
             hubConnection.Connect();
+
+
+            FlowLib.Utils.Convert.General.BinaryPrefixes bp;
+            Console.WriteLine("Press any key to update information");
+            do
+            {
+                Console.ReadKey(true);
+                Console.Clear();
+                Console.WriteLine("Press any key to update information");
+                Console.WriteLine("==================================");
+                if (stats != null)
+                {
+                    Console.WriteLine("Total data sent: " + FlowLib.Utils.Convert.General.FormatBytes(stats.TotalBytesSent, out bp) + bp);
+                    Console.WriteLine("Total data received: " + FlowLib.Utils.Convert.General.FormatBytes(stats.TotalBytesReceived, out bp) + bp);
+                    Console.WriteLine("current download speed: " + FlowLib.Utils.Convert.General.FormatBytes(stats.CurrentReceiveSpeed, out bp) + bp + "/s");
+                    Console.WriteLine("current upload speed: " + FlowLib.Utils.Convert.General.FormatBytes(stats.CurrentSendSpeed, out bp) + bp + "/s");
+                    Decimal d = new decimal(stats.MaximumReceiveSpeed);
+                    Console.WriteLine("Maximum download speed: " + FlowLib.Utils.Convert.General.FormatBytes(decimal.ToInt64(d), out bp) + bp + "/s");
+                    d = new decimal(stats.MaximumSendSpeed);
+                    Console.WriteLine("Maximum upload speed: " + FlowLib.Utils.Convert.General.FormatBytes(decimal.ToInt64(d), out bp) + bp + "/s");
+                    d = new decimal(stats.MinimumReceiveSpeed);
+                    Console.WriteLine("Minimum download speed: " + FlowLib.Utils.Convert.General.FormatBytes(decimal.ToInt64(d), out bp) + bp + "/s");
+                    d = new decimal(stats.MinimumSendSpeed);
+                    Console.WriteLine("Minimum upload speed: " + FlowLib.Utils.Convert.General.FormatBytes(decimal.ToInt64(d), out bp) + bp + "/s");
+                }
+                else
+                {
+                    Console.WriteLine("No transfer has started yet.");
+                }
+                Console.WriteLine("==================================");
+            } while (true);
+        }
+
+        void Connection_Update(object sender, FlowLib.Events.FmdcEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case Actions.TransferStarted:
+                    Transfer trans = e.Data as Transfer;
+                    if (trans != null)
+                    {
+                        // Here we bind transfer to our data collector
+                        stats = new GeneralProtocolDataCollector(trans);
+                        if (trans.Protocol == null)
+                        {
+                            trans.Protocol = new FlowLib.Protocols.AdcProtocol(trans);
+                            trans.Listen();
+                            transferManager.AddTransfer(trans);
+                        }
+
+                        trans.Protocol.ChangeDownloadItem += new FmdcEventHandler(Protocol_ChangeDownloadItem);
+                        trans.Protocol.RequestTransfer += new FmdcEventHandler(Protocol_RequestTransfer);
+                        trans.ProtocolChange += new FmdcEventHandler(trans_ProtocolChange);
+                        e.Handled = true;
+                    }
+                    break;
+            }
+        }
+
+        void trans_ProtocolChange(object sender, FmdcEventArgs e)
+        {
+            Transfer trans = sender as Transfer;
+            if (trans == null)
+                return;
+            IProtocolTransfer prot = e as IProtocolTransfer;
+            if (prot != null)
+            {
+                prot.ChangeDownloadItem -= Protocol_ChangeDownloadItem;
+                prot.RequestTransfer -= Protocol_RequestTransfer;
+            }
+            trans.Protocol.ChangeDownloadItem += new FmdcEventHandler(Protocol_ChangeDownloadItem);
+            trans.Protocol.RequestTransfer += new FmdcEventHandler(Protocol_RequestTransfer);
         }
 
         void PassiveConnectToUser_UpdateBase(object sender, FmdcEventArgs e) { }
@@ -104,14 +183,11 @@ namespace ConsoleDemo.Examples
                     Transfer trans = e.Data as Transfer;
                     if (trans != null)
                     {
-#if !COMPACT_FRAMEWORK
-                        // Security, Windows Mobile doesnt support SSLStream so we disable this feature for it.
-                        trans.SecureUpdate += new FmdcEventHandler(trans_SecureUpdate);
-#endif
+                        // Here we bind transfer to our data collector
+                        stats = new GeneralProtocolDataCollector(trans);
                         transferManager.StartTransfer(trans);
                         trans.Protocol.ChangeDownloadItem += new FmdcEventHandler(Protocol_ChangeDownloadItem);
                         trans.Protocol.RequestTransfer += new FmdcEventHandler(Protocol_RequestTransfer);
-
                     }
                     break;
                 case Actions.UserOnline:
@@ -119,10 +195,10 @@ namespace ConsoleDemo.Examples
                     if (!sentRequest && hasMe)
                     {
                         User usr = null;
-                        if ((usr = hub.GetUserByNick("FlowLibActiveTLS")) != null)
+                        if ((usr = hub.GetUserByNick("DCpp706")) != null)
                         {
                             // Adding filelist of unknown type to download manager.
-                            // to the user FlowLibActiveTLS
+                            // to the user DCpp706
                             ContentInfo info = new ContentInfo(ContentInfo.FILELIST, BaseFilelist.UNKNOWN);
                             info.Set(ContentInfo.STORAGEPATH, currentDir + "Filelists\\" + usr.StoreID + ".filelist");
                             downloadManager.AddDownload(new DownloadItem(info), new Source(hub.RemoteAddress.ToString(), usr.StoreID));
@@ -159,34 +235,5 @@ namespace ConsoleDemo.Examples
                 e.Handled = true;
             }
         }
-
-#if !COMPACT_FRAMEWORK
-// Security, Windows Mobile doesnt support SSLStream so we disable this feature for it.
-        void trans_SecureUpdate(object sender, FmdcEventArgs e)
-        {
-            switch (e.Action)
-            {
-                case Actions.SecuritySelectLocalCertificate:
-                    LocalCertificationSelectionInfo lc = e.Data as LocalCertificationSelectionInfo;
-                    if (lc != null)
-                    {
-                        string file = System.AppDomain.CurrentDomain.BaseDirectory + "FlowLib.cer";
-                        lc.SelectedCertificate = X509Certificate.CreateFromCertFile(file);
-                        e.Data = lc;
-                    }
-
-                    break;
-                case Actions.SecurityValidateRemoteCertificate:
-                    CertificateValidationInfo ct = e.Data as CertificateValidationInfo;
-                    if (ct != null)
-                    {
-                        ct.Accepted = true;
-                        e.Data = ct;
-                        e.Handled = true;
-                    }
-                    break;
-            }
-        }
-#endif
     }
 }

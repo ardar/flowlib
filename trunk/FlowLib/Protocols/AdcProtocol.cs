@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2008 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1236,7 +1236,7 @@ namespace FlowLib.Protocols
                             // We are active and they are active. Let them connect to us
                             // TODO : We should really use something else as token
                             Update(con, new FmdcEventArgs(Actions.TransferRequest, new TransferRequest(usr.ID, hub, usr.UserInfo,true)));
-                            if (usr.UserInfo.ContainsKey(UserInfo.SECURE))
+                            if (usr.UserInfo.ContainsKey(UserInfo.SECURE) && hub.Me.ContainsKey(UserInfo.SECURE))
                                 hub.Send(new CTM(hub, usr.ID, hub.Me.ID, "ADCS/0.10", hub.Share.Port, usr.ID));
                             else
                                 hub.Send(new CTM(hub, usr.ID, hub.Me.ID, hub.Share.Port, usr.ID));
@@ -1252,7 +1252,7 @@ namespace FlowLib.Protocols
                             }
                             // TODO : We should really use something else as token
                             Update(con, new FmdcEventArgs(Actions.TransferRequest, new TransferRequest(usr.ID, hub, usr.UserInfo, true)));
-                            if (usr.UserInfo.ContainsKey(UserInfo.SECURE))
+                            if (usr.UserInfo.ContainsKey(UserInfo.SECURE) && hub.Me.ContainsKey(UserInfo.SECURE))
                                 hub.Send(new RCM(usr.ID, hub, "ADCS/0.10", hub.Me.ID, usr.ID));
                             else
                                 hub.Send(new RCM(usr.ID, hub, hub.Me.ID, usr.ID));
