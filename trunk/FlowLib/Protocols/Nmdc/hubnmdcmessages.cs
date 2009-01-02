@@ -256,6 +256,7 @@ namespace FlowLib.Protocols.HubNmdc
                     string[] sections = temp.Split('$');
                     info = new UserInfo();
                     info.DisplayName = from;
+                    info.Set(UserInfo.STOREID, hub.HubSetting.Address + hub.HubSetting.Port.ToString() + from);
                     if (sections.Length == 6)
                     {
                         int pos = 0;
