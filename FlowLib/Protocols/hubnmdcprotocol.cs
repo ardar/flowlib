@@ -477,6 +477,7 @@ namespace FlowLib.Protocols
                 {
                     UserInfo userInfo = new UserInfo();
                     userInfo.DisplayName = userid;
+                    userInfo.Set(UserInfo.STOREID, hub.HubSetting.Address + hub.HubSetting.Port.ToString() + userid);
                     if (hub.GetUserById(userid) == null)
                         Update(hub, new FmdcEventArgs(Actions.UserOnline, userInfo));
                 }
@@ -488,6 +489,7 @@ namespace FlowLib.Protocols
                 {
                     UserInfo userInfo = new UserInfo();
                     userInfo.DisplayName = userid;
+                    userInfo.Set(UserInfo.STOREID, hub.HubSetting.Address + hub.HubSetting.Port.ToString() + userid);
                     userInfo.IsOperator = true;
                     User usr = null;
                     if ((usr = hub.GetUserById(userid)) == null)
