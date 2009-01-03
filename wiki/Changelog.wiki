@@ -6,12 +6,13 @@
   _[Todo See Todo for changes still remaining before release]_
 
 
-= 20090102 =
+= 20090103 =
 
   * *Changes from TODO:*
   * UPnP Support (Rewritten and implemented small parts of my UPnPSharp library to fit FlowLib)
   * Statistics support (Show how much of X traffic that has been transferred and what kind of traffic. You will of course be able to declare your own matching objects.)
   * Connection detection (Code comes from Xmpl). It will make it possible to determine what type of connection user can get without setting some firewall rules up (None, Passive, Active through UPnP, Active).
+  * Added UpdateFlowLibMobileProject.exe that will generate a Compact .Net Framework project from the FlowLib.csproj. This is to make it even more easy to use FlowLib on you Mobile platform.
 
 
 
@@ -58,9 +59,7 @@
   * ADD		- Support for double in General.FormatBytes
   * FIX		- Bug where FlowLib would try to start a secure transfer even if we don't support secure transfers (Only looked at other user before).
   * FIX		- Bugs where User.Id where used instead of User.StoreId in some code examples.
-
-
-
+  * FIX		- *FlowLib is now running on Compact Framework 3.5.* Use FlowLibMobile.csproj and FlowLibMobile.sln for developing to your Mobile platform.
 
   
 
