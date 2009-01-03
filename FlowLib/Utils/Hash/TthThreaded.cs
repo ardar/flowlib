@@ -310,7 +310,9 @@ namespace FlowLib.Utils.Hash
             finally
             {
                 // We remove the object to indicate that we are finished
+#if COMPACT_FRAMEWORK
                 Thread.CurrentThread.GetData();
+#endif
             }
         }
 
