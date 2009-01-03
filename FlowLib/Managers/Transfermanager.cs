@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2008 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +29,10 @@ using System.Net;
 using System.Threading;
 using System.Net.Sockets;
 using System.Collections.Generic;
+
+#if COMPACT_FRAMEWORK
+using FlowLib.Utils.CompactFramworkExtensionMethods;
+#endif
 
 namespace FlowLib.Managers
 {
@@ -137,9 +141,15 @@ namespace FlowLib.Managers
         {
             AddTransfer(trans);
             // Connect transfer.
+#if !COMPACT_FRAMEWORK
             Thread t = new Thread(new ParameterizedThreadStart(ConnectTransfer));
             t.IsBackground = true;
             t.Start(trans);
+#else
+            Thread t = new Thread(new ThreadStart(ConnectTransfer));
+            t.IsBackground = true;
+            t.Start(trans);
+#endif
         }
 
         void trans_ConnectionStatusChange(object sender, FmdcEventArgs e)
@@ -175,6 +185,12 @@ namespace FlowLib.Managers
             transfers.Remove(id);
         }
 
+#if COMPACT_FRAMEWORK
+        private void ConnectTransfer()
+        {
+            ConnectTransfer(Thread.CurrentThread.GetData());
+        }
+#endif
         private void ConnectTransfer(object obj)
         {
             if (obj is ITransfer)
@@ -183,13 +199,5 @@ namespace FlowLib.Managers
                 t.Connect();
             }
         }
-
-        private void OnReceive(System.IAsyncResult ar)
-        {
-            System.Net.Sockets.UdpClient udp = (System.Net.Sockets.UdpClient)ar.AsyncState;
-            System.Net.IPEndPoint sender = new System.Net.IPEndPoint(0, 0);
-            byte[] data = udp.EndReceive(ar, ref sender);
-        }
-
     }
 }

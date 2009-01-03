@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2008 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -112,7 +112,7 @@ namespace FlowLib.Utils.ErrorHandling
             sb.Append("OSP:" + (int)System.Environment.OSVersion.Platform + "\r\n");                // OS Platform
             sb.Append("OSV:" + System.Environment.OSVersion.Version + "\r\n");                 // OS Version
             // Walk around for Windows Mobile.
-#if (!WINDOWSMOBILE)
+#if !COMPACT_FRAMEWORK
             sb.Append("OSS:" + System.Environment.OSVersion.ServicePack + "\r\n");             // Os ServicePack.
 #endif
         }
@@ -131,7 +131,7 @@ namespace FlowLib.Utils.ErrorHandling
                     sb.Append("Exception type: " + e.GetType().FullName + "\r\n");
                     // This is if we know we can collect special info for a specific Exception
                     // Walk around for Windows Mobile.
-#if (!WINDOWSMOBILE)
+#if !COMPACT_FRAMEWORK
                     switch (e.GetType().ToString())
                     {
                         case "System.Reflection.ReflectionTypeLoadException":
@@ -145,14 +145,14 @@ namespace FlowLib.Utils.ErrorHandling
                 if (e.Message != null)
                     sb.Append("Exception text: " + e.Message + "\r\n");
                 // Walk around for Windows Mobile.
-#if (!WINDOWSMOBILE)
+#if !COMPACT_FRAMEWORK
                 if (e.TargetSite != null)
                     sb.Append("Function Name: " + e.TargetSite.ToString() + "\r\n");
 #endif
                 if (e.StackTrace != null)
                     sb.Append("StackTrace: " + e.StackTrace.ToString() + "\r\n");
                 // Walk around for Windows Mobile.
-#if (!WINDOWSMOBILE)
+#if !COMPACT_FRAMEWORK
                 if (e.Source != null)
                     sb.Append("Source: " + e.Source + "\r\n");
 #endif

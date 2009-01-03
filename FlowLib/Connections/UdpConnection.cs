@@ -53,7 +53,9 @@ namespace FlowLib.Connections
         {
             EndPoint = ip;
             connection = new UdpClient(ip);
+#if !COMPACT_FRAMEWORK
             connection.DontFragment = true;
+#endif
             StartListen();
         }
 

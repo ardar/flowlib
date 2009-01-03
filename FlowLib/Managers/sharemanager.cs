@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2008 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,10 +31,18 @@ namespace FlowLib.Managers
     public class ShareManager
     {
         protected const int IndexShareNames = 0;
-        protected string directory = System.AppDomain.CurrentDomain.BaseDirectory;
-
+        protected string directory;
         public string FileName = "Shares";
         protected SortedList<string, Share> shares = new SortedList<string, Share>();
+
+        public ShareManager()
+        {
+#if !COMPACT_FRAMEWORK
+            directory = System.AppDomain.CurrentDomain.BaseDirectory;
+#else
+            directory = System.IO.Directory.GetCurrentDirectory();
+#endif
+        }
         /// <summary>
         /// Adding share to manager
         /// </summary>

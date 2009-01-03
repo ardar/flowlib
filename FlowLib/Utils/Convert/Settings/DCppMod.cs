@@ -21,6 +21,10 @@
 
 using System.IO;
 
+#if COMPACT_FRAMEWORK
+using FlowLib.Utils.CompactFramworkExtensionMethods;
+#endif
+
 namespace FlowLib.Utils.Convert.Settings
 {
     /// <summary>

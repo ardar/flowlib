@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2008 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -72,7 +72,11 @@ namespace FlowLib.Utils
 
         public static bool IsValidFileName(string name)
         {
+#if !COMPACT_FRAMEWORK
             char[] forbiddenChars = System.IO.Path.GetInvalidFileNameChars();
+#else            
+            char[] forbiddenChars = System.IO.Path.GetInvalidPathChars();
+#endif
             for (int i = 0; i < forbiddenChars.Length; i++)
             {
                 if (name.Contains(forbiddenChars[i].ToString()))

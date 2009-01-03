@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2008 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,10 @@ using FlowLib.Interfaces;
 using FlowLib.Protocols;
 using FlowLib.Containers;
 using FlowLib.Connections;
+
+#if COMPACT_FRAMEWORK
+using FlowLib.Utils.CompactFramworkExtensionMethods;
+#endif
 
 namespace FlowLib.Protocols.HubNmdc
 {
@@ -992,7 +996,13 @@ namespace FlowLib.Protocols.HubNmdc
             {
                 string tmp = raw.Substring(pos1);
                 char[] test = { '$', '$' };
+#if !COMPACT_FRAMEWORK
                 nicks = tmp.Split(test, System.StringSplitOptions.RemoveEmptyEntries);
+#else
+                System.Collections.Generic.List<string> lst = new System.Collections.Generic.List<string>(tmp.Split(test));
+                while (lst.Remove(string.Empty)) { }
+                nicks = lst.ToArray();
+#endif
                 if (nicks.Length > 0)
                     IsValid = true;
             }
@@ -1032,7 +1042,13 @@ namespace FlowLib.Protocols.HubNmdc
             {
                 string tmp = raw.Substring(++pos1);
                 char[] test = { '$', '$' };
+#if !COMPACT_FRAMEWORK
                 ops = tmp.Split(test, System.StringSplitOptions.RemoveEmptyEntries); // command.Split("$$", StringSplitOptions.RemoveEmptyEntries);
+#else
+                System.Collections.Generic.List<string> lst = new System.Collections.Generic.List<string>(tmp.Split(test));
+                while (lst.Remove(string.Empty)) { }
+                ops = lst.ToArray();
+#endif
             }
             IsValid = true;
         }

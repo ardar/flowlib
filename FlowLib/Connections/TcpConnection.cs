@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2008 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,6 +39,10 @@ using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using FlowLib.Containers.Security;
 using FlowLib.Enums;
+#endif
+
+#if COMPACT_FRAMEWORK
+using FlowLib.Utils.CompactFramworkExtensionMethods;
 #endif
 
 namespace FlowLib.Connections
@@ -320,8 +324,9 @@ namespace FlowLib.Connections
                 disposing = true;
                 ProtocolChange -= OnProtocolChanged;
                 ConnectionStatusChange -= OnConnectionStatusChanged;
+#if !COMPACT_FRAMEWORK
                 SecureUpdate -= OnSecureUpdate;
-
+#endif
                 allDone.Close();
                 buffer = null;
                 localAddress = null;
@@ -337,11 +342,13 @@ namespace FlowLib.Connections
                     protocol.Dispose();
                     protocol = null;
                 }
+#if !COMPACT_FRAMEWORK
                 if (secStream != null)
                 {
                     secStream.Dispose();
                     secStream = null;
                 }
+#endif
                 GC.SuppressFinalize(this);
                 disposed = true;
                 disposing = false;

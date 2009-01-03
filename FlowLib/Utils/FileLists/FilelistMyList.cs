@@ -26,6 +26,10 @@ using FlowLib.Enums;
 using System.Collections.Generic;
 using System;
 
+#if COMPACT_FRAMEWORK
+using FlowLib.Utils.CompactFramworkExtensionMethods;
+#endif
+
 namespace FlowLib.Utils.FileLists
 {
     public class FilelistMyList : BaseFilelist

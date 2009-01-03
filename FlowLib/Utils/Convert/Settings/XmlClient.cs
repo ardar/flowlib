@@ -24,6 +24,10 @@ using System.Xml;
 using System.Collections.Generic;
 using FlowLib.Containers;
 
+#if COMPACT_FRAMEWORK
+using FlowLib.Utils.CompactFramworkExtensionMethods;
+#endif
+
 namespace FlowLib.Utils.Convert.Settings
 {
     public abstract class XmlClient : BaseClient
@@ -46,7 +50,8 @@ namespace FlowLib.Utils.Convert.Settings
             }
 
             XmlDeclaration xmlDec;
-            xmlDec = document.CreateXmlDeclaration("1.0", System.Text.Encoding.UTF8.BodyName, "yes");
+            //xmlDec = document.CreateXmlDeclaration("1.0", System.Text.Encoding.UTF8.BodyName, "yes");
+            xmlDec = document.CreateXmlDeclaration("1.0", "utf-8", "yes");
             document.AppendChild(xmlDec);
 
             XmlElement xmlFavorites = document.CreateElement("Favorites");

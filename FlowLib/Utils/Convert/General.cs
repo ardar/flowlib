@@ -177,7 +177,11 @@ namespace FlowLib.Utils.Convert
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < byteStr.Length; i++)
             {
+#if !COMPACT_FRAMEWORK
                 sb.Append(Char.ConvertFromUtf32(byteStr[i]));
+#else
+                sb.Append((Char)byteStr[i]);
+#endif
             }
             return sb.ToString();
         }

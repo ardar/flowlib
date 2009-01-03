@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2008 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,7 +40,19 @@ namespace FlowLib.Utils.Convert.Settings
         {
             if (File.Exists(path))
             {
+#if !COMPACT_FRAMEWORK
                 return Read(File.ReadAllBytes(path));
+#else
+                byte[] data;
+                using (System.IO.FileStream fs = System.IO.File.OpenRead(path))
+                {
+                    data = new byte[fs.Length];
+                    fs.Read(data, 0, data.Length);
+                    fs.Close();
+                    return Read(data);
+                }
+#endif
+
             }
             else
             {
@@ -52,7 +64,18 @@ namespace FlowLib.Utils.Convert.Settings
         public void Write(string path)
         {
             FlowLib.Utils.FileOperations.PathExists(path);
+#if !COMPACT_FRAMEWORK
             File.WriteAllBytes(path, Write());
+#else
+            using (FileStream fs = File.OpenWrite(path))
+            {
+                byte[] data = Write();
+                fs.Write(data, 0, data.Length);
+                fs.Flush();
+                fs.Dispose();
+                fs.Close();
+            }
+#endif
         }
 
         public abstract byte[] Write();
