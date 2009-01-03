@@ -41,6 +41,10 @@ using System;
 using System.Threading;
 using System.IO;
 
+#if COMPACT_FRAMEWORK
+using FlowLib.Utils.CompactFramworkExtensionMethods;
+#endif
+
 namespace FlowLib.Utils.Hash
 {
     public class TthThreaded : IDisposable
@@ -212,7 +216,7 @@ namespace FlowLib.Utils.Hash
                 ThreadsList[i].Priority = threadPriority;
                 ThreadsList[i].IsBackground = true;
                 ThreadsList[i].Name = i.ToString();
-                ThreadsList[i].Start();
+                ThreadsList[i].Start(true);
             }
 
             bool ThreadsAreWorking = false;
@@ -226,7 +230,11 @@ namespace FlowLib.Utils.Hash
                 ThreadsAreWorking = false;
 
                 for (int i = 0; i < ThreadCount; i++)
+#if !COMPACT_FRAMEWORK
                     if (ThreadsList[i].IsAlive)
+#else
+                    if (ThreadsList[i].IsAlive())
+#endif
                         ThreadsAreWorking = true;
 
 
@@ -236,61 +244,74 @@ namespace FlowLib.Utils.Hash
         void StopThreads()
         {
             for (int i = 0; i < ThreadCount; i++)
+#if !COMPACT_FRAMEWORK
                 if (ThreadsList[i] != null && ThreadsList[i].IsAlive)
-                    ThreadsList[i].Abort();
+#else
+                if (ThreadsList[i] != null && ThreadsList[i].IsAlive())
+#endif
+                ThreadsList[i].Abort();
         }
 
         void ProcessLeafs()
         {
-            FileStream ThreadFilePtr = new FileStream(Filename, FileMode.Open, FileAccess.Read);
-            FileBlock ThreadFileBlock = FileParts[System.Convert.ToInt16(Thread.CurrentThread.Name)];
-            Tiger TG = new Tiger();
-            byte[] DataBlock;
-            byte[] Data = new byte[LeafSize + 1];
-            long LeafIndex;
-            int BlockLeafs;
-            int i;
-
-            ThreadFilePtr.Position = ThreadFileBlock.Start;
-
-            while (ThreadFilePtr.Position < ThreadFileBlock.End)
+            try
             {
-                LeafIndex = (long)ThreadFilePtr.Position / 1024;
+                FileStream ThreadFilePtr = new FileStream(Filename, FileMode.Open, FileAccess.Read);
+                FileBlock ThreadFileBlock = FileParts[System.Convert.ToInt16(Thread.CurrentThread.Name)];
+                Tiger TG = new Tiger();
+                byte[] DataBlock;
+                byte[] Data = new byte[LeafSize + 1];
+                long LeafIndex;
+                int BlockLeafs;
+                int i;
 
-                if (ThreadFileBlock.End - ThreadFilePtr.Position < DataBlockSize)
-                    DataBlock = new byte[ThreadFileBlock.End - ThreadFilePtr.Position];
-                else
-                    DataBlock = new byte[DataBlockSize];
+                ThreadFilePtr.Position = ThreadFileBlock.Start;
 
-                ThreadFilePtr.Read(DataBlock, 0, DataBlock.Length); //read block
-
-                BlockLeafs = DataBlock.Length / 1024;
-
-                for (i = 0; i < BlockLeafs; i++)
+                while (ThreadFilePtr.Position < ThreadFileBlock.End)
                 {
-                    Buffer.BlockCopy(DataBlock, i * LeafSize, Data, 1, LeafSize);
+                    LeafIndex = (long)ThreadFilePtr.Position / 1024;
 
-                    TG.Initialize();
-                    TTH[0][LeafIndex++] = TG.ComputeHash(Data);
+                    if (ThreadFileBlock.End - ThreadFilePtr.Position < DataBlockSize)
+                        DataBlock = new byte[ThreadFileBlock.End - ThreadFilePtr.Position];
+                    else
+                        DataBlock = new byte[DataBlockSize];
+
+                    ThreadFilePtr.Read(DataBlock, 0, DataBlock.Length); //read block
+
+                    BlockLeafs = DataBlock.Length / 1024;
+
+                    for (i = 0; i < BlockLeafs; i++)
+                    {
+                        Buffer.BlockCopy(DataBlock, i * LeafSize, Data, 1, LeafSize);
+
+                        TG.Initialize();
+                        TTH[0][LeafIndex++] = TG.ComputeHash(Data);
+                    }
+
+                    if (i * LeafSize < DataBlock.Length)
+                    {
+                        Data = new byte[DataBlock.Length - BlockLeafs * LeafSize + 1];
+                        Data[0] = LeafHash;
+
+                        Buffer.BlockCopy(DataBlock, BlockLeafs * LeafSize, Data, 1, (Data.Length - 1));
+
+                        TG.Initialize();
+                        TTH[0][LeafIndex++] = TG.ComputeHash(Data);
+
+                        Data = new byte[LeafSize + 1];
+                        Data[0] = LeafHash;
+                    }
                 }
 
-                if (i * LeafSize < DataBlock.Length)
-                {
-                    Data = new byte[DataBlock.Length - BlockLeafs * LeafSize + 1];
-                    Data[0] = LeafHash;
-
-                    Buffer.BlockCopy(DataBlock, BlockLeafs * LeafSize, Data, 1, (Data.Length - 1));
-
-                    TG.Initialize();
-                    TTH[0][LeafIndex++] = TG.ComputeHash(Data);
-
-                    Data = new byte[LeafSize + 1];
-                    Data[0] = LeafHash;
-                }
+                DataBlock = null;
+                Data = null;
             }
-
-            DataBlock = null;
-            Data = null;
+            catch (ThreadAbortException) { }
+            finally
+            {
+                // We remove the object to indicate that we are finished
+                Thread.CurrentThread.GetData();
+            }
         }
 
         void CompressTree()

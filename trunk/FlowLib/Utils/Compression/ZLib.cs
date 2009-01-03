@@ -27,6 +27,10 @@ using System.IO;
 using System.Data;
 using FlowLib.Utils.Compression.ZLibSubMethods;
 
+#if COMPACT_FRAMEWORK
+using FlowLib.Utils.CompactFramworkExtensionMethods;
+#endif
+
 namespace FlowLib.Utils.Compression
 {
     public class ZLib

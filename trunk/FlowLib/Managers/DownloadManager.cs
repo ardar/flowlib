@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2008 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -315,7 +315,11 @@ namespace FlowLib.Managers
         /// </summary>
         public void Load()
         {
+#if !COMPACT_FRAMEWORK
             Load(System.AppDomain.CurrentDomain.BaseDirectory);
+#else
+            Load(System.IO.Directory.GetCurrentDirectory());
+#endif
         }
 
         // TODO : Do loading

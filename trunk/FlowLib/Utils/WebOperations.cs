@@ -128,6 +128,7 @@ namespace FlowLib.Utils
                 HttpWebRequest wReq = (HttpWebRequest)WebRequest.Create(url);
                 wReq.UserAgent = "FlowLib";
 
+#if !COMPACT_FRAMEWORK
                 wReq.CookieContainer = new CookieContainer();
                 // Enable cookie support
                 if (responseHeaders != null && responseHeaders.HasKeys())
@@ -147,6 +148,7 @@ namespace FlowLib.Utils
                         //wReq.Headers.Set("Cookie", str);
                     }
                 }
+#endif
 
                 if (!string.IsNullOrEmpty(method) && !string.IsNullOrEmpty(contentType) && values != null)
                 {

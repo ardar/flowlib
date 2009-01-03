@@ -23,6 +23,10 @@ using FlowLib.Interfaces;
 using FlowLib.Protocols;
 using FlowLib.Containers;
 
+#if COMPACT_FRAMEWORK
+using FlowLib.Utils.CompactFramworkExtensionMethods;
+#endif
+
 namespace FlowLib.Protocols.TransferNmdc
 {
     public class MyNick : StrMessage

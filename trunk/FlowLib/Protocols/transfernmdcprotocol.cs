@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2008 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,10 @@ using FlowLib.Containers;
 using FlowLib.Connections;
 using FlowLib.Managers;
 using FlowLib.Enums;
+
+#if COMPACT_FRAMEWORK
+using FlowLib.Utils.CompactFramworkExtensionMethods;
+#endif
 
 namespace FlowLib.Protocols
 {
@@ -125,7 +129,13 @@ namespace FlowLib.Protocols
         #endregion
         #region Constructor(s)
         public TransferNmdcProtocol(ITransfer trans)
-            :this(trans, System.AppDomain.CurrentDomain.BaseDirectory)
+            :this(trans,
+#if !COMPACT_FRAMEWORK
+            System.AppDomain.CurrentDomain.BaseDirectory
+#else
+            System.IO.Directory.GetCurrentDirectory()
+#endif
+            )
         {
 
         }
@@ -216,12 +226,21 @@ namespace FlowLib.Protocols
                 if (this.received.Length > 0)
                 {
                     byte[] old = this.Encoding.GetBytes(this.received);
+#if !COMPACT_FRAMEWORK
                     long size = (long)length + old.LongLength;
 
                     byte[] tmp = new byte[size];
                     System.Array.Copy(old, 0, tmp, 0, old.LongLength);
                     if (b != null)
                         System.Array.Copy(b, 0, tmp, old.LongLength, (long)length);
+#else
+                    int size = length + old.Length;
+
+                    byte[] tmp = new byte[size];
+                    System.Array.Copy(old, 0, tmp, 0, old.Length);
+                    if (b != null)
+                        System.Array.Copy(b, 0, tmp, old.Length, length);
+#endif
                     b = tmp;
                     length += old.Length;
                     received = string.Empty;
@@ -781,8 +800,11 @@ namespace FlowLib.Protocols
                             if (trans.Share != null && trans.Share.ContainsContent(ref tmp) && tmp.ContainsKey(ContentInfo.TTHL))
                             {
                                 byte[] bytes = Utils.Convert.Base32.Decode(tmp.Get(ContentInfo.TTHL));
+#if !COMPACT_FRAMEWORK
                                 trans.CurrentSegment = new SegmentInfo(-1, 0, bytes.LongLength);
-
+#else
+                                trans.CurrentSegment = new SegmentInfo(-1, 0, bytes.Length);
+#endif
                                 ADCSND adcsend = new ADCSND(trans);
                                 adcsend.Type = adcget.Type;
                                 adcsend.Content = adcget.Content;

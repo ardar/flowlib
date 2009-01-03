@@ -344,7 +344,9 @@ namespace FlowLib.Utils.Compression.ZLibSubMethods
 				}
 	
 				if (restoreDateTime) {
+#if !COMPACT_FRAMEWORK
 					File.SetLastWriteTime(targetName, entry.DateTime);
+#endif
 				}
 			}
 		}

@@ -31,6 +31,10 @@ using FlowLib.Containers;
 using FlowLib.Connections;
 using FlowLib.Enums;
 
+#if COMPACT_FRAMEWORK
+using FlowLib.Utils.CompactFramworkExtensionMethods;
+#endif
+
 namespace FlowLib.Protocols
 {
     /// <summary>
@@ -334,12 +338,21 @@ namespace FlowLib.Protocols
                 if (this.received.Length > 0)
                 {
                     byte[] old = this.Encoding.GetBytes(this.received);
+#if !COMPACT_FRAMEWORK
                     long size = (long)length + old.LongLength;
 
                     byte[] tmp = new byte[size];
                     System.Array.Copy(old, 0, tmp, 0, old.LongLength);
                     if (b != null)
                         System.Array.Copy(b, 0, tmp, old.LongLength, (long)length);
+#else
+                    int size = length + old.Length;
+
+                    byte[] tmp = new byte[size];
+                    System.Array.Copy(old, 0, tmp, 0, old.Length);
+                    if (b != null)
+                        System.Array.Copy(b, 0, tmp, old.Length, length);
+#endif
                     b = tmp;
                     length += old.Length;
                     received = string.Empty;
@@ -735,6 +748,7 @@ namespace FlowLib.Protocols
                     // We will just simply disconnect if hub doesnt support this right now
                     con.Disconnect("Connection doesnt support BASE or BAS0");
                 }
+#if !COMPACT_FRAMEWORK
                 // Encrypted transfers
                 if (supports.ADCS)
                 {
@@ -746,6 +760,7 @@ namespace FlowLib.Protocols
                         con.SecureProtocol = SecureProtocols.TLS;
                     }
                 }
+#endif
             }
             #endregion
             #region RES
@@ -811,8 +826,10 @@ namespace FlowLib.Protocols
                     User me = hub.GetUserById(hub.Me.ID);
                     trans.Me = new UserInfo(me.UserInfo);
                     trans.Protocol = new AdcProtocol(trans);
+#if !COMPACT_FRAMEWORK
                     if (ctm.Secure)
                         trans.SecureProtocol = SecureProtocols.TLS;
+#endif
 
                     // Support for prior versions of adc then 1.0
                     string token = ctm.Token;
@@ -965,7 +982,11 @@ namespace FlowLib.Protocols
                                 if (con.Share != null && con.Share.ContainsContent(ref tmp) && tmp.ContainsKey(ContentInfo.TTHL))
                                 {
                                     byte[] bytes = Utils.Convert.Base32.Decode(tmp.Get(ContentInfo.TTHL));
+#if !COMPACT_FRAMEWORK
                                     trans.CurrentSegment = new SegmentInfo(-1, 0, bytes.LongLength);
+#else
+                                    trans.CurrentSegment = new SegmentInfo(-1, 0, bytes.Length);
+#endif
 
                                     con.Send(new SND(trans, get.ContentType, get.Identifier, new SegmentInfo(-1, trans.CurrentSegment.Start, trans.CurrentSegment.Length)));
                                     // Send content to user

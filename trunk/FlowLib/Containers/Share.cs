@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2008 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +29,10 @@ using FlowLib.Events;
 using FlowLib.Utils.Hash;
 using FlowLib.Utils.Convert;
 using FlowLib.Enums;
+
+#if COMPACT_FRAMEWORK
+using FlowLib.Utils.CompactFramworkExtensionMethods;
+#endif
 
 namespace FlowLib.Containers
 {
@@ -352,9 +356,15 @@ namespace FlowLib.Containers
             try
             {
                 virtualDirs.Add(vd.SystemPath, vd);
+#if !COMPACT_FRAMEWORK
                 Thread t = new Thread(new ParameterizedThreadStart(OnAddVirtualDir));
                 t.IsBackground = true;
                 t.Start(vd);
+#else
+                Thread t = new Thread(new ThreadStart(OnAddVirtualDir));
+                t.IsBackground = true;
+                t.Start(vd);
+#endif
             }
             catch (ArgumentException) {
                 /* This is if dir has already been added
@@ -364,6 +374,13 @@ namespace FlowLib.Containers
             }
             return value;
         }
+
+#if COMPACT_FRAMEWORK
+        protected virtual void OnAddVirtualDir()
+        {
+            OnAddVirtualDir(Thread.CurrentThread.GetData());
+        }
+#endif
 
         protected virtual void OnAddVirtualDir(object ovd)
         {
@@ -598,7 +615,11 @@ namespace FlowLib.Containers
             // Copy interesting info
             ContentInfo info = new ContentInfo();
 
+#if !COMPACT_FRAMEWORK
             info.LastModified = fileInfo.LastWriteTimeUtc.Ticks;
+#else
+            info.LastModified = fileInfo.LastWriteTime.ToFileTimeUtc();
+#endif
             info.Size = fileInfo.Length;
             // TODO : Check fileInfo.Name so it will make a valid virtual name
             info.Set(ContentInfo.VIRTUAL, virtualname + fileInfo.Name);
@@ -871,7 +892,11 @@ namespace FlowLib.Containers
         /// </summary>
         public void Load()
         {
+#if !COMPACT_FRAMEWORK
             Load(System.AppDomain.CurrentDomain.BaseDirectory);
+#else
+            Load(System.IO.Directory.GetCurrentDirectory());
+#endif
         }
         /// <summary>
         /// Loads settings for share setting file from directory.
