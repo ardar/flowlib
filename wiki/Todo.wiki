@@ -9,9 +9,11 @@ _Note that just because it is on this list it is not a promise that it will be d
   
   _[Changelog See changelog to see fixes and changes not listed here]_
 
-= Release ? =
-  * Make test project (This is so i can test that base functionality still works before releasing)
+  * Bloom filter (http://adc.sourceforge.net/wiki/index.php/Extensions#BLOM_-_Bloom_filters)
+  * Algorithm for minimizing data needed to be sent between flowlib "clients/bots"
   * Verify downloaded content
     # Full TIGR extention support
+
+= Release ? =
+  * Make test project (This is so i can test that base functionality still works before releasing)
   * Partial File Sharing (http://strongdc.sourceforge.net/forum/viewtopic.php?f=12&t=5665)
-  * Algorithm for minimizing data needed to be sent between flowlib "bots"
