@@ -1,4 +1,4 @@
-#summary What has been changed?
+#summary Changelog - What has been changed?
 #labels Featured
 
 = Next release =
