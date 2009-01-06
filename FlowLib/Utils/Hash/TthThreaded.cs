@@ -216,7 +216,11 @@ namespace FlowLib.Utils.Hash
                 ThreadsList[i].Priority = threadPriority;
                 ThreadsList[i].IsBackground = true;
                 ThreadsList[i].Name = i.ToString();
+#if !COMPACT_FRAMEWORK
+                ThreadsList[i].Start();
+#else
                 ThreadsList[i].Start(true);
+#endif
             }
 
             bool ThreadsAreWorking = false;
