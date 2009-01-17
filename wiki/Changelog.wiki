@@ -6,6 +6,10 @@
   _[Todo See Todo for changes still remaining before release]_
 
 
+  * FIX		- TthThreaded. It now works as it should again after the Mobile modifications.
+  * FIX		- We can now handle hub sending empty commands. http://code.google.com/p/xmpl/issues/detail?id=12 . Thanks Spookie for reporting and investigating. Much easier when someone can point where the error is :)
+
+
 = 20090103 =
 
   * *Changes from TODO:*
