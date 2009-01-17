@@ -479,7 +479,8 @@ namespace FlowLib.Protocols
             firstMsg = false;
 
             // Loop through Commands.
-            while ((pos = raw.IndexOf(Seperator)) > 0)
+            //while ((pos = raw.IndexOf(Seperator)) > 0)
+            while ((pos = raw.IndexOf(Seperator)) != -1)
             {
                 pos++;
                 StrMessage msg = ParseMessage(raw.Substring(0, pos));
