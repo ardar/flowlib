@@ -180,8 +180,20 @@ namespace FlowLib.Connections
         /// </summary>
         public SortedList<string, User> Userlist
         {
-            get { return userlist; }
-            set { userlist = value; }
+            get 
+            {
+                lock (userlist)
+                {
+                    return userlist;
+                }
+            }
+            set 
+            {
+                lock (userlist)
+                {
+                    userlist = value;
+                }
+            }
         }
         #endregion
 
@@ -269,10 +281,13 @@ namespace FlowLib.Connections
                     worker.Abort();
                     worker = null;
                 }
-                if (userlist != null)
+                lock (userlist)
                 {
-                    userlist.Clear();
-                    userlist = null;
+                    if (userlist != null)
+                    {
+                        userlist.Clear();
+                        userlist = null;
+                    }
                 }
                 this.me = null;
                 if (share != null)
@@ -300,9 +315,12 @@ namespace FlowLib.Connections
         public User GetUserById(string id)
         {
             User usr = new User(id);
-            if (id != null && userlist.TryGetValue(id, out usr))
+            lock (userlist)
             {
-                return usr;
+                if (id != null && userlist.TryGetValue(id, out usr))
+                {
+                    return usr;
+                }
             }
             return null;
         }
@@ -314,11 +332,14 @@ namespace FlowLib.Connections
         public User GetUserByNick(string nick)
         {
             // TODO : Make this more effective.
-            foreach (KeyValuePair<string, User> kpair in userlist)
+            lock (userlist)
             {
-                if (nick.Equals(kpair.Value.DisplayName))
+                foreach (KeyValuePair<string, User> kpair in userlist)
                 {
-                    return kpair.Value;
+                    if (nick.Equals(kpair.Value.DisplayName))
+                    {
+                        return kpair.Value;
+                    }
                 }
             }
             return null;
@@ -490,13 +511,19 @@ namespace FlowLib.Connections
                     UserInfo ui = (UserInfo)e.Data;
                     User u = new User(ui.DisplayName);
                     u.UserInfo = ui;
-                    userlist.Add(ui.ID, u);
+                    lock (userlist)
+                    {
+                        userlist.Add(ui.ID, u);
+                    }
                     break;
                 case Actions.UserOffline:
                     UserInfo userInfo = (UserInfo)e.Data;
                     if (userInfo == null)
                         return;
-                    userlist.Remove(userInfo.ID);
+                    lock (userlist)
+                    {
+                        userlist.Remove(userInfo.ID);
+                    }
                     break;
             }
         }
