@@ -10,6 +10,8 @@
   * FIX		- We can now handle hub sending empty commands. [http://code.google.com/p/xmpl/issues/detail?id=12 Xmpl - Issue 12]. Thanks Spookie for reporting and investigating. Much easier when someone can point where the error is :)
   * FIX		- Crashed when adding multiple folders to share at once. Thanks hackward for reporting [http://code.google.com/p/flowlib/issues/detail?id=19 Issue 19]
   * FIX		- Crashed when multiple sources to one content was active. Thanks hackward for reporting. [http://code.google.com/p/flowlib/issues/detail?id=21 Issue 21]
+  * ADD		- SegmentsDownloaded and SegmentsInProgress properties for DownloadItem.
+  * ADD		- function FlowLib.Utils.Convert.General.StringToBitArray (So you can convert string to BitArray).
 
 
 
