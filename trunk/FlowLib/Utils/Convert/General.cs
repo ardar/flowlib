@@ -195,5 +195,20 @@ namespace FlowLib.Utils.Convert
             }
             return sb.ToString();
         }
+
+        public static System.Collections.BitArray StringToBitArray(string str)
+        {
+            System.Collections.BitArray bit = new System.Collections.BitArray(str.Length, false);
+            for (int i = 0; i < str.Length; i++)
+			{
+                switch (str[i])
+                {
+                    case '1':
+                        bit.Set(i, true);
+                        break;
+                }
+			}
+            return bit;
+        }
     }
 }

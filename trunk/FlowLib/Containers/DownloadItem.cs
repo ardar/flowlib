@@ -81,6 +81,41 @@ namespace FlowLib.Containers
         #endregion
 
         #region Properties
+        public BitArray SegmentsDownloaded
+        {
+            get
+            {
+                lock (segmentsDownloaded)
+                {
+                    return segmentsDownloaded;
+                }
+            }
+            set
+            {
+                lock (segmentsDownloaded)
+                {
+                    segmentsDownloaded = value;
+                }
+            }
+        }
+        public BitArray SegmentsInProgress
+        {
+            get
+            {
+                lock (segmentsInProgress)
+                {
+                    return segmentsInProgress;
+                }
+            }
+            set
+            {
+                lock (segmentsInProgress)
+                {
+                    segmentsInProgress = value;
+                }
+            }
+        }
+
         /// <summary>
         /// ContentInfo containing systemname and stuff for this download item
         /// </summary>
@@ -165,12 +200,18 @@ namespace FlowLib.Containers
                     segmentsInProgress = new BitArray((int)segCount);
                 }
                 // Get progress
-                BitArray tmp = this.segmentsDownloaded.Or(this.segmentsInProgress);
+                BitArray tmp = null;
+                lock (segmentsDownloaded)
+                {
+                    lock (segmentsInProgress)
+                    {
+                        tmp = this.segmentsDownloaded.Or(this.segmentsInProgress);
+                    }
+                }
                 for (int i = 0; i < tmp.Count; i++)
                 {
                     if (!tmp.Get(i))
                     {
-
                         // Set length to segment size
                         long lengthToDownload = SegmentSize;
                         // Is segment size bigger then content size?
@@ -194,35 +235,58 @@ namespace FlowLib.Containers
 
         public void Cancel(int pos, Source src)
         {
-            if (segmentsInProgress != null && pos >= 0 && segmentsInProgress.Get(pos))
+            lock (segmentsInProgress)
             {
-                segmentsInProgress.Set(pos, false);
+                if (segmentsInProgress != null && pos >= 0 && segmentsInProgress.Get(pos))
+                {
+                    segmentsInProgress.Set(pos, false);
+                }
             }
             SegmentCanceled(this, new FmdcEventArgs(pos, src));
         }
 
         public bool Start(int pos, Source src)
         {
-            bool value = (!segmentsDownloaded.Get(pos) && !segmentsInProgress.Get(pos));
+            bool value;
+            lock (segmentsDownloaded)
+            {
+                lock (segmentsInProgress)
+                {
+                    value = (!segmentsDownloaded.Get(pos) && !segmentsInProgress.Get(pos));
+                }
+            }
             if (value)
             {
-                segmentsDownloaded.Set(pos, true);
+                lock (segmentsDownloaded)
+                {
+                    segmentsDownloaded.Set(pos, true);
+                }
                 SegmentStarted(this, new FmdcEventArgs(pos, src));
             }
             return value;
         }
+
         public void Finished(int pos, Source src)
         {
-            segmentsDownloaded.Set(pos, true);
-            segmentsInProgress.Set(pos, false);
+            lock (segmentsDownloaded)
+            {
+                segmentsDownloaded.Set(pos, true);
+            }
+            lock (segmentsInProgress)
+            {
+                segmentsInProgress.Set(pos, false);
+            }
             segmentDoneCount++;
             // Tell everyone that one segment is finished
             SegmentCompleted(this, new FmdcEventArgs(pos, src));
 
-            // Tell everyone that this downloadItem is finished
-            if (segmentDoneCount == segmentsDownloaded.Count)
+            lock (segmentsDownloaded)
             {
-                DownloadCompleted(this, new FmdcEventArgs(0, src));
+                // Tell everyone that this downloadItem is finished
+                if (segmentDoneCount == segmentsDownloaded.Count)
+                {
+                    DownloadCompleted(this, new FmdcEventArgs(0, src));
+                }
             }
         }
 
