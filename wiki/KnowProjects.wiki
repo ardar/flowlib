@@ -5,6 +5,7 @@
 
    * .Nothing.
    * [http://code.google.com/p/xmpl/ Xmpl]
+   * [http://o-go.ru/ OGODC 2]
 
 = Bots =
 
