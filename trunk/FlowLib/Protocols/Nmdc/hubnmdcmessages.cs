@@ -564,9 +564,11 @@ namespace FlowLib.Protocols.HubNmdc
                             break;
                         case "8":       // Folders
                             sb.Append("$0");
+                            info.Set(SearchInfo.TYPE, "1");
                             break;
                         case "9":       // TTH Search
                             sb.Append("$1");
+                            info.Set(SearchInfo.TYPE, "2");
                             break;
                     }
                     info.Set(SearchInfo.EXTENTION, sb.ToString());
@@ -690,6 +692,20 @@ namespace FlowLib.Protocols.HubNmdc
 
             string schStr = info.Get(SearchInfo.SEARCH);
             schStr = schStr.Replace(" ", "$");
+
+            #region Is TTH Search?
+            switch (info.Get(SearchInfo.TYPE))
+            {
+                case "1":   // Directory
+                    type = "?8";
+                    break;
+                case "2":   // TTH
+                    type = "?9";
+                    schStr = "TTH:" + schStr;
+                    break;
+            }
+            #endregion
+
             search = string.Format("{0}{1}?{2}", size, type, schStr);
             Raw = string.Format("$Search {0} {1}|", id, search);
         }
