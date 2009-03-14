@@ -597,13 +597,17 @@ namespace FlowLib.Protocols.HubNmdc
                 case FlowLib.Enums.ConnectionTypes.Direct:
                 case FlowLib.Enums.ConnectionTypes.UPnP:
                 case FlowLib.Enums.ConnectionTypes.Forward:
+                    string port = hub.Share.Port.ToString();
+                    if (hub.Me.ContainsKey(UserInfo.UDPPORT))
+                        port = hub.Me.Get(UserInfo.UDPPORT);
+
                     if (hub.Me.ContainsKey(UserInfo.IP))
                     {
-                        id = string.Format("{0}:{1}", hub.Me.Get(UserInfo.IP), hub.Share.Port);
+                        id = string.Format("{0}:{1}", hub.Me.Get(UserInfo.IP), port);
                     }
                     else
                     {
-                        id = string.Format("{0}:{1}", hub.LocalAddress.Address, hub.Share.Port);
+                        id = string.Format("{0}:{1}", hub.LocalAddress.Address, port);
                     }
                     break;
                 default:
