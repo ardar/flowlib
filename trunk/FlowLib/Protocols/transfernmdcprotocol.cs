@@ -677,7 +677,7 @@ namespace FlowLib.Protocols
                 long length = trans.Content.Size;
                 do
                 {
-                    trans.Send(new ConMessage(trans, bytesToSend));
+                    trans.Send(new BinaryMessage(trans, bytesToSend, bytesToSend.Length));
                     trans.CurrentSegment.Position += bytesToSend.Length;
                 } while (connectionStatus != TcpConnection.Disconnected && (bytesToSend = this.GetContent(System.Text.Encoding.ASCII, trans.CurrentSegment.Position, trans.CurrentSegment.Length - trans.CurrentSegment.Position)) != null);
                 trans.Disconnect();
@@ -749,7 +749,7 @@ namespace FlowLib.Protocols
                         trans.Send(new Sending(trans));
                         firstTime = false;
                     }
-                    trans.Send(new ConMessage(trans, bytesToSend));
+                    trans.Send(new BinaryMessage(trans, bytesToSend, bytesToSend.Length));
                     trans.CurrentSegment.Position += bytesToSend.Length;
                 }
                 if (firstTime)
@@ -853,7 +853,7 @@ namespace FlowLib.Protocols
                         //    zlib.Compress2(bytesToSend);
                         //    bytesToSend = zlib.Read();
                         //}
-                        trans.Send(new ConMessage(trans, bytesToSend));
+                        trans.Send(new BinaryMessage(trans, bytesToSend, bytesToSend.Length));
                         bytesToSend = null;
 
                     }
