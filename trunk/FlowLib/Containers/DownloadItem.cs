@@ -75,24 +75,36 @@ namespace FlowLib.Containers
         protected BitArray segmentsDownloaded = null;
         protected BitArray segmentsInProgress = null;
         protected long added = -1;
-        protected int segmentDoneCount = 0;
+        protected int segDoneCount = 0;
+        protected int segTotalCount = 0;
 
         //protected DownloadPriority priority = DownloadPriority.Default;
         #endregion
 
         #region Properties
+        public int DoneSegmentCount
+        {
+            get { return segDoneCount; }
+            set { segDoneCount = value; }
+        }
+        public int TotalSegmentCount
+        {
+            get { return segTotalCount; }
+            set { segTotalCount = value; }
+        }
+
         public BitArray SegmentsDownloaded
         {
             get
             {
-                lock (segmentsDownloaded)
+                lock (this)
                 {
                     return segmentsDownloaded;
                 }
             }
             set
             {
-                lock (segmentsDownloaded)
+                lock (this)
                 {
                     segmentsDownloaded = value;
                 }
@@ -102,14 +114,14 @@ namespace FlowLib.Containers
         {
             get
             {
-                lock (segmentsInProgress)
+                lock (this)
                 {
                     return segmentsInProgress;
                 }
             }
             set
             {
-                lock (segmentsInProgress)
+                lock (this)
                 {
                     segmentsInProgress = value;
                 }
@@ -188,54 +200,64 @@ namespace FlowLib.Containers
         /// <returns></returns>
         public SegmentInfo GetAvailable()
         {
-            if (info.Size > 0)
+            return GetAvailable(null);
+        }
+        /// <summary>
+        /// Get first available free segment pos.
+        /// -1 means there is no free segments left.
+        /// -2 means no size have been set for this download item yet.
+        /// </summary>
+        /// <returns></returns>
+        public SegmentInfo GetAvailable(Source src)
+        {
+            lock (this)
             {
-                // Segments has not been set yet. set it.
-                if (segmentsInProgress == null)
+                if (info.Size > 0)
                 {
-                    long segCount = 0;
-                    if ((segCount = (info.Size / segmentSize)) == 0 || (info.Size % segmentSize) != 0)
-                        segCount++;
-                    segmentsDownloaded = new BitArray((int)segCount);
-                    segmentsInProgress = new BitArray((int)segCount);
-                }
-                // Get progress
-                BitArray tmp = null;
-                lock (segmentsDownloaded)
-                {
-                    lock (segmentsInProgress)
+                    // Segments has not been set yet. set it.
+                    if (segmentsInProgress == null)
                     {
-                        tmp = this.segmentsDownloaded.Or(this.segmentsInProgress);
+                        long segCount = 0;
+                        if ((segCount = (info.Size / segmentSize)) == 0 || (info.Size % segmentSize) != 0)
+                            segCount++;
+                        segmentsDownloaded = new BitArray((int)segCount);
+                        segmentsInProgress = new BitArray((int)segCount);
+                        segTotalCount = (int)segCount;
                     }
-                }
-                for (int i = 0; i < tmp.Count; i++)
-                {
-                    if (!tmp.Get(i))
+                    // Get progress
+                    BitArray tmp = null;
+                            tmp = new BitArray(segmentsDownloaded);
+                            tmp = tmp.Or(this.segmentsInProgress);
+                    for (int i = 0; i < tmp.Count; i++)
                     {
-                        // Set length to segment size
-                        long lengthToDownload = SegmentSize;
-                        // Is segment size bigger then content size?
-                        if (SegmentSize > ContentInfo.Size)
+                        if (!tmp.Get(i))
                         {
-                            lengthToDownload = ContentInfo.Size;
-                        }
-                        // Are we at last segment
-                        else if ((1 + i) * SegmentSize > ContentInfo.Size)
-                        {
-                            lengthToDownload = ContentInfo.Size % SegmentSize;
-                        }
+                            // Set length to segment size
+                            long lengthToDownload = SegmentSize;
+                            // Is segment size bigger then content size?
+                            if (SegmentSize > ContentInfo.Size)
+                            {
+                                lengthToDownload = ContentInfo.Size;
+                            }
+                            // Are we at last segment
+                            else if ((1 + i) * SegmentSize > ContentInfo.Size)
+                            {
+                                lengthToDownload = ContentInfo.Size % SegmentSize;
+                            }
 
-                        return new SegmentInfo(i, i * SegmentSize, lengthToDownload);
+                            Start(i, src, false);
+                            return new SegmentInfo(i, i * SegmentSize, lengthToDownload);
+                        }
                     }
+                    return new SegmentInfo(-1);
                 }
-                return new SegmentInfo(-1);
+                return new SegmentInfo(-2);
             }
-            return new SegmentInfo(-2);
         }
 
         public void Cancel(int pos, Source src)
         {
-            lock (segmentsInProgress)
+            lock (this)
             {
                 if (segmentsInProgress != null && pos >= 0 && segmentsInProgress.Get(pos))
                 {
@@ -247,46 +269,45 @@ namespace FlowLib.Containers
 
         public bool Start(int pos, Source src)
         {
+            return Start(pos, src, true);
+        }
+        protected bool Start(int pos, Source src, bool lockResources)
+        {
+            if (lockResources)
+                System.Threading.Monitor.Enter(this);
             bool value;
-            lock (segmentsDownloaded)
+            try
             {
-                lock (segmentsInProgress)
-                {
-                    value = (!segmentsDownloaded.Get(pos) && !segmentsInProgress.Get(pos));
-                }
-            }
-            if (value)
-            {
-                lock (segmentsDownloaded)
+                value = (!segmentsDownloaded.Get(pos) && !segmentsInProgress.Get(pos));
+                if (value)
                 {
                     segmentsDownloaded.Set(pos, true);
+                    SegmentStarted(this, new FmdcEventArgs(pos, src));
                 }
-                SegmentStarted(this, new FmdcEventArgs(pos, src));
+            }
+            finally
+            {
+                if (lockResources)
+                    System.Threading.Monitor.Exit(this);
             }
             return value;
         }
 
         public void Finished(int pos, Source src)
         {
-            lock (segmentsDownloaded)
+            lock (this)
             {
                 segmentsDownloaded.Set(pos, true);
-            }
-            lock (segmentsInProgress)
-            {
                 segmentsInProgress.Set(pos, false);
             }
-            segmentDoneCount++;
+            segDoneCount++;
             // Tell everyone that one segment is finished
             SegmentCompleted(this, new FmdcEventArgs(pos, src));
 
-            lock (segmentsDownloaded)
+            // Tell everyone that this downloadItem is finished
+            if (segDoneCount == segTotalCount)
             {
-                // Tell everyone that this downloadItem is finished
-                if (segmentDoneCount == segmentsDownloaded.Count)
-                {
-                    DownloadCompleted(this, new FmdcEventArgs(0, src));
-                }
+                DownloadCompleted(this, new FmdcEventArgs(0, src));
             }
         }
 
