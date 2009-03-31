@@ -413,9 +413,8 @@ namespace FlowLib.Protocols
                                     {
                                         trans.DownloadItem.Finished(trans.CurrentSegment.Index, trans.Source);
                                         //// Searches for a download item and a segment id
-                                        GetDownloadItem();
                                         // Request new segment from user. IF we have found one. ELSE disconnect.
-                                        if (trans.DownloadItem != null && (trans.CurrentSegment = trans.DownloadItem.GetAvailable()).Index != -1)
+                                        if (GetSegment(true))
                                         {
                                             OnDownload();
                                         }
@@ -597,9 +596,8 @@ namespace FlowLib.Protocols
                     con.Send(new INF(con, trans.Me));
                     if (download)
                     {
-                        GetDownloadItem();
                         // Request new segment from user. IF we have found one. ELSE disconnect.
-                        if (trans.DownloadItem != null && (trans.CurrentSegment = trans.DownloadItem.GetAvailable()).Index != -1)
+                        if (GetSegment(true))
                         {
                             OnDownload();
                         }
@@ -1069,10 +1067,7 @@ namespace FlowLib.Protocols
                 {
                     trans.DownloadItem.ContentInfo.Size = snd.SegmentInfo.Length;
                     trans.DownloadItem.SegmentSize = snd.SegmentInfo.Length;
-                    if ((trans.CurrentSegment = trans.DownloadItem.GetAvailable()).Index != -1)
-                    {
-                        trans.DownloadItem.Start(trans.CurrentSegment.Index, trans.Source);
-                    }
+                    GetSegment(false);
                 }
                 else if (trans.CurrentSegment.Length != snd.SegmentInfo.Length)
                 {
@@ -1339,10 +1334,6 @@ namespace FlowLib.Protocols
                     }
 
                     // Set that we are actually downloading stuff
-                    if (trans.CurrentSegment.Index >= 0)
-                    {
-                        trans.DownloadItem.Start(trans.CurrentSegment.Index, trans.Source);
-                    }
                     rawData = false;
 
                     /// $UGetZBlock needs both SupportGetZBlock and SupportXmlBZList.
@@ -1364,25 +1355,31 @@ namespace FlowLib.Protocols
                 }
             }
         }
-        
 
+        [System.Obsolete("This method is depricated. Please use GetSegment instead")]
         public void GetDownloadItem()
         {
-            // Get content
-            trans.DownloadItem = null;
-            DownloadItem dwnItem = null;
-            UserInfo usrInfo = trans.User;
-            if (usrInfo != null)
-            {
-                FmdcEventArgs eArgs = new FmdcEventArgs(0, dwnItem);
-                ChangeDownloadItem(trans, eArgs);
+            GetSegment(true);
+        }
 
-                trans.DownloadItem = eArgs.Data as DownloadItem;
-                if (trans.DownloadItem != null && (trans.CurrentSegment = trans.DownloadItem.GetAvailable()).Index != -1)
-                    download = true;
-                else
-                    download = false;
+        public bool GetSegment(bool requestNewDownloadItem)
+        {
+            if (requestNewDownloadItem)
+            {
+                // Get content
+                trans.DownloadItem = null;
+                DownloadItem dwnItem = null;
+                UserInfo usrInfo = trans.User;
+                if (usrInfo != null)
+                {
+                    FmdcEventArgs eArgs = new FmdcEventArgs(0, dwnItem);
+                    ChangeDownloadItem(trans, eArgs);
+
+                    trans.DownloadItem = eArgs.Data as DownloadItem;
+                }
             }
+            download = (trans.DownloadItem != null && (trans.CurrentSegment = trans.DownloadItem.GetAvailable(trans.Source)).Index != -1);
+            return download;
         }
 
         #endregion

@@ -283,6 +283,9 @@ namespace FlowLib.Protocols
                                         // Write this byte array to file
                                         fs.Write(b, 0, length);
                                         trans.CurrentSegment.Position += length;
+                                        // Saves and unlocks file
+                                        fs.Flush();
+                                        fs.Unlock(trans.CurrentSegment.Start, trans.CurrentSegment.Length);
                                     }
                                     catch (System.Exception exp)
                                     {
@@ -291,9 +294,6 @@ namespace FlowLib.Protocols
                                     }
                                     finally
                                     {
-                                        // Saves and unlocks file
-                                        fs.Flush();
-                                        fs.Unlock(trans.CurrentSegment.Start, trans.CurrentSegment.Length);
                                         fs.Dispose();
                                         fs.Close();
                                     }
@@ -301,9 +301,8 @@ namespace FlowLib.Protocols
                                     {
                                         trans.DownloadItem.Finished(trans.CurrentSegment.Index, trans.Source);
                                         //// Searches for a download item and a segment id
-                                        GetDownloadItem();
                                         // Request new segment from user. IF we have found one. ELSE disconnect.
-                                        if (trans.DownloadItem != null && (trans.CurrentSegment = trans.DownloadItem.GetAvailable()).Index != -1)
+                                        if (GetSegment(true))
                                         {
                                             OnDownload();
                                         }
@@ -423,24 +422,30 @@ namespace FlowLib.Protocols
             return false;
         }
 
+        [System.Obsolete("This method is depricated. Please use GetSegment instead")]
         public void GetDownloadItem()
         {
-            // Get content
-            trans.DownloadItem = null;
-            trans.CurrentSegment = null;
-            DownloadItem dwnItem = null;
-            UserInfo usrInfo = trans.User;
-            if (usrInfo != null)
-            {
-                FmdcEventArgs eArgs = new FmdcEventArgs(0, dwnItem);
-                ChangeDownloadItem(trans, eArgs);
+            GetSegment(true);
+        }
 
-                trans.DownloadItem = eArgs.Data as DownloadItem;
-                if (trans.DownloadItem != null && (trans.CurrentSegment = trans.DownloadItem.GetAvailable()).Index != -1)
-                    download = true;
-                else
-                    download = false;
+        public bool GetSegment(bool requestNewDownloadItem)
+        {
+            if (requestNewDownloadItem)
+            {
+                // Get content
+                trans.DownloadItem = null;
+                DownloadItem dwnItem = null;
+                UserInfo usrInfo = trans.User;
+                if (usrInfo != null)
+                {
+                    FmdcEventArgs eArgs = new FmdcEventArgs(0, dwnItem);
+                    ChangeDownloadItem(trans, eArgs);
+
+                    trans.DownloadItem = eArgs.Data as DownloadItem;
+                }
             }
+            download = (trans.DownloadItem != null && (trans.CurrentSegment = trans.DownloadItem.GetAvailable(trans.Source)).Index != -1);
+            return download;
         }
 
         public void OnDownload()
@@ -611,10 +616,7 @@ namespace FlowLib.Protocols
                 {
                     trans.DownloadItem.ContentInfo.Size = sending.Length;
                     trans.DownloadItem.SegmentSize = sending.Length;
-                    if ((trans.CurrentSegment = trans.DownloadItem.GetAvailable()).Index != -1)
-                    {
-                        trans.DownloadItem.Start(trans.CurrentSegment.Index, trans.Source);
-                    }
+                    GetSegment(false);
                 }
                 else if (trans.CurrentSegment.Length != sending.Length)
                 {
@@ -630,10 +632,7 @@ namespace FlowLib.Protocols
                 {
                     trans.DownloadItem.ContentInfo.Size = fileLength.Length;
                     trans.DownloadItem.SegmentSize = fileLength.Length;
-                    if ((trans.CurrentSegment = trans.DownloadItem.GetAvailable()).Index != -1)
-                    {
-                        trans.DownloadItem.Start(trans.CurrentSegment.Index, trans.Source);
-                    }
+                    GetSegment(false);
                 }
                 else if (trans.CurrentSegment.Length != fileLength.Length)
                 {
@@ -654,10 +653,7 @@ namespace FlowLib.Protocols
                 {
                     trans.DownloadItem.ContentInfo.Size = adcsnd.Length;
                     trans.DownloadItem.SegmentSize = adcsnd.Length;
-                    if ((trans.CurrentSegment = trans.DownloadItem.GetAvailable()).Index != -1)
-                    {
-                        trans.DownloadItem.Start(trans.CurrentSegment.Index, trans.Source);
-                    }
+                    GetSegment(false);
                 }
                 else if (trans.CurrentSegment.Length != adcsnd.Length)
                 {

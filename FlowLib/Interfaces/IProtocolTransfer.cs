@@ -31,6 +31,7 @@ namespace FlowLib.Interfaces
         event FmdcEventHandler Error;
 
         void OnDownload();
+        [System.Obsolete("This method is depricated. Please use GetSegment instead")]
         void GetDownloadItem();
     }
 }
