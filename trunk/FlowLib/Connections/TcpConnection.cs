@@ -407,6 +407,8 @@ namespace FlowLib.Connections
             try
             {
                 this.ConnectionStatusChange(this, new FmdcEventArgs(Disconnected, new FmdcException(msg)));
+
+                socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontLinger,new LingerOption(false, 0));
                 socket.Disconnect(true);
             }
             catch (Exception) { }
