@@ -149,7 +149,7 @@ namespace FlowLib.Containers
         protected int port = -1;
         protected string name = string.Empty;
         protected bool isHashing = false;
-        protected bool cancelHashing = false;
+        protected bool cnlHashing = false;
         protected bool isSaving = false;
         #region Lists
         /// <summary>
@@ -692,6 +692,12 @@ namespace FlowLib.Containers
             }
             return false;
         }
+
+        public virtual void CancelHashing()
+        {
+            cnlHashing = true;
+        }
+
         /// <summary>
         /// Hash ContentInfos in share
         /// </summary>
@@ -699,10 +705,10 @@ namespace FlowLib.Containers
         {
             while (isHashing)
             {
-                cancelHashing = true;
+                cnlHashing = true;
                 Thread.Sleep(250);
             }
-            cancelHashing = false;
+            cnlHashing = false;
             
             // Do we need to hash share?
             if (this.TotalCount > this.HashedCount && !this.isHashing)
@@ -806,7 +812,7 @@ namespace FlowLib.Containers
                         }
                     }
                     // If we have a other thread wanting to hash, cancel this one.
-                    if (this.cancelHashing)
+                    if (this.cnlHashing)
                     {
                         this.isHashing = false;
                         return;
