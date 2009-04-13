@@ -289,8 +289,9 @@ namespace FlowLib.Protocols
                                     }
                                     catch (System.Exception exp)
                                     {
-                                        System.Console.WriteLine("E:" + exp);
-                                        trans.DownloadItem.Cancel(trans.CurrentSegment.Index, trans.Source);
+                                        //trans.DownloadItem.Cancel(trans.CurrentSegment.Index, trans.Source);
+                                        trans.Disconnect("Exception thrown when trying to write to file: " + exp.ToString());
+                                        return;
                                     }
                                     finally
                                     {
@@ -495,11 +496,6 @@ namespace FlowLib.Protocols
                             }
                         }
 
-                        // Set that we are actually downloading stuff
-                        if (trans.CurrentSegment.Index >= 0)
-                        {
-                            trans.DownloadItem.Start(trans.CurrentSegment.Index, trans.Source);
-                        }
                         rawData = false;
                         compressedZLib = false;
 
