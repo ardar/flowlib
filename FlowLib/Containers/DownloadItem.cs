@@ -281,7 +281,7 @@ namespace FlowLib.Containers
                 value = (!segmentsDownloaded.Get(pos) && !segmentsInProgress.Get(pos));
                 if (value)
                 {
-                    segmentsDownloaded.Set(pos, true);
+                    segmentsInProgress.Set(pos, true);
                     SegmentStarted(this, new FmdcEventArgs(pos, src));
                 }
             }
