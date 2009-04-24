@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2008 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -141,10 +141,31 @@ namespace FlowLib.Containers
         /// <summary>
         /// File size of target
         /// </summary>
+        [XmlAttribute(AttributeName = "Size")]
         public long Size
         {
             get { return size; }
             set { size = value; }
+        }
+
+        /// <summary>
+        /// This property is here for xml serialization only.
+        /// </summary>
+        [XmlIgnore()]
+        public bool LastModifiedSpecified
+        {
+            get { return LastModified != 0; }
+            set { }
+        }
+
+        /// <summary>
+        /// This property is here for xml serialization only.
+        /// </summary>
+        [XmlIgnore()]
+        public bool SizeSpecified
+        {
+            get { return Size != 0; }
+            set { }
         }
 
         /// <summary>

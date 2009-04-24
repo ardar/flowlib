@@ -196,6 +196,20 @@ namespace FlowLib.Utils.Convert
             return sb.ToString();
         }
 
+        public static bool[] BitArrayToBoolArray(System.Collections.BitArray b)
+        {
+            // TODO: When we switch to .net 3,5..
+            if (b == null)
+                return new bool[] { };
+
+            bool[] tmp = new bool[b.Count - 1];
+            for (int i = 0; i < b.Length; i++)
+            {
+                tmp[i] = b.Get(i);
+            }
+            return tmp;
+        }
+
         public static System.Collections.BitArray StringToBitArray(string str)
         {
             System.Collections.BitArray bit = new System.Collections.BitArray(str.Length, false);

@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2008 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,8 @@
  *
  */
 
+using System.Xml.Serialization;
+
 namespace FlowLib.Containers
 {
     public class FlowKeyValuePair<TKey, TValue>
@@ -29,6 +31,7 @@ namespace FlowLib.Containers
         protected TKey vKey = default(TKey);
         protected TValue vValue = default(TValue);
 
+        [XmlAttribute(AttributeName = "Key")]
         public TKey Key
         {
             get { return vKey; }
@@ -41,6 +44,7 @@ namespace FlowLib.Containers
                 }
             }
         }
+        [XmlAttribute(AttributeName = "Value")]
         public TValue Value
         {
             get { return vValue; }

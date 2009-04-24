@@ -81,6 +81,7 @@
     <Compile Include="Containers\SearchResultInfo.cs" />
     <Compile Include="Containers\Security\CertificateValidationInfo.cs" />
     <Compile Include="Containers\Security\LocalCertificationSelectionInfo.cs" />
+    <Compile Include="Containers\StoredDownload.cs" />
     <Compile Include="Containers\StrMessage.cs" />
     <Compile Include="Containers\UdpMessage.cs" />
     <Compile Include="Containers\SegmentInfo.cs" />

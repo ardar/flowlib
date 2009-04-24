@@ -22,16 +22,17 @@
 using FlowLib.Containers;
 using FlowLib.Events;
 using System.Collections.Generic;
+using FlowLib.Utils;
+using System.Xml.Serialization;
 
 namespace FlowLib.Managers
 {
     /// <summary>
     /// Class handling downloadItems
     /// </summary>
+    [System.Serializable()]
     public class DownloadManager
     {
-        public string FileName = "Downloads";
-        
         /// <summary>
         /// Downloading have been completed of segment
         /// </summary>
@@ -65,16 +66,83 @@ namespace FlowLib.Managers
         /// </summary>
         public event FmdcEventHandler SourceRemoved;
 
-        protected SortedList<DownloadItem, FlowSortedList<Source>> downloadItems = new SortedList<DownloadItem, FlowSortedList<Source>>();
-        protected SortedList<Source, FlowSortedList<DownloadItem>> sourceItems = new SortedList<Source, FlowSortedList<DownloadItem>>();
+        protected SortedList<DownloadItem, FlowSortedList<Source>> dwnItems = new SortedList<DownloadItem, FlowSortedList<Source>>();
+        protected SortedList<Source, FlowSortedList<DownloadItem>> srcItems = new SortedList<Source, FlowSortedList<DownloadItem>>();
 
         protected string directory = null;
+
+        [XmlIgnore()]
+        public IList<DownloadItem> DownloadItems
+        {
+            get
+            {
+                lock (this)
+                {
+                    return dwnItems.Keys;
+                }
+            }
+        }
+
+        [XmlIgnore()]
+        public IList<Source> SourceItems
+        {
+            get
+            {
+                lock (this)
+                {
+                    return srcItems.Keys;
+                }
+            }
+        }
+
+        /// <summary>
+        /// This property is here for xml serialization only.
+        /// </summary>
+        public StoredDownload[] Items
+        {
+            get
+            {
+                lock (this)
+                {
+                    List<StoredDownload> tmpList = new List<StoredDownload>();
+                    foreach (var item in dwnItems)
+                    {
+                        tmpList.Add(new StoredDownload
+                        {
+                            DownloadItem = item.Key,
+                            Sources = item.Value.ToArray()
+                        });
+                        
+                    }
+                    return tmpList.ToArray();
+                }
+            }
+            set
+            {
+                lock (this)
+                {
+                    foreach (var item in value)
+                    {
+                        AddDownload(item.DownloadItem, item.Sources);
+                    }
+                }
+            }
+        }
+
+        [System.Xml.Serialization.XmlIgnore()]
+        public string FileName
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Init listeners for this static class
         /// </summary>
         public DownloadManager()
         {
+            FileName = "Downloads";
+
             SegmentCanceled = new FmdcEventHandler(DownloadManager_SegmentCanceled);
             SegmentCompleted = new FmdcEventHandler(DownloadManager_SegmentCompleted);
             SegmentStarted = new FmdcEventHandler(DownloadManager_SegmentStarted);
@@ -101,24 +169,39 @@ namespace FlowLib.Managers
         /// <param name="s">Source to remove</param>
         public void RemoveSource(Source s)
         {
-            if (sourceItems.ContainsKey(s))
+            RemoveSource(s, true);
+        }
+
+        protected void RemoveSource(Source s, bool shouldLock)
+        {
+            if (srcItems.ContainsKey(s))
             {
-                FlowSortedList<DownloadItem> tmpSrc = sourceItems[s];
-                if (tmpSrc != null)
+                if (shouldLock)
+                    System.Threading.Monitor.Enter(this);
+                try
                 {
-                    foreach (DownloadItem var in tmpSrc)
+                    FlowSortedList<DownloadItem> tmpSrc = srcItems[s];
+                    if (tmpSrc != null)
                     {
-                        if (downloadItems.ContainsKey(var))
+                        foreach (DownloadItem var in tmpSrc)
                         {
-                            FlowSortedList<Source> tmpDwn = downloadItems[var];
-                            if (tmpDwn != null)
+                            if (dwnItems.ContainsKey(var))
                             {
-                                tmpDwn.Remove(s);
+                                FlowSortedList<Source> tmpDwn = dwnItems[var];
+                                if (tmpDwn != null)
+                                {
+                                    tmpDwn.Remove(s);
+                                }
                             }
                         }
                     }
+                    srcItems.Remove(s);
                 }
-                sourceItems.Remove(s);
+                finally
+                {
+                    if (shouldLock)
+                        System.Threading.Monitor.Exit(this);
+                }
                 SourceRemoved(this, new FmdcEventArgs(0, s));
             }
         }
@@ -128,26 +211,40 @@ namespace FlowLib.Managers
         /// <param name="d">DownloadItem to remove</param>
         public void RemoveDownload(DownloadItem d)
         {
-            if (downloadItems.ContainsKey(d))
+            RemoveDownload(d, true);
+        }
+        protected void RemoveDownload(DownloadItem d, bool shouldLock)
+        {
+            if (dwnItems.ContainsKey(d))
             {
-                FlowSortedList<Source> tmpDwn = downloadItems[d];
-                if (tmpDwn != null)
+                if (shouldLock)
+                    System.Threading.Monitor.Enter(this);
+                try
                 {
-                    foreach (Source var in tmpDwn)
+                    FlowSortedList<Source> tmpDwn = dwnItems[d];
+                    if (tmpDwn != null)
                     {
-                        if (sourceItems.ContainsKey(var))
+                        foreach (Source var in tmpDwn)
                         {
-                            FlowSortedList<DownloadItem> tmpSrc = sourceItems[var];
-                            if (tmpSrc != null)
+                            if (srcItems.ContainsKey(var))
                             {
-                                tmpSrc.Remove(d);
-                                if (tmpSrc.Count == 0)
-    								sourceItems.Remove(var);
+                                FlowSortedList<DownloadItem> tmpSrc = srcItems[var];
+                                if (tmpSrc != null)
+                                {
+                                    tmpSrc.Remove(d);
+                                    if (tmpSrc.Count == 0)
+                                        srcItems.Remove(var);
+                                }
                             }
                         }
                     }
+                    dwnItems.Remove(d);
                 }
-                downloadItems.Remove(d);
+                finally
+                {
+                    if (shouldLock)
+                        System.Threading.Monitor.Exit(this);
+                }
                 DownloadRemoved(this, new FmdcEventArgs(0, d));
                 d.DownloadCompleted -= d_DownloadCompleted;
                 d.SegmentCanceled -= d_SegmentCanceled;
@@ -163,45 +260,65 @@ namespace FlowLib.Managers
         /// <param name="s">Source to be related to downloaditem</param>
         public void AddDownload(DownloadItem d, Source s)
         {
+            AddDownload(d, new Source[] { s });
+        }
+
+        /// <summary>
+        /// Adds downloaditem related to Source
+        /// Source can be null
+        /// </summary>
+        /// <param name="d">DownloadItem to be added</param>
+        /// <param name="sources">Sources to be related to downloaditem</param>
+        public void AddDownload(DownloadItem d, Source[] sources)
+        {
             // Downloads
             FlowSortedList<Source> tmpDwn = null;
-            if (!downloadItems.ContainsKey(d))
+            if (!dwnItems.ContainsKey(d))
             {
-                tmpDwn = new FlowSortedList<Source>();
-                d.DownloadCompleted += new FmdcEventHandler(d_DownloadCompleted);
-                d.SegmentCanceled += new FmdcEventHandler(d_SegmentCanceled);
-                d.SegmentCompleted += new FmdcEventHandler(d_SegmentCompleted);
-                d.SegmentStarted += new FmdcEventHandler(d_SegmentStarted);
+                lock (this)
+                {
+                    tmpDwn = new FlowSortedList<Source>();
+                    d.DownloadCompleted += new FmdcEventHandler(d_DownloadCompleted);
+                    d.SegmentCanceled += new FmdcEventHandler(d_SegmentCanceled);
+                    d.SegmentCompleted += new FmdcEventHandler(d_SegmentCompleted);
+                    d.SegmentStarted += new FmdcEventHandler(d_SegmentStarted);
 
-                downloadItems.Add(d, tmpDwn);
+                    dwnItems.Add(d, tmpDwn);
+                }
                 DownloadAdded(this, new FmdcEventArgs(0, d));
             }
             else
             {
-                lock (downloadItems)
+                lock (this)
                 {
                     // This is if we have a fake downloaditem (that we probably have)
-                    d = downloadItems.Keys[downloadItems.IndexOfKey(d)];
-                    tmpDwn = downloadItems[d];
+                    d = dwnItems.Keys[dwnItems.IndexOfKey(d)];
+                    tmpDwn = dwnItems[d];
                 }
             }
-            if (s != null)
+            foreach (Source s in sources)
             {
-                tmpDwn.Add(s);
+                if (s != null)
+                {
+                    lock (this)
+                    {
+                        tmpDwn.Add(s);
 
-                // Sources
-                FlowSortedList<DownloadItem> tmpSrc = null;
-                if (!sourceItems.ContainsKey(s))
-                {
-                    tmpSrc = new FlowSortedList<DownloadItem>();
-                    sourceItems.Add(s, tmpSrc);
-                    SourceAdded(this, new FmdcEventArgs(0, s));
+                        // Sources
+                        FlowSortedList<DownloadItem> tmpSrc = null;
+                        if (!srcItems.ContainsKey(s))
+                        {
+                            tmpSrc = new FlowSortedList<DownloadItem>();
+                            srcItems.Add(s, tmpSrc);
+                            SourceAdded(this, new FmdcEventArgs(0, s));
+                        }
+                        else
+                        {
+                            tmpSrc = srcItems[s];
+                        }
+                        tmpSrc.Add(d);
+                    }
                 }
-                else
-                {
-                    tmpSrc = sourceItems[s];
-                }
-                tmpSrc.Add(d);
             }
         }
 
@@ -215,18 +332,22 @@ namespace FlowLib.Managers
         {
             AddDownload(d, s);
         }
+
         /// <summary>
         /// Removes all downloads and sources
         /// </summary>
         public void Clear()
         {
-            foreach (KeyValuePair<DownloadItem, FlowSortedList<Source>> var in downloadItems)
+            lock (this)
             {
-                RemoveDownload(var.Key);
-            }
-            foreach (KeyValuePair<Source, FlowSortedList<DownloadItem>> var in sourceItems)
-            {
-                RemoveSource(var.Key);
+                foreach (KeyValuePair<DownloadItem, FlowSortedList<Source>> var in dwnItems)
+                {
+                    RemoveDownload(var.Key, false);
+                }
+                foreach (KeyValuePair<Source, FlowSortedList<DownloadItem>> var in srcItems)
+                {
+                    RemoveSource(var.Key, false);
+                }
             }
         }
 
@@ -280,7 +401,7 @@ namespace FlowLib.Managers
         /// <returns>Returns true if source exist</returns>
         public bool ContainsSource(Source s)
         {
-            return sourceItems.ContainsKey(s);
+            return srcItems.ContainsKey(s);
         }
 
         /// <summary>
@@ -290,7 +411,7 @@ namespace FlowLib.Managers
         /// <returns>Return true if downloaditem exist</returns>
         public bool ContainsDownload(DownloadItem d)
         {
-            return downloadItems.ContainsKey(d);
+            return dwnItems.ContainsKey(d);
         }
         /// <summary>
         /// If source is related to a downloaditem in downloadmanager.
@@ -299,13 +420,16 @@ namespace FlowLib.Managers
         /// <param name="s">Source to find related downloaditems for</param>
         /// <param name="d">DownloadItem found for Source</param>
         /// <returns>Returns true if downloaditem was found for source</returns>
-        public bool TryGetDownload(Source s, out DownloadItem d)
+        public virtual bool TryGetDownload(Source s, out DownloadItem d)
         {
             FlowSortedList<DownloadItem> items = null;
-            if (sourceItems.TryGetValue(s, out items) && items.Count > 0)
+            lock (this)
             {
-                d = items[0];
-                return true;
+                if (srcItems.TryGetValue(s, out items) && items.Count > 0)
+                {
+                    d = items[0];
+                    return true;
+                }
             }
             d = null;
             return false;
@@ -323,26 +447,30 @@ namespace FlowLib.Managers
 #endif
         }
 
-        // TODO : Do loading
-        public void Load(string dir)
+        public virtual void Load(string dir)
         {
             directory = dir;
+            lock (this)
+	        {
+                DownloadManager tmpMgr = FileOperations<DownloadManager>.LoadObject(dir + FileName + ".xml");
+                if (tmpMgr != null)
+                {
+                    FileName = tmpMgr.FileName;
+                    this.Items = tmpMgr.Items;
+                }
+	        }
         }
 
-        // TODO : Do saving
         public void Save()
         {
             Save(directory);
         }
 
-        // TODO : Do saving
-        public void Save(string dir)
+        public virtual void Save(string dir)
         {
-            lock (downloadItems)
-            {
-                //downloadItems
-
-
+            lock (this)
+        	{
+                FileOperations<DownloadManager>.SaveObject(dir + FileName + ".xml", this);
             }
         }
     }

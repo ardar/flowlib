@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2008 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 
 namespace FlowLib.Containers
 {
@@ -71,6 +72,7 @@ namespace FlowLib.Containers
         //   System.ArgumentOutOfRangeException:
         //     System.Collections.Generic.SortedList<TKey,TValue>.Capacity is set to a value
         //     that is less than System.Collections.Generic.SortedList<TKey,TValue>.Count.
+        [XmlAttribute(AttributeName = "Capacity")]
         public int Capacity
         {
             get { return list.Capacity; }
@@ -169,6 +171,8 @@ namespace FlowLib.Containers
         }
         #endregion
 
+        [XmlArray(IsNullable=true, ElementName="Items")]
+        [XmlArrayItem(ElementName="Item")]
         public PropertyContainerItems Items
         {
             get { return new PropertyContainerItems(ref list); }
@@ -180,6 +184,22 @@ namespace FlowLib.Containers
                 }
             }
         }
+
+        #region XmlSeralization
+        [XmlIgnore()]
+        public bool CapacitySpecified
+        {
+            get { return Capacity != 4; }
+            set { }
+        }
+        [XmlIgnore()]
+        public bool ItemsSpecified
+        {
+            get { return list.Count > 0; }
+            set { }
+        }
+        #endregion
+
 
         public class PropertyContainerItems :IEnumerable<FlowKeyValuePair<TKey, TValue>>, IEnumerable
         {
