@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2008 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,8 @@
  *
  */
 
+using System.Xml.Serialization;
+
 namespace FlowLib.Containers
 {
     /// <summary>
@@ -29,11 +31,12 @@ namespace FlowLib.Containers
         System.Collections.IComparer,
         System.IComparable
     {
-        string conId = string.Empty;
-        string userId = string.Empty;
+        protected string conId = string.Empty;
+        protected string userId = string.Empty;
         /// <summary>
         /// Connection Id
         /// </summary>
+        [XmlAttribute(AttributeName = "ConId")]
         public string ConnectionId
         {
             get { return conId; }
@@ -42,11 +45,18 @@ namespace FlowLib.Containers
         /// <summary>
         /// User Id
         /// </summary>
+        [XmlAttribute(AttributeName = "UserId")]
         public string UserId
         {
             get { return userId; }
 			set { userId = value; }
         }
+
+        /// <summary>
+        /// Create source, used for xml seralization
+        /// </summary>
+        protected Source() { }
+
         /// <summary>
         /// Creates source from connection id and user id
         /// </summary>

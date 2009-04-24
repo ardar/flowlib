@@ -1,4 +1,4 @@
-
+﻿
 /*
  *
  * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
@@ -19,36 +19,23 @@
  *
  */
 
+using System.Xml.Serialization;
+
 namespace FlowLib.Containers
 {
-    public class BannedInfo
+    public class StoredDownload
     {
-        protected long time = -1;
-        protected string msg = null;
-        protected string banBy = null;
-
-        public long Time
+        public DownloadItem DownloadItem
         {
-            get { return time; }
-        }
-        public string Message
-        {
-            get { return msg; }
-        }
-        public string BannedBy
-        {
-            get { return banBy; }
+            get;
+            set;
         }
 
-        public BannedInfo() {}
-        public BannedInfo(long time) : this(time, null) { }
-        public BannedInfo(long time, string msg) : this(time, msg, null) { }
-        public BannedInfo(long time, string msg, string bannedBy)
+        [XmlArray(IsNullable = true, ElementName = "Sources")]
+        public Source[] Sources
         {
-            this.time = time;
-            this.msg = msg;
-            this.banBy = bannedBy;
+            get;
+            set;
         }
-
     }
 }

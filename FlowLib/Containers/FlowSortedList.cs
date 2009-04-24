@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2008 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -156,6 +156,7 @@ namespace FlowLib.Containers
                 return default(T);
             }
         }
+
         /// <summary>
         /// Adds an object to the list.
         /// </summary>
@@ -375,8 +376,12 @@ namespace FlowLib.Containers
         }
         #endregion
 
-        #region IEnumerable<T> Members
+        public T[] ToArray()
+        {
+            return list1.ToArray();
+        }
 
+        #region IEnumerable<T> Members
         IEnumerator<T> IEnumerable<T>.GetEnumerator()
         {
             return list1.GetEnumerator();

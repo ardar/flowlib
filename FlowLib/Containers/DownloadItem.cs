@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2008 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,8 @@
 using System.Collections;
 using FlowLib.Events;
 using FlowLib.Enums;
+using FlowLib.Utils.Convert;
+using System.Xml.Serialization;
 
 namespace FlowLib.Containers
 {
@@ -82,48 +84,51 @@ namespace FlowLib.Containers
         #endregion
 
         #region Properties
+        [XmlAttribute( AttributeName="DoneSegmentCount")]
         public int DoneSegmentCount
         {
             get { return segDoneCount; }
             set { segDoneCount = value; }
         }
+
         public int TotalSegmentCount
         {
             get { return segTotalCount; }
             set { segTotalCount = value; }
         }
 
-        public BitArray SegmentsDownloaded
+        public bool[] SegmentsDownloaded
         {
             get
             {
                 lock (this)
                 {
-                    return segmentsDownloaded;
+                    return General.BitArrayToBoolArray(segmentsDownloaded);
                 }
             }
             set
             {
                 lock (this)
                 {
-                    segmentsDownloaded = value;
+                    segmentsDownloaded = new BitArray(value);
                 }
             }
         }
-        public BitArray SegmentsInProgress
+        [System.Xml.Serialization.XmlIgnore()]
+        public bool[] SegmentsInProgress
         {
             get
             {
                 lock (this)
                 {
-                    return segmentsInProgress;
+                    return General.BitArrayToBoolArray(segmentsInProgress);
                 }
             }
             set
             {
                 lock (this)
                 {
-                    segmentsInProgress = value;
+                    segmentsInProgress = new BitArray(value);
                 }
             }
         }
@@ -141,6 +146,7 @@ namespace FlowLib.Containers
         /// <summary>
         /// Segment Size for this download
         /// </summary>
+        [XmlAttribute(AttributeName = "SegmentSize")]
         public long SegmentSize
         {
             get { return segmentSize; }
@@ -156,6 +162,7 @@ namespace FlowLib.Containers
         /// <summary>
         /// Indicates when this item was created
         /// </summary>
+        [XmlAttribute(AttributeName = "Added")]
         public long Added
         {
             get { return added; }
@@ -354,6 +361,38 @@ namespace FlowLib.Containers
         public int CompareTo(object obj)
         {
             return Compare(this, obj);
+        }
+        #endregion
+        #region XmlSeralization
+        [XmlIgnore()]
+        public bool DoneSegmentCountSpecified
+        {
+            get { return segDoneCount != 0; }
+            set { }
+        }
+        [XmlIgnore()]
+        public bool AddedSpecified
+        {
+            get { return Added != 0; }
+            set { }
+        }
+        [XmlIgnore()]
+        public bool SegmentsDownloadedSpecified
+        {
+            get { return segmentsDownloaded != null && segmentsDownloaded.Count != 0; }
+            set { }
+        }
+        [XmlIgnore()]
+        public bool TotalSegmentCountSpecified
+        {
+            get { return TotalSegmentCount != 0; }
+            set { }
+        }
+        [XmlIgnore()]
+        public bool SegmentSizeSpecified
+        {
+            get { return SegmentSize != 1024 * 1024; }
+            set { }
         }
         #endregion
     }
