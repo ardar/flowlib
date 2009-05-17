@@ -46,12 +46,24 @@ namespace FlowLib.Managers
 
 		public SortedList<string, TransferRequest> Requests
 		{
-			get { return requests; }
+			get
+            {
+                lock (this)
+                {
+                    return requests;
+                }
+            }
 		}
 
         public SortedList<string, ITransfer> Transfers
         {
-            get { return transfers; }
+            get
+            {
+                lock (this)
+                {
+                    return transfers;
+                }
+            }
         }
 
         public TransferManager()
@@ -68,8 +80,11 @@ namespace FlowLib.Managers
         /// <param name="user">UserInfo on user where made the request</param>
         public void AddTransferReq(string key, Hub hub, UserInfo user)
         {
-            if (! requests.ContainsKey(key))
-                requests.Add(key, new TransferRequest(key, hub, user));
+            lock (this)
+            {
+                if (!requests.ContainsKey(key))
+                    requests.Add(key, new TransferRequest(key, hub, user));
+            }
             // TODO : Add req limiter.
         }
 
@@ -80,8 +95,11 @@ namespace FlowLib.Managers
         /// <param name="req">Transfer request to add</param>
         public void AddTransferReq(TransferRequest req)
         {
-            if (!requests.ContainsKey(req.Key))
-                requests.Add(req.Key, req);
+            lock (this)
+            {
+                if (!requests.ContainsKey(req.Key))
+                    requests.Add(req.Key, req);
+            }
             // TODO : Add req limiter.
         }
 
@@ -93,7 +111,10 @@ namespace FlowLib.Managers
         public TransferRequest GetTransferReq(string key)
         {
             TransferRequest req = null;
-            requests.TryGetValue(key, out req);
+            lock (this)
+            {
+                requests.TryGetValue(key, out req);
+            }
             return req;
         }
         /// <summary>
@@ -103,7 +124,10 @@ namespace FlowLib.Managers
         /// <returns>Returns true if a match was found and removed</returns>
         public bool RemoveTransferReq(string key)
         {
-            return requests.Remove(key);
+            lock (this)
+            {
+                return requests.Remove(key);
+            }
         }
 
         public void AddTransfer(ITransfer trans)
@@ -112,23 +136,32 @@ namespace FlowLib.Managers
             RemoveTransfer(id);
             trans.ConnectionStatusChange += new FmdcEventHandler(trans_ConnectionStatusChange);
             // Add transfer to list.
-            transfers.Add(id, trans);
+            lock (this)
+            {
+                transfers.Add(id, trans);
+            }
         }
 
         public ITransfer GetTransfer(string key)
         {
             ITransfer old = null;
-            transfers.TryGetValue(key, out old);
+            lock (this)
+            {
+                transfers.TryGetValue(key, out old);
+            }
             return old;
         }
 
         public bool RemoveTransfer(string key)
         {
             ITransfer old = null;
-            if (transfers.TryGetValue(key, out old))
+            lock (this)
             {
-                old.Disconnect("Too many connections.");
-                return transfers.Remove(key);
+                if (transfers.TryGetValue(key, out old))
+                {
+                    old.Disconnect("Too many connections.");
+                    return transfers.Remove(key);
+                }
             }
             return false;
         }
@@ -159,7 +192,10 @@ namespace FlowLib.Managers
             {
                 trans.ConnectionStatusChange -= trans_ConnectionStatusChange;
                 string id = string.Format("{0}{1}", trans.RemoteAddress.Address.ToString(), trans.RemoteAddress.Port);
-                transfers.Remove(id);
+                lock (this)
+                {
+                    transfers.Remove(id);
+                }
             }
         }
 
@@ -169,20 +205,30 @@ namespace FlowLib.Managers
         /// </summary>
         public void Clear()
         {
-            SortedList<string, ITransfer> tmpList = new SortedList<string, ITransfer>(transfers);
+            SortedList<string, ITransfer> tmpList = null;
+            lock (this)
+            {
+                tmpList = new SortedList<string, ITransfer>(transfers);
+            }
             foreach (KeyValuePair<string, ITransfer> var in tmpList)
             {
                 var.Value.Disconnect();
             }
-            transfers.Clear();
-            requests.Clear();
+            lock (this)
+            {
+                transfers.Clear();
+                requests.Clear();
+            }
         }
 
         public void EndTransfer(ITransfer trans)
         {
             string id = string.Format("{0}{1}", trans.RemoteAddress.Address.ToString(), trans.RemoteAddress.Port);
             trans.Disconnect();
-            transfers.Remove(id);
+            lock (this)
+            {
+                transfers.Remove(id);
+            }
         }
 
 #if COMPACT_FRAMEWORK
