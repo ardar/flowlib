@@ -672,6 +672,7 @@ namespace FlowLib.Protocols
                     trans.Send(new BinaryMessage(trans, bytesToSend, bytesToSend.Length));
                     trans.CurrentSegment.Position += bytesToSend.Length;
                 } while (connectionStatus != TcpConnection.Disconnected && (bytesToSend = this.GetContent(System.Text.Encoding.ASCII, trans.CurrentSegment.Position, trans.CurrentSegment.Length - trans.CurrentSegment.Position)) != null);
+                trans.Content = null;
                 trans.Disconnect();
             }
             else if (message is Get)
