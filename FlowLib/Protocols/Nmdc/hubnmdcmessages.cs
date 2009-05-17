@@ -335,7 +335,7 @@ namespace FlowLib.Protocols.HubNmdc
                 + info.Connection
                 + hub.Protocol.Encoding.GetString(new byte[] { ConvertStatusFlagToByte(status) }) + "$"
                 + info.Email + "$"
-                + info.Share
+                + (string.IsNullOrEmpty(info.Share) ? "0" : info.Share)
                 + "$|";
             IsValid = true;
         }
