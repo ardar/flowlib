@@ -557,7 +557,7 @@ namespace FlowLib.Connections
         /// Sets TcpConnection in a listening mode waiting for a message.
         /// NOTE: This function can't be used if you havnt used the TcpConnection(Socket s) constructor.
         /// </summary>
-        public void Listen()
+        public virtual void Listen()
         {
             if (!importedSocket)
                 throw new InvalidOperationException("To call this function you need to have created this object with the TcpConnection(Socket s) constructor");

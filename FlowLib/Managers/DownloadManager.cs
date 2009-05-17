@@ -413,6 +413,32 @@ namespace FlowLib.Managers
         {
             return dwnItems.ContainsKey(d);
         }
+
+        /// <summary>
+        /// If DownloadItem is related to any Sources in DownloadManager.
+        /// They will be returned.
+        /// </summary>
+        /// <param name="d">DownloadItem to find related soures for</param>
+        /// <param name="s">Sources found for DownloadItem</param>
+        /// <returns>Returns true if Sources can be found for DownloadItem</returns>
+        public virtual bool TryGetSources(DownloadItem d, out Source[] s)
+        {
+            lock (this)
+            {
+                if (dwnItems.ContainsKey(d))
+                {
+                    FlowSortedList<Source> tmp = dwnItems[d];
+                    if (tmp != null && tmp.Count > 0)
+                    {
+                        s = tmp.ToArray();
+                        return true;
+                    }
+                }
+            }
+            s = null;
+            return false;
+        }
+
         /// <summary>
         /// If source is related to a downloaditem in downloadmanager.
         /// First match will be returned.
