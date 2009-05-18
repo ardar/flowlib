@@ -36,13 +36,17 @@ namespace FlowLib.Utils.Statistics
         protected override void HandleReceived(IConMessage msg)
         {
             if (msg is BinaryMessage)
-                TotalBytesReceived += msg.Bytes.Length;
+            {
+                TotalBytesReceived += ((BinaryMessage)msg).Length;
+            }
         }
 
         protected override void HandleSend(IConMessage msg)
         {
             if (msg is BinaryMessage)
-                TotalBytesSent += msg.Bytes.Length;
+            {
+                TotalBytesSent += ((BinaryMessage)msg).Length;
+            }
         }
     }
 }

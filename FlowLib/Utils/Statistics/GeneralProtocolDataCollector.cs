@@ -21,6 +21,7 @@
 
 using System;
 using FlowLib.Interfaces;
+using FlowLib.Containers;
 
 namespace FlowLib.Utils.Statistics
 {
@@ -139,12 +140,26 @@ namespace FlowLib.Utils.Statistics
 
         protected override void HandleReceived(IConMessage msg)
         {
-            TotalBytesReceived += msg.Bytes.Length;
+            if (msg is BinaryMessage)
+            {
+                TotalBytesReceived += ((BinaryMessage)msg).Length;
+            }
+            else
+            {
+                TotalBytesReceived += msg.Bytes.Length;
+            }
         }
 
         protected override void HandleSend(IConMessage msg)
         {
-            TotalBytesSent += msg.Bytes.Length;
+            if (msg is BinaryMessage)
+            {
+                TotalBytesSent += ((BinaryMessage)msg).Length;
+            }
+            else
+            {
+                TotalBytesSent += msg.Bytes.Length;
+            }
         }
     }
 }
