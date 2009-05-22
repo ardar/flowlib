@@ -1,4 +1,5 @@
 #summary Code Example - Connect to hub
+#sidebar CodeExamplesMenuWiki
 
 = Description =
 
