@@ -1,4 +1,5 @@
 #summary Code Example - Active Searching
+#sidebar CodeExamplesMenuWiki
 
 = Description =
 
