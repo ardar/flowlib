@@ -1,0 +1,35 @@
+#summary Menu for Wiki pages
+#labels Deprecated
+
+*[Changelog Changelog]*
+
+*[CodeExamples Code examples]*
+
+  * [CodeExamplesConnectToHub Connect to hub]
+  * [CodeExampleChangeBotUserInfo Change bot info (MyInfo)]
+  * [CodeExampleRetrievingUserInfoWhenReceivingPrivateMessage Retreive user information]
+  * [CodeExampleDebugRawCommands Show/Handle raw commands]
+  * [CodeExampleSendMainChatOrPM Send MainChat / PM]
+  * [CodeExampleRecevieMainChatOrPMFromHub Retreive MainChat / PM]
+  * [CodeExamplesPassvieEmptySharing Enable passive sharing]
+  * [CodeExamplesActiveEmptySharing Enable active sharing]
+  * [CodeExamplesPassiveDownloadFilelistFromUser Download filelist from user (P)]
+  * [CodeExamplesActiveDownloadFilelistFromUser Download filelist from user (A)]
+  * [CodeExampleSearchPassive Search for content (P)]
+  * [CodeExampleSearchActive Search for content (A)]
+  * [CodeExampleEncryptedTraffic Encrypted Communicaion]
+  * [CodeExampleWhatConnectionIsPossible Determine possible connection?]
+  * [CodeExamplesCollectTransferedInformationFromActiveDownloadFilelistFromUser Get download speed]
+  * [CollectTransferedInformationForHub Connection Statistics]
+
+*[FAQ FAQ]*
+
+*[FeatureRequests Feature Requests]*
+
+*[MissingTopics Missing Topics]*
+
+*[KnowProjects Know Projects]*
+
+----
+_(A) = Active, (P) = Passive_
+----
