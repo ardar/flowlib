@@ -1,4 +1,5 @@
 #summary Code Example - Active Empty Sharing
+#sidebar CodeExamplesMenuWiki
 
 = Description =
 
