@@ -1,4 +1,5 @@
 #summary Code Example - Show what raw commands beeing sent and received
+#sidebar CodeExamplesMenuWiki
 
 = Description =
 
