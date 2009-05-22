@@ -1,4 +1,5 @@
 #summary Code Example - Empty sharing in passive mode
+#sidebar CodeExamplesMenuWiki
 
 = Description =
 
