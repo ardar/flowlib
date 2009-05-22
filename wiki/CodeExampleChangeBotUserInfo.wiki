@@ -1,4 +1,5 @@
 #summary Code Example - Change Bot UserInfo
+#sidebar CodeExamplesMenuWiki
 
 = Description =
 
