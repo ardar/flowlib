@@ -1,4 +1,5 @@
 #summary Code Example - Downloading filelist from user (Active)
+#sidebar CodeExamplesMenuWiki
 
 = Description =
 
