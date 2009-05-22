@@ -1,4 +1,5 @@
 #summary Code Examples - Menu Wiki
+#labels Deprecated
 
 *[CodeExamples Code examples]*
 
