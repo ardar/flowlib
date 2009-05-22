@@ -12,7 +12,3 @@
 *[MissingTopics Missing Topics]*
 
 *[KnowProjects Know Projects]*
-
-----
-_(A) = Active, (P) = Passive_
-----
