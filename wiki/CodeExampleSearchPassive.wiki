@@ -1,4 +1,5 @@
 #summary Code Example - Passive Searching
+#sidebar CodeExamplesMenuWiki
 
 = Description =
 
