@@ -1,4 +1,5 @@
 #summary Code Example - Collect information from hub
+#sidebar CodeExamplesMenuWiki
 
 = Description =
 
