@@ -1,4 +1,5 @@
-#Code Example - Encrypted traffic
+#summary Code Example - Encrypted traffic
+#sidebar CodeExamplesMenuWiki
 
 = Index =
 
