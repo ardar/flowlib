@@ -221,7 +221,13 @@ namespace FlowLib.Containers
         /// </summary>
         public IList<VirtualDir> VirtualDirs
         {
-            get { return virtualDirs.Values; }
+            get 
+            {
+                lock (virtualDirs)
+                {
+                    return virtualDirs.Values;
+                }
+            }
         }
         /// <summary>
         /// Indicates if share is currently hashing
@@ -238,9 +244,12 @@ namespace FlowLib.Containers
             get
             {
                 long total = 0;
-                foreach (KeyValuePair<string, VirtualDir> item in virtualDirs)
+                lock (virtualDirs)
                 {
-                    total += item.Value.HashedCount;
+                    foreach (KeyValuePair<string, VirtualDir> item in virtualDirs)
+                    {
+                        total += item.Value.HashedCount;
+                    }
                 }
                 return total;
             }
@@ -253,9 +262,12 @@ namespace FlowLib.Containers
             get
             {
                 long total = 0;
-                foreach (KeyValuePair<string, VirtualDir> item in virtualDirs)
+                lock (virtualDirs)
                 {
-                    total += item.Value.HashedSize;
+                    foreach (KeyValuePair<string, VirtualDir> item in virtualDirs)
+                    {
+                        total += item.Value.HashedSize;
+                    }
                 }
                 return total;
             }
@@ -268,9 +280,12 @@ namespace FlowLib.Containers
             get
             {
                 long total = 0;
-                foreach (KeyValuePair<string, VirtualDir> item in virtualDirs)
+                lock (virtualDirs)
                 {
-                    total += item.Value.TotalCount;
+                    foreach (KeyValuePair<string, VirtualDir> item in virtualDirs)
+                    {
+                        total += item.Value.TotalCount;
+                    }
                 }
                 return total;
             }
@@ -283,9 +298,12 @@ namespace FlowLib.Containers
             get
             {
                 long total = 0;
-                foreach (KeyValuePair<string, VirtualDir> item in virtualDirs)
+                lock (virtualDirs)
                 {
-                    total += item.Value.TotalSize;
+                    foreach (KeyValuePair<string, VirtualDir> item in virtualDirs)
+                    {
+                        total += item.Value.TotalSize;
+                    }
                 }
                 return total;
             }
@@ -355,7 +373,10 @@ namespace FlowLib.Containers
             VirtualDir vd = new VirtualDir(systempath, virtualdir);
             try
             {
-                virtualDirs.Add(vd.SystemPath, vd);
+                lock (virtualDirs)
+                {
+                    virtualDirs.Add(vd.SystemPath, vd);
+                }
 #if !COMPACT_FRAMEWORK
                 Thread t = new Thread(new ParameterizedThreadStart(OnAddVirtualDir));
                 t.IsBackground = true;
@@ -402,12 +423,15 @@ namespace FlowLib.Containers
         {
             if (System.IO.Directory.Exists(systempath))
             {
-                foreach (KeyValuePair<string, VirtualDir> item in virtualDirs)
+                lock (virtualDirs)
                 {
-                    if (item.Key.Equals(systempath) && !item.Value.VirtualPath.Equals(virtualdir))
+                    foreach (KeyValuePair<string, VirtualDir> item in virtualDirs)
                     {
-                        ErrorOccured(this, new FmdcEventArgs(Share.ErrorSourceDirectoryDuplicate, systempath));
-                        return;
+                        if (item.Key.Equals(systempath) && !item.Value.VirtualPath.Equals(virtualdir))
+                        {
+                            ErrorOccured(this, new FmdcEventArgs(Share.ErrorSourceDirectoryDuplicate, systempath));
+                            return;
+                        }
                     }
                 }
 
@@ -514,12 +538,18 @@ namespace FlowLib.Containers
             }
             if (contentInfo.ContainsKey(ContentInfo.VIRTUAL) && !virtualNames.ContainsKey(contentInfo.Get(ContentInfo.VIRTUAL)))
             {
-                virtualNames.Add(contentInfo.Get(ContentInfo.VIRTUAL), contentInfo);
+                lock (virtualNames)
+                {
+                    virtualNames.Add(contentInfo.Get(ContentInfo.VIRTUAL), contentInfo);
+                }
                 value = true;
             }
             if (contentInfo.ContainsKey(ContentInfo.TTH) && !tthNames.ContainsKey(contentInfo.Get(ContentInfo.TTH)))
             {
-                tthNames.Add(contentInfo.Get(ContentInfo.TTH), contentInfo);
+                lock (tthNames)
+                {
+                    tthNames.Add(contentInfo.Get(ContentInfo.TTH), contentInfo);
+                }
 
 				if (!contentInfo.ContainsKey(ContentInfo.FILELIST))
 				{
@@ -535,8 +565,16 @@ namespace FlowLib.Containers
         public virtual bool RemoveFile(ContentInfo contentInfo)
         {
             if (contentInfo.IsTth)
-                tthNames.Remove(contentInfo.Get(ContentInfo.TTH));
-            virtualNames.Remove(contentInfo.Get(ContentInfo.VIRTUAL));
+            {
+                lock (tthNames)
+                {
+                    tthNames.Remove(contentInfo.Get(ContentInfo.TTH));
+                }
+            }
+            lock (virtualNames)
+            {
+                virtualNames.Remove(contentInfo.Get(ContentInfo.VIRTUAL));
+            }
             lock (share)
             {
                 return share.Remove(contentInfo.Get(ContentInfo.STORAGEPATH));
@@ -545,13 +583,15 @@ namespace FlowLib.Containers
         #endregion
         protected virtual void AddContent(ContentInfo contentInfo)
         {
-            foreach (KeyValuePair<string, VirtualDir> item in virtualDirs)
+            IList<VirtualDir> tmpDirs = VirtualDirs;
+            foreach (VirtualDir item in tmpDirs)
             {
-                if (contentInfo.Get(ContentInfo.STORAGEPATH).StartsWith(item.Key))
+                if (contentInfo.Get(ContentInfo.STORAGEPATH).StartsWith(item.SystemPath))
                 {
-                    AddContent(contentInfo, item.Value);
+                    AddContent(contentInfo, item);
                     return;
                 }
+
             }
         }
 
@@ -562,7 +602,13 @@ namespace FlowLib.Containers
             try
             {
                 ContentInfo virtualValue;
-                if (virtualNames.TryGetValue(contentInfo.Get(ContentInfo.VIRTUAL), out virtualValue) && !virtualValue.Get(ContentInfo.STORAGEPATH).Equals(contentInfo.Get(ContentInfo.STORAGEPATH)))
+                bool alreadyContainsContentInVirtualNames = false;
+                lock (virtualNames)
+                {
+                    alreadyContainsContentInVirtualNames = virtualNames.TryGetValue(contentInfo.Get(ContentInfo.VIRTUAL), out virtualValue) && !virtualValue.Get(ContentInfo.STORAGEPATH).Equals(contentInfo.Get(ContentInfo.STORAGEPATH));
+                }
+
+                if (alreadyContainsContentInVirtualNames)
                 {
                     // TODO : Making it optional what should happen if we get a Virtual name conflict.
                     // Duplicate of virtual name.
@@ -573,7 +619,10 @@ namespace FlowLib.Containers
                 {
                     if (virtualValue == null)
                     {
-                        virtualNames.Add(contentInfo.Get(ContentInfo.VIRTUAL), contentInfo);
+                        lock (virtualNames)
+                        {
+                            virtualNames.Add(contentInfo.Get(ContentInfo.VIRTUAL), contentInfo);
+                        }
                         lock (share)
                         {
                             share.Add(contentInfo.Get(ContentInfo.STORAGEPATH), contentInfo);
@@ -587,7 +636,13 @@ namespace FlowLib.Containers
                         // We are trying to add a contentInfo with same name,
                         // See if content has changed. If so we will replace info.
                         ContentInfo tmpContent;
-                        if (share.TryGetValue(virtualValue.Get(ContentInfo.STORAGEPATH), out tmpContent))
+                        bool alreadyContainsContentInShare = false;
+                        lock (share)
+                        {
+                            alreadyContainsContentInShare = share.TryGetValue(virtualValue.Get(ContentInfo.STORAGEPATH), out tmpContent);
+                        }
+
+                        if (alreadyContainsContentInShare)
                         {
                             if (tmpContent.LastModified != contentInfo.LastModified || tmpContent.Size != contentInfo.Size)
                             {
@@ -615,13 +670,14 @@ namespace FlowLib.Containers
         }
         protected virtual void AddContent(System.IO.FileInfo fileInfo, string virtualname)
         {
-            foreach (KeyValuePair<string, VirtualDir> item in virtualDirs)
+            IList<VirtualDir> tmpDirs = VirtualDirs;
+            foreach (VirtualDir item in tmpDirs)
             {
-                if (virtualname.StartsWith(item.Key))
+                if (virtualname.StartsWith(item.VirtualPath))
                 {
-                    AddContent(fileInfo, virtualname, item.Value);
-                    return;
+                    AddContent(fileInfo, virtualname, item);
                 }
+                
             }
         }
 
@@ -651,22 +707,49 @@ namespace FlowLib.Containers
         /// <returns>Returns true if systempath exist as virtual dir</returns>
         public virtual bool RemoveVirtualDir(string systempath)
         {
-            if (virtualDirs.ContainsKey(systempath))
+            bool containsSystemPath = false;
+            lock (virtualDirs)
+            {
+                containsSystemPath = virtualDirs.ContainsKey(systempath);
+            }
+
+            if (containsSystemPath)
             {
                 int pos;
-                if ((pos = share.IndexOfKey(systempath)) != -1)
+                IList<string> keys = null;
+                lock (share)
                 {
-                    IList<string> keys = share.Keys;
+                    pos = share.IndexOfKey(systempath);
+                    if (pos != -1)
+                    {
+                        keys = share.Keys;
+                    }
+                }
+                if (keys != null)
+                {
                     for (int i = pos; i < keys.Count; i++)
                     {
                         if (keys[i].StartsWith(systempath))
                         {
                             ContentInfo info = null;
-                            if (share.TryGetValue(keys[i], out info) && info != null)
+                            bool containsKeyAndInfo = false;
+                            lock (share)
                             {
-                                virtualNames.Remove(info.Get(ContentInfo.VIRTUAL));
+                                containsKeyAndInfo = share.TryGetValue(keys[i], out info) && info != null;
+                            }
+                            if (containsKeyAndInfo)
+                            {
+                                lock (virtualNames)
+                                {
+                                    virtualNames.Remove(info.Get(ContentInfo.VIRTUAL));
+                                }
                                 if (info.IsHashed)
-                                    tthNames.Remove(info.Get(ContentInfo.TTH));
+                                {
+                                    lock (tthNames)
+                                    {
+                                        tthNames.Remove(info.Get(ContentInfo.TTH));
+                                    }
+                                }
                             }
                             lock (share)
                             {
@@ -680,15 +763,20 @@ namespace FlowLib.Containers
                         }
                     }
                 }
-                bool value = virtualDirs.Remove(systempath);
+
+                bool contentHasBeenRemoved = false;
+                lock (virtualDirs)
+                {
+                    contentHasBeenRemoved = virtualDirs.Remove(systempath);
+                }
                 Save();
-                if (value)
+                if (contentHasBeenRemoved)
                 {
                     VirtualDirRemoved(this, new EventArgs());
                     if (IsHashing)
                         HashContent();
                 }
-                return value;
+                return contentHasBeenRemoved;
             }
             return false;
         }
@@ -755,7 +843,10 @@ namespace FlowLib.Containers
                                 // If file was hashed. Add info
                                 if (item.Value.IsHashed)
                                 {
-                                    tthNames.Add(item.Value.Get(ContentInfo.TTH), item.Value);
+                                    lock (tthNames)
+                                    {
+                                        tthNames.Add(item.Value.Get(ContentInfo.TTH), item.Value);
+                                    }
                                     filesAdded++;
                                     tmp.HashedCount++;
                                     tmp.HashedSize += item.Value.Size;
@@ -782,7 +873,10 @@ namespace FlowLib.Containers
                                 {
                                     share.Remove(item.Key);
                                 }
-                                virtualNames.Remove(item.Value.Get(ContentInfo.VIRTUAL));
+                                lock (virtualNames)
+                                {
+                                    virtualNames.Remove(item.Value.Get(ContentInfo.VIRTUAL));
+                                }
                                 if (tmp != null)
                                 {
                                     tmp.TotalCount--;
@@ -830,12 +924,12 @@ namespace FlowLib.Containers
 
         protected VirtualDir GetMatchingVirtualDir(string systemPath)
         {
-            // loop until we finds the virtual dir this content should be in.
-            foreach (KeyValuePair<string, VirtualDir> virtualItem in virtualDirs)
+            IList<VirtualDir> tmpDirs = VirtualDirs;
+            foreach (VirtualDir item in tmpDirs)
             {
-                if (systemPath.StartsWith(virtualItem.Value.SystemPath))
+                if (systemPath.StartsWith(item.SystemPath))
                 {
-                    return virtualItem.Value;
+                    return item;
                 }
             }
             return null;
@@ -851,8 +945,14 @@ namespace FlowLib.Containers
         {
             #region Remove files that doesnt exist anymore
             SortedList<string, ContentInfo> removedItems = new SortedList<string, ContentInfo>();
+            SortedList<string, ContentInfo> tmpShare = null;
+            lock (share)
+            {
+                // We don't want to lock share while we are doing the slow check on filesystem.
+                tmpShare = new SortedList<string, ContentInfo>(share);
+            }
             // We will first check if any contentInfo has been removed.
-            foreach (KeyValuePair<string, ContentInfo> item in share)
+            foreach (KeyValuePair<string, ContentInfo> item in tmpShare)
             {
                 if (item.Value == null)
                     continue;
@@ -884,11 +984,17 @@ namespace FlowLib.Containers
                         {
                             tmp.HashedCount--;
                             tmp.HashedSize -= item.Value.Size;
-                            tthNames.Remove(item.Value.Get(ContentInfo.TTH));
+                            lock (tthNames)
+                            {
+                                tthNames.Remove(item.Value.Get(ContentInfo.TTH));
+                            }
                         }
                         tmp.TotalCount--;
                         tmp.TotalSize -= item.Value.Size;
-                        virtualNames.Remove(item.Value.Get(ContentInfo.VIRTUAL));
+                        lock (virtualNames)
+                        {
+                            virtualNames.Remove(item.Value.Get(ContentInfo.VIRTUAL));
+                        }
                         lock (share)
                         {
                             share.Remove(item.Key);
@@ -900,20 +1006,20 @@ namespace FlowLib.Containers
             #endregion
             bool changing = false;
             // Refreshing all virtual directories.
-
-            foreach (KeyValuePair<string, VirtualDir> item in virtualDirs)
+            IList<VirtualDir> tmpDirs = VirtualDirs;
+            foreach (VirtualDir dir in tmpDirs)
             {
                 // If we are adding/removing or on any other way already changing share,
                 // we dont want to reload list.
-                if (item.Value.IsChanging)
+                if (dir.IsChanging)
                 {
                     changing = true;
                     continue;
                 }
-                long fileCountBeforeAdding = item.Value.TotalCount;
-                AddDir(item.Value.SystemPath, item.Value.VirtualPath, item.Value);
+                long fileCountBeforeAdding = dir.TotalCount;
+                AddDir(dir.SystemPath, dir.VirtualPath, dir);
                 // If count has changed. Save.
-                if (fileCountBeforeAdding != item.Value.TotalCount)
+                if (fileCountBeforeAdding != dir.TotalCount)
                     Save();
             }
             // TODO : This is a ugly way todo it. Can it be done in a diffrent way?
@@ -979,7 +1085,10 @@ namespace FlowLib.Containers
                     VirtualDir value = (VirtualDir)setting.GetObject(i);
                     if (value != null)
                     {
-                        virtualDirs.Add(value.SystemPath, value);
+                        lock (virtualDirs)
+                        {
+                            virtualDirs.Add(value.SystemPath, value);
+                        }
                         lock (share)
                         {
                             share.Add(value.SystemPath, null);
@@ -1008,12 +1117,20 @@ namespace FlowLib.Containers
                         {
                             share.Add(content.Get(ContentInfo.STORAGEPATH), content);
                         }
-                        virtualNames.Add(content.Get(ContentInfo.VIRTUAL), content);
+                        lock (virtualNames)
+                        {
+                            virtualNames.Add(content.Get(ContentInfo.VIRTUAL), content);
+                        }
                         // TODO : Add setting so we know if we allow dublicate files with same TTH in share.
                         try
                         {
                             if (content.IsTth)
-                                tthNames.Add(content.Get(ContentInfo.TTH), content);
+                            {
+                                lock (tthNames)
+                                {
+                                    tthNames.Add(content.Get(ContentInfo.TTH), content);
+                                }
+                            }
                         }
                         catch (ArgumentException) {
                             // We have already added a file with this tth.
@@ -1024,7 +1141,10 @@ namespace FlowLib.Containers
                                 if ((vd = this.GetMatchingVirtualDir(content.Get(ContentInfo.STORAGEPATH))) != null)
                                 {
                                     // Remove file if we dont allow duplicates.
-                                    virtualNames.Remove(content.Get(ContentInfo.VIRTUAL));
+                                    lock (virtualNames)
+                                    {
+                                        virtualNames.Remove(content.Get(ContentInfo.VIRTUAL));
+                                    }
                                     lock (share)
                                     {
                                         share.Remove(content.Get(ContentInfo.STORAGEPATH));
@@ -1091,9 +1211,15 @@ namespace FlowLib.Containers
             SettingsGroup setting = new SettingsGroup();
             // Stores where virtual dirs and share list begins and ends.
             setting.Add(IndexVirtualDirBegin, new SettingItem(virtualDirBegin, -1));
-            setting.Add(IndexVirtualDirCount, new SettingItem(virtualDirs.Count, -1));
+            lock (virtualDirs)
+            {
+                setting.Add(IndexVirtualDirCount, new SettingItem(virtualDirs.Count, -1));
+            }
             setting.Add(IndexShareBegin, new SettingItem(shareBegin, -1));
-            setting.Add(IndexShareCount, new SettingItem(share.Count, -1));
+            lock (share)
+            {
+                setting.Add(IndexShareCount, new SettingItem(share.Count, -1));
+            }
             setting.Add(IndexLastModifiedTimeStamp, new SettingItem(LastModified, -1));
             setting.Add(IndexHashAllowDuplicate, new SettingItem(HashAllowDuplicate, false));
             setting.Add(IndexHashAutoSaveCount, new SettingItem(HashAutoSaveCount, 10));
@@ -1102,16 +1228,21 @@ namespace FlowLib.Containers
             setting.Add(IndexHashThreadSleep, new SettingItem(HashThreadSleep, 0));
             setting.Add(IndexPort, new SettingItem(Port, -1));
 
-
             // Stores Virtual dirs
             int tmpVirtualDirBegin = virtualDirBegin;
-            foreach (KeyValuePair<string, VirtualDir> item in virtualDirs)
+            IList<VirtualDir> tmpDirs = VirtualDirs;
+            foreach (VirtualDir item in tmpDirs)
             {
-                setting.Add(tmpVirtualDirBegin++, new SettingItem(item.Value, null));
+                setting.Add(tmpVirtualDirBegin++, new SettingItem(item, null));
             }
             // Stores ContentInfo
             int tmpshareBegin = shareBegin;
-            foreach (KeyValuePair<string, ContentInfo> item in share)
+            SortedList<string, ContentInfo> tmpShare = null;
+            lock (share)
+            {
+                tmpShare = new SortedList<string, ContentInfo>(share);
+            }
+            foreach (KeyValuePair<string, ContentInfo> item in tmpShare)
             {
                 if (item.Value != null)
                     setting.Add(tmpshareBegin++, new SettingItem(item.Value, null));
@@ -1133,20 +1264,38 @@ namespace FlowLib.Containers
         public virtual bool ContainsContent(ref ContentInfo info)
         {
             bool found = false;
-            if (info.IsHashed && tthNames.ContainsKey(info.Get(ContentInfo.TTH)))
+            if (info.IsHashed)
             {
-                info = tthNames[info.Get(ContentInfo.TTH)];
-                found = true;
+                bool containsTTH = false;
+                lock (tthNames)
+                {
+                    containsTTH = tthNames.ContainsKey(info.Get(ContentInfo.TTH));
+                    if (containsTTH)
+                        info = tthNames[info.Get(ContentInfo.TTH)];
+                    found = containsTTH;
+                }
             }
-            else if (info.ContainsKey(ContentInfo.STORAGEPATH) && share.ContainsKey(info.Get(ContentInfo.STORAGEPATH)))
+            else if (info.ContainsKey(ContentInfo.STORAGEPATH))
             {
-                info = share[info.Get(ContentInfo.STORAGEPATH)];
-                found = true;
+                bool containsStoragePath = false;
+                lock (share)
+                {
+                    containsStoragePath = share.ContainsKey(info.Get(ContentInfo.STORAGEPATH));
+                    if (containsStoragePath)
+                        info = share[info.Get(ContentInfo.STORAGEPATH)];
+                    found = containsStoragePath;
+                }
             }
-            else if (info.ContainsKey(ContentInfo.VIRTUAL) && virtualNames.ContainsKey(info.Get(ContentInfo.VIRTUAL)))
+            else if (info.ContainsKey(ContentInfo.VIRTUAL))
             {
-                info = virtualNames[info.Get(ContentInfo.VIRTUAL)];
-                found = true;
+                bool containsVirtual = false;
+                lock (virtualNames)
+                {
+                    containsVirtual = virtualNames.ContainsKey(info.Get(ContentInfo.VIRTUAL));
+                    if (containsVirtual)
+                        info = virtualNames[info.Get(ContentInfo.VIRTUAL)];
+                    found = containsVirtual;
+                }
             }
             // TODO : Add Filtering matchning here.
             return found;
@@ -1214,17 +1363,28 @@ namespace FlowLib.Containers
 
         public IEnumerator GetEnumerator()
         {
-            lock (share)
+            if (share.Count != 0)
             {
-                if (share.Count != 0)
+                lock (share)
+                {
                     return share.GetEnumerator();
-                else if (tthNames.Count != 0)
+                }
+            }
+            else if (tthNames.Count != 0)
+            {
+                lock (tthNames)
+                {
                     return tthNames.GetEnumerator();
-                else
+                }
+            }
+            else
+            {
+                lock (virtualNames)
+                {
                     return virtualNames.GetEnumerator();
+                }
             }
         }
-
         #endregion
     }
 }
