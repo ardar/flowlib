@@ -322,16 +322,19 @@ namespace FlowLib.Connections
             if (!disposed)
             {
                 disposing = true;
-                ProtocolChange -= OnProtocolChanged;
-                ConnectionStatusChange -= OnConnectionStatusChanged;
-#if !COMPACT_FRAMEWORK
-                SecureUpdate -= OnSecureUpdate;
-#endif
+                Disconnect("Dispose");
+
                 allDone.Close();
                 buffer = null;
                 localAddress = null;
                 remoteAddress = null;
-                Disconnect("Dispose");
+
+                ProtocolChange -= OnProtocolChanged;
+                // ConnectionStatusChange need to be removed after calling Disconnect as Disconnect fires ConnectionStatusChange;
+                ConnectionStatusChange -= OnConnectionStatusChanged;
+#if !COMPACT_FRAMEWORK
+                SecureUpdate -= OnSecureUpdate;
+#endif
                 if (socket != null)
                 {
                     socket.Close();
