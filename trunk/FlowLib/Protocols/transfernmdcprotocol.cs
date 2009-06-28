@@ -252,7 +252,7 @@ namespace FlowLib.Protocols
                     {
                         if (this.download)
                         {
-                            if (trans.DownloadItem != null && trans.CurrentSegment.Index != -1)
+                            if (trans.DownloadItem != null && trans.CurrentSegment != null && trans.CurrentSegment.Index != -1)
                             {
                                 if (trans.CurrentSegment.Length < length)
                                 {
@@ -468,7 +468,7 @@ namespace FlowLib.Protocols
                 else
                 {
                     // We won battle. Start download.
-                    if (trans.DownloadItem != null && trans.CurrentSegment.Index != -1)
+                    if (trans.DownloadItem != null && trans.CurrentSegment != null && trans.CurrentSegment.Index != -1)
                     {
                         // Set right content string
                         trans.Content = new ContentInfo(ContentInfo.REQUEST, trans.DownloadItem.ContentInfo.Get(ContentInfo.VIRTUAL));
@@ -610,7 +610,7 @@ namespace FlowLib.Protocols
                     EnsureCurrentSegmentCancelation();
                     GetSegment(false);
                 }
-                else if (trans.CurrentSegment.Length != sending.Length)
+                else if (trans.CurrentSegment != null && trans.CurrentSegment.Length != sending.Length)
                 {
                     trans.Disconnect("Why would i want to get a diffrent length of bytes then i asked for?");
                     return;
@@ -627,7 +627,7 @@ namespace FlowLib.Protocols
                     EnsureCurrentSegmentCancelation();
                     GetSegment(false);
                 }
-                else if (trans.CurrentSegment.Length != fileLength.Length)
+                else if (trans.CurrentSegment != null && trans.CurrentSegment.Length != fileLength.Length)
                 {
                     trans.Disconnect("Why would i want to get a diffrent length of bytes then i asked for?");
                     return;
@@ -649,7 +649,7 @@ namespace FlowLib.Protocols
                     EnsureCurrentSegmentCancelation();
                     GetSegment(false);
                 }
-                else if (trans.CurrentSegment.Length != adcsnd.Length)
+                else if (trans.CurrentSegment != null && trans.CurrentSegment.Length != adcsnd.Length)
                 {
                     trans.Disconnect("Why would i want to get a diffrent length of bytes then i asked for?");
                     return;
@@ -658,7 +658,7 @@ namespace FlowLib.Protocols
             }
             else if (message is Send)
             {
-                if (this.download || bytesToSend == null)
+                if (this.download || bytesToSend == null || trans.CurrentSegment == null)
                 {
                     trans.Disconnect();
                     return;
