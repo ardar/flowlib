@@ -248,11 +248,7 @@ namespace FlowLib.Protocols
                 case TcpConnection.Connected: break;
                 case TcpConnection.Connecting: break;
                 case TcpConnection.Disconnected:
-                    if (trans.DownloadItem != null && trans.CurrentSegment != null)
-                    {
-                        // Clean up here please :)
-                        trans.DownloadItem.Cancel(trans.CurrentSegment.Index, trans.Source);
-                    }
+                    EnsureCurrentSegmentCancelation();
 
                     if (e.Data is Utils.FmdcException)
                     {
@@ -412,7 +408,7 @@ namespace FlowLib.Protocols
                                     }
                                     if (trans.CurrentSegment.Position >= trans.CurrentSegment.Length)
                                     {
-                                        trans.DownloadItem.Finished(trans.CurrentSegment.Index, trans.Source);
+                                        EnsureCurrentSegmentFinishing();
                                         //// Searches for a download item and a segment id
                                         // Request new segment from user. IF we have found one. ELSE disconnect.
                                         if (GetSegment(true))
@@ -597,6 +593,7 @@ namespace FlowLib.Protocols
                     con.Send(new INF(con, trans.Me));
                     if (download)
                     {
+                        EnsureCurrentSegmentCancelation();
                         // Request new segment from user. IF we have found one. ELSE disconnect.
                         if (GetSegment(true))
                         {
@@ -1068,6 +1065,7 @@ namespace FlowLib.Protocols
                 {
                     trans.DownloadItem.ContentInfo.Size = snd.SegmentInfo.Length;
                     trans.DownloadItem.SegmentSize = snd.SegmentInfo.Length;
+                    EnsureCurrentSegmentCancelation();
                     GetSegment(false);
                 }
                 else if (trans.CurrentSegment.Length != snd.SegmentInfo.Length)
