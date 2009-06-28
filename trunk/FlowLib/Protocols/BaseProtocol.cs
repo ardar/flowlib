@@ -41,6 +41,25 @@ namespace FlowLib.Protocols
             }
             return null;
         }
+        protected void EnsureCurrentSegmentCancelation()
+        {
+            if (trans.DownloadItem != null && trans.CurrentSegment != null)
+            {
+                // Clean up here please :)
+                trans.DownloadItem.Cancel(trans.CurrentSegment.Index, trans.Source);
+                trans.CurrentSegment = null;
+            }
+        }
+
+        protected void EnsureCurrentSegmentFinishing()
+        {
+            if (trans.DownloadItem != null && trans.CurrentSegment != null)
+            {
+                // Clean up here please :)
+                trans.DownloadItem.Finished(trans.CurrentSegment.Index, trans.Source);
+                trans.CurrentSegment = null;
+            }
+        }
 
     }
 }
