@@ -365,7 +365,7 @@ namespace FlowLib.Protocols
                     {
                         if (this.download && trans != null)
                         {
-                            if (trans.DownloadItem != null && trans.CurrentSegment.Index != -1)
+                            if (trans.DownloadItem != null && trans.CurrentSegment != null && trans.CurrentSegment.Index != -1)
                             {
                                 if (trans.CurrentSegment.Length < length)
                                 {
@@ -1068,7 +1068,7 @@ namespace FlowLib.Protocols
                     EnsureCurrentSegmentCancelation();
                     GetSegment(false);
                 }
-                else if (trans.CurrentSegment.Length != snd.SegmentInfo.Length)
+                else if (trans.CurrentSegment != null && trans.CurrentSegment.Length != snd.SegmentInfo.Length)
                 {
                     trans.Disconnect("Why would i want to get a diffrent length of bytes then i asked for?");
                     return;
@@ -1314,7 +1314,7 @@ namespace FlowLib.Protocols
             if (download)
             {
                 // We won battle. Start download.
-                if (trans.DownloadItem != null && trans.CurrentSegment.Index != -1)
+                if (trans.DownloadItem != null && trans.CurrentSegment != null && trans.CurrentSegment.Index != -1)
                 {
                     // Set right content string
                     trans.Content = new ContentInfo(ContentInfo.REQUEST, trans.DownloadItem.ContentInfo.Get(ContentInfo.VIRTUAL));

@@ -32,7 +32,7 @@ namespace FlowLib.Protocols
         {
             Share share = trans.Share;
             Containers.ContentInfo info = trans.Content;
-            if (share != null && share.ContainsContent(ref info))
+            if (share != null && trans.CurrentSegment != null && share.ContainsContent(ref info))
             {
                 trans.Content = info;
                 if (length == -1 && start == 0)
