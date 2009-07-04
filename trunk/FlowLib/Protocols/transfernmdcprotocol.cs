@@ -185,7 +185,7 @@ namespace FlowLib.Protocols
             if (connectionStatus != TcpConnection.Disconnected && System.DateTime.Now.Ticks > interval)
             {
                 FmdcEventArgs e = new FmdcEventArgs((int)TransferErrors.INACTIVITY);
-                Error(this, e);
+                Error(trans, e);
                 if (!e.Handled)
                     trans.Disconnect("Inactivity");
             }
@@ -570,7 +570,7 @@ namespace FlowLib.Protocols
                     TransferRequest req = new TransferRequest(myNick.Info.ID, null, null);
 
                     FmdcEventArgs eArgs = new FmdcEventArgs(0, req);
-                    RequestTransfer(this, eArgs);
+                    RequestTransfer(trans, eArgs);
                     req = eArgs.Data as TransferRequest;
                     if (!eArgs.Handled || req == null)
                     {
@@ -866,7 +866,7 @@ namespace FlowLib.Protocols
             else if (message is MaxedOut)
             {
                 FmdcEventArgs e = new FmdcEventArgs((int)TransferErrors.NO_FREE_SLOTS);
-                Error(this, e);
+                Error(trans, e);
                 if (!e.Handled)
                     trans.Disconnect();
             }
@@ -884,7 +884,7 @@ namespace FlowLib.Protocols
                         e = new FmdcEventArgs((int)TransferErrors.UNKNOWN, error.Message);
                         break;
                 }
-                Error(this, e);
+                Error(trans, e);
                 if (!e.Handled)
                     trans.Disconnect();
             }
@@ -902,7 +902,7 @@ namespace FlowLib.Protocols
                         e = new FmdcEventArgs((int)TransferErrors.UNKNOWN, failed.Message);
                         break;
                 }
-                Error(this, e);
+                Error(trans, e);
                 if (!e.Handled)
                     trans.Disconnect();
             }
