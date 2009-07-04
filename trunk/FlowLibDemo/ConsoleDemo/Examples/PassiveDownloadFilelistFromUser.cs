@@ -125,13 +125,15 @@ namespace ConsoleDemo.Examples
 
         void Protocol_RequestTransfer(object sender, FmdcEventArgs e)
         {
+            ITransfer trans = sender as ITransfer;
             TransferRequest req = e.Data as TransferRequest;
             req = transferManager.GetTransferReq(req.Key);
-            if (req != null)
+            if (trans != null && req != null)
             {
                 e.Handled = true;
                 e.Data = req;
                 transferManager.RemoveTransferReq(req.Key);
+                transferManager.AddTransfer(trans);
             }
         }
 

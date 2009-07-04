@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2008 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -141,13 +141,15 @@ namespace ConsoleDemo.Examples
 
         void Protocol_RequestTransfer(object sender, FmdcEventArgs e)
         {
+            ITransfer trans = sender as ITransfer;
             TransferRequest req = e.Data as TransferRequest;
             req = transferManager.GetTransferReq(req.Key);
-            if (req != null)
+            if (trans != null && req != null)
             {
                 e.Handled = true;
                 e.Data = req;
                 transferManager.RemoveTransferReq(req.Key);
+                transferManager.AddTransfer(trans);
             }
         }
 
