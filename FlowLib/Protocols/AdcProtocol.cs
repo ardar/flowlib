@@ -563,7 +563,7 @@ namespace FlowLib.Protocols
 
                     TransferRequest req = new TransferRequest(token, null, inf.UserInfo);
                     FmdcEventArgs eArgs = new FmdcEventArgs(0, req);
-                    RequestTransfer(this, eArgs);
+                    RequestTransfer(trans, eArgs);
                     req = eArgs.Data as TransferRequest;
                     if (!eArgs.Handled || req == null)
                     {
@@ -575,7 +575,7 @@ namespace FlowLib.Protocols
                     {
                         // For some reason user is trying to tell us it is a diffrent user. We dont like that.
                         FmdcEventArgs e = new FmdcEventArgs((int)TransferErrors.USERID_MISMATCH);
-                        Error(this, e);
+                        Error(trans, e);
                         if (!e.Handled)
                         {
                             trans.Disconnect("User Id Mismatch");
