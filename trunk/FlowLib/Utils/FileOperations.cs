@@ -30,7 +30,7 @@ namespace FlowLib.Utils
         public static void SaveObject(string path, T obj)
         {
             FileOperations.PathExists(path);
-            XmlSerializer s = new XmlSerializer(obj.GetType(), new XmlRootAttribute());
+            XmlSerializer s = new XmlSerializer(obj.GetType());
             TextWriter w = new StreamWriter(path);
             s.Serialize(w, obj);
             w.Close();
@@ -38,7 +38,7 @@ namespace FlowLib.Utils
 
         public static T LoadObject(string path)
         {
-            XmlSerializer s = new XmlSerializer(typeof(T), new XmlRootAttribute());
+            XmlSerializer s = new XmlSerializer(typeof(T));
             if (File.Exists(path))
             {
                 T obj;
