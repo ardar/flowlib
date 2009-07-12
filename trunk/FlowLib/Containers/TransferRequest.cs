@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2008 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ namespace FlowLib.Containers
     {
         UserInfo user = null;
         Hub hub = null;
+        Share share = null;
         string key = null;
         int meDownload = -1;      // Not set (We dont know who is going to download)
 
@@ -68,7 +69,13 @@ namespace FlowLib.Containers
 
         public Share Share
         {
-            get { return hub.Share; }
+            get
+            {
+                if (share == null)
+                    return hub.Share;
+                return share;
+            }
+            set { share = value; }
         }
 
         public int Port

@@ -549,7 +549,7 @@ namespace FlowLib.Protocols
                 if (lk.Extended)
                     trans.Send(mySupport = new Supports(trans));
 
-                GetDownloadItem();
+                GetSegment(true);
 
                 Direction dir = new Direction(trans, this.download);
                 this.downloadRandom = dir.Number;
@@ -564,31 +564,48 @@ namespace FlowLib.Protocols
             else if (message is MyNick)
             {
                 MyNick myNick = (MyNick)message;
-                if (trans.Me == null || trans.Share == null)
-                {
-                    this.trans.User = myNick.Info;
-                    TransferRequest req = new TransferRequest(myNick.Info.ID, null, null);
 
-                    FmdcEventArgs eArgs = new FmdcEventArgs(0, req);
-                    RequestTransfer(trans, eArgs);
-                    req = eArgs.Data as TransferRequest;
-                    if (!eArgs.Handled || req == null)
+                trans.User = myNick.Info;
+                TransferRequest req = new TransferRequest(myNick.Info.ID, null, null);
+
+                FmdcEventArgs eArgs = new FmdcEventArgs(0, req);
+                RequestTransfer(trans, eArgs);
+                req = eArgs.Data as TransferRequest;
+                if (!eArgs.Handled || req == null)
+                {
+
+                    if (trans.Me == null || trans.Share == null)
                     {
                         // Can't see user on my allow list
                         trans.Disconnect("No match for Request");
                         return;
                     }
+                    else
+                    {
+                        // As developers already started to use this.
+                        // We need to support the same behaivor as before (not doing anything when we are passive).
+                    }
+                }
+
+                if (trans.Me == null || trans.Share == null)
+                {
                     trans.Me = req.Me;
                     trans.User = req.User;
                     trans.Share = req.Share;
                     trans.Source = req.Source;
-					trans.Send(new Lock(trans));
-				}
+                    trans.Send(new Lock(trans));
+                }
                 else
                 {
                     trans.User = myNick.Info;
-					trans.Source.UserId = trans.User.StoreID;
-				}
+                    trans.Source.UserId = trans.Source.ConnectionId.Replace(":", string.Empty) + trans.User.StoreID;
+
+                    // Do we want to specify a Share for this connection?
+                    if (eArgs.Handled && req.Share != null)
+                    {
+                        trans.Share = req.Share;
+                    }
+                }
             }
             else if (message is Supports)
             {

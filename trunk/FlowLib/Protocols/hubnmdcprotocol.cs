@@ -628,36 +628,48 @@ namespace FlowLib.Protocols
             }
             else if (e.Action.Equals(Actions.StartTransfer))
             {
+                UserInfo usrInfo;
                 User usr = e.Data as User;
                 if (usr == null)
-                    return;
+                {
+                    usrInfo = e.Data as UserInfo;
+                    if (usrInfo == null)
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    usrInfo = usr.UserInfo;
+                }
+
                 switch (hub.Me.Mode)
                 {
                     case ConnectionTypes.Direct:
                     case ConnectionTypes.UPnP:
                     case ConnectionTypes.Forward:
-                        Update(hub, new FmdcEventArgs(Actions.TransferRequest, new TransferRequest(usr.ID, hub, usr.UserInfo)));
+                        Update(hub, new FmdcEventArgs(Actions.TransferRequest, new TransferRequest(usrInfo.ID, hub, usrInfo)));
 #if !COMPACT_FRAMEWORK
 // Security, Windows Mobile doesnt support SSLStream so we disable this feature for it.
                         if (
-                            usr.UserInfo.ContainsKey(UserInfo.SECURE) && 
+                            usrInfo.ContainsKey(UserInfo.SECURE) && 
                             hub.Me.ContainsKey(UserInfo.SECURE) &&
                             !string.IsNullOrEmpty( hub.Me.Get(UserInfo.SECURE) )
                             )
-                            hub.Send(new ConnectToMe(usr.ID, hub.Share.Port, hub, SecureProtocols.TLS));
+                            hub.Send(new ConnectToMe(usrInfo.ID, hub.Share.Port, hub, SecureProtocols.TLS));
                         else
 #endif
-                            hub.Send(new ConnectToMe(usr.ID, hub.Share.Port, hub));
+                            hub.Send(new ConnectToMe(usrInfo.ID, hub.Share.Port, hub));
                         break;
                     case ConnectionTypes.Passive:
                     case ConnectionTypes.Socket5:
                     case ConnectionTypes.Unknown:
                     default:
-                        if (usr.UserInfo.Mode == ConnectionTypes.Passive)
+                        if (usrInfo.Mode == ConnectionTypes.Passive)
                         {
                             break;
                         }
-                        hub.Send(new RevConnectToMe(usr.ID, hub));
+                        hub.Send(new RevConnectToMe(usrInfo.ID, hub));
                         break;
                 }
             }
