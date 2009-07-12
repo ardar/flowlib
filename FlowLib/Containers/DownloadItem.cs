@@ -227,7 +227,8 @@ namespace FlowLib.Containers
                         long segCount = 0;
                         if ((segCount = (info.Size / segmentSize)) == 0 || (info.Size % segmentSize) != 0)
                             segCount++;
-                        segmentsDownloaded = new BitArray((int)segCount);
+                        if (segmentsDownloaded == null)
+                            segmentsDownloaded = new BitArray((int)segCount);
                         segmentsInProgress = new BitArray((int)segCount);
                         segTotalCount = (int)segCount;
                     }
