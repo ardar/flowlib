@@ -212,6 +212,10 @@ namespace FlowLib.Protocols
         #region Parse
         public void ParseRaw(byte[] b, int length)
         {
+            // We may have data on our stack even when we have disconnected the transfer.
+            if (this.connectionStatus == TcpConnection.Disconnected)
+                return;
+
             if (rawData)
             {
                 if (length < 0)
@@ -334,7 +338,7 @@ namespace FlowLib.Protocols
             }
             int pos = 0;
             // Loop through Commands.
-            while ((pos = raw.IndexOf(Seperator)) > 0)
+            while ((pos = raw.IndexOf(Seperator)) > 0 && this.connectionStatus != TcpConnection.Disconnected)
             {
                 // We have received a command that tells us to read binary
                 if (rawData)
