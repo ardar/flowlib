@@ -38,7 +38,7 @@ namespace FlowLib.Connections
 
         protected UserInfo me = null;
         protected UserInfo user = null;
-        protected Share share = null;
+        protected IShare share = null;
         protected DownloadItem downloadItem = null;
         protected int downloadSegmentId = -1;
         protected ContentInfo info = new ContentInfo();
@@ -104,7 +104,7 @@ namespace FlowLib.Connections
         /// <summary>
         /// Sharing instance for this transfer
         /// </summary>
-        public override Share Share
+        public override IShare Share
         {
             get { return share; }
             set { share = value; }

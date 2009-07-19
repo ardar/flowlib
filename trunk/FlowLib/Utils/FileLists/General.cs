@@ -20,6 +20,7 @@
  */
 
 using FlowLib.Containers;
+using FlowLib.Interfaces;
 
 namespace FlowLib.Utils.FileLists
 {
@@ -32,7 +33,7 @@ namespace FlowLib.Utils.FileLists
         /// </summary>
         /// <param name="share">Share you want to update/add filelist to</param>
         /// <param name="directory">Directory where you want to save filelists in</param>
-        public static void AddCommonFilelistsToShare(Share share, string directory)
+        public static void AddCommonFilelistsToShare(IShare share, string directory)
         {
             // Xml Utf-8 (Current DC++)
             FlowLib.Utils.FileLists.FilelistXmlBz2 xml = new FlowLib.Utils.FileLists.FilelistXmlBz2(share);

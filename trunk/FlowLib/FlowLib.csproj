@@ -92,6 +92,7 @@
     <Compile Include="Containers\TagInfo.cs" />
     <Compile Include="Containers\TransferRequest.cs" />
     <Compile Include="Interfaces\IProtocolDataCollector.cs" />
+    <Compile Include="Interfaces\IShare.cs" />
     <Compile Include="Utils\Statistics\BaseProtocolDataCollector.cs" />
     <Compile Include="Utils\Statistics\BinaryMessagesDataCollector.cs" />
     <Compile Include="Utils\Statistics\GeneralProtocolDataCollector.cs" />

@@ -22,6 +22,7 @@
 using System.Collections.Generic;
 using System;
 using FlowLib.Containers;
+using FlowLib.Interfaces;
 
 namespace FlowLib.Utils.FileLists
 {
@@ -34,9 +35,9 @@ namespace FlowLib.Utils.FileLists
         public const string HUFFMAN = "HUFFMAN";
 
         protected char seperator = '\\';
-        protected Share share = null;
+        protected IShare share = null;
         protected bool hasWritenFilelist = false;
-        protected BaseFilelist(Share share) { this.share = share; }
+        protected BaseFilelist(IShare share) { this.share = share; }
         protected abstract void StartFilelist();
         protected abstract void EndFilelist();
         protected abstract void StartDirectory(string name);
@@ -55,7 +56,7 @@ namespace FlowLib.Utils.FileLists
             get { return hasWritenFilelist; }
         }
 
-        public Share Share
+        public IShare Share
         {
             get { return share; }
         }
