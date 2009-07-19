@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="Examples\CollectTransferedInformationForHub.cs" />
     <Compile Include="Examples\CollectTransferedInformationFromFilelistDownload.cs" />
+    <Compile Include="Examples\MultiConnections.cs" />
     <Compile Include="Examples\WhatConnectionIsPossible.cs" />
     <Compile Include="ConsoleClient\Controls\Button.cs" />
     <Compile Include="ConsoleClient\Controls\Control.cs" />
