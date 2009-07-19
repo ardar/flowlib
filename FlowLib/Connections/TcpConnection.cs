@@ -203,7 +203,7 @@ namespace FlowLib.Connections
         /// <summary>
         /// Sharing instance for this transfer
         /// </summary>
-        public abstract Share Share
+        public abstract IShare Share
         {
             get;
             set;

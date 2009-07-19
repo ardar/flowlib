@@ -25,6 +25,7 @@ using FlowLib.Containers;
 using FlowLib.Enums;
 using System.Collections.Generic;
 using System;
+using FlowLib.Interfaces;
 
 #if COMPACT_FRAMEWORK
 using FlowLib.Utils.CompactFramworkExtensionMethods;
@@ -98,7 +99,7 @@ namespace FlowLib.Utils.FileLists
             fromFile = true;
         }
 
-        public FilelistMyList(Share share)
+        public FilelistMyList(IShare share)
             : base(share)
         {
             systemPath = "";
@@ -107,7 +108,7 @@ namespace FlowLib.Utils.FileLists
         }
 
 
-        public FilelistMyList(Share share, string systemPath)
+        public FilelistMyList(IShare share, string systemPath)
             : base(share)
         {
             this.systemPath = systemPath;

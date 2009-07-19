@@ -1088,7 +1088,7 @@ namespace FlowLib.Protocols
 
         protected void SendRES(SearchInfo info, UserInfo usr)
         {
-            Share share = null;
+            IShare share = null;
             if (hub != null || hub.Share != null || usr != null)
             {
                 share = hub.Share;

@@ -25,6 +25,7 @@ using FlowLib.Containers;
 using FlowLib.Enums;
 using System.Collections.Generic;
 using System;
+using FlowLib.Interfaces;
 
 namespace FlowLib.Utils.FileLists
 {
@@ -116,26 +117,26 @@ namespace FlowLib.Utils.FileLists
             fromXml = true;
         }
 
-        public FilelistXmlBz2(Share share)
+        public FilelistXmlBz2(IShare share)
             : base(share)
         {
             systemPath = "";
         }
 
 
-        public FilelistXmlBz2(Share share, string systemPath)
+        public FilelistXmlBz2(IShare share, string systemPath)
             : base(share)
         {
             this.systemPath = systemPath;
         }
 
-        public FilelistXmlBz2(Share share, Encoding xmlEncoding)
+        public FilelistXmlBz2(IShare share, Encoding xmlEncoding)
             : this(share)
         {
             this.encoding = xmlEncoding;
         }
 
-        public FilelistXmlBz2(Share share, Encoding xmlEncoding, string systemPath)
+        public FilelistXmlBz2(IShare share, Encoding xmlEncoding, string systemPath)
             : this(share, xmlEncoding)
         {
             this.systemPath = systemPath;

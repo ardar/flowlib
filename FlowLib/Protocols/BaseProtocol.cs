@@ -30,7 +30,7 @@ namespace FlowLib.Protocols
 
         protected virtual byte[] GetContent(System.Text.Encoding encoding, long start, long length)
         {
-            Share share = trans.Share;
+            IShare share = trans.Share;
             Containers.ContentInfo info = trans.Content;
             if (share != null && trans.CurrentSegment != null && share.ContainsContent(ref info))
             {

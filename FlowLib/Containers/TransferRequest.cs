@@ -28,7 +28,7 @@ namespace FlowLib.Containers
     {
         UserInfo user = null;
         Hub hub = null;
-        Share share = null;
+        IShare share = null;
         string key = null;
         int meDownload = -1;      // Not set (We dont know who is going to download)
 
@@ -67,7 +67,7 @@ namespace FlowLib.Containers
             set { user = value;}
         }
 
-        public Share Share
+        public IShare Share
         {
             get
             {

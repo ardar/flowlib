@@ -29,6 +29,7 @@ using FlowLib.Events;
 using FlowLib.Utils.Hash;
 using FlowLib.Utils.Convert;
 using FlowLib.Enums;
+using FlowLib.Interfaces;
 
 #if COMPACT_FRAMEWORK
 using FlowLib.Utils.CompactFramworkExtensionMethods;
@@ -39,7 +40,7 @@ namespace FlowLib.Containers
     /// <summary>
     /// Class representing shared content in p2p networks like Direct Connect
     /// </summary>
-    public class Share : IEnumerable<KeyValuePair<string, ContentInfo>>
+    public class Share : IShare
     {
         #region Events
         /// <summary>

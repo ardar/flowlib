@@ -72,7 +72,7 @@ namespace FlowLib.Interfaces
         /// <summary>
         /// Sharing instance for this transfer
         /// </summary>
-        Share Share
+        IShare Share
         {
             get;
             set;

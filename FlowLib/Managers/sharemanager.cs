@@ -22,6 +22,7 @@
 using FlowLib.Containers;
 using System.Collections.Generic;
 using FlowLib.Events;
+using FlowLib.Interfaces;
 
 namespace FlowLib.Managers
 {
@@ -33,7 +34,7 @@ namespace FlowLib.Managers
         protected const int IndexShareNames = 0;
         protected string directory;
         public string FileName = "Shares";
-        protected SortedList<string, Share> shares = new SortedList<string, Share>();
+        protected SortedList<string, IShare> shares = new SortedList<string, IShare>();
 
         public ShareManager()
         {
@@ -48,7 +49,7 @@ namespace FlowLib.Managers
         /// </summary>
         /// <param name="s">Share we want to add</param>
         /// <returns>Returns true if share name is not already existing (and is added)</returns>
-        public bool AddShare(Share s)
+        public bool AddShare(IShare s)
         {
             if (!s.Name.Contains("|") && !shares.ContainsKey(s.Name))
             {
@@ -72,7 +73,7 @@ namespace FlowLib.Managers
         /// <param name="id">id we want to get share of</param>
         /// <param name="s">Returning share if matching id</param>
         /// <returns>Returns true if id match a share</returns>
-        public bool GetShare(string id, out Share s)
+        public bool GetShare(string id, out IShare s)
         {
             return shares.TryGetValue(id, out s);
         }
@@ -83,7 +84,7 @@ namespace FlowLib.Managers
         /// <returns>returns true if manager contains a share with id as name</returns>
         public bool RemoveShare(string id)
         {
-            Share s;
+            IShare s;
             if (shares.TryGetValue(id, out s))
             {
                 if (shares.Remove(id))
@@ -103,7 +104,7 @@ namespace FlowLib.Managers
         /// <returns>Returns true if share name exist and if contentinfo exist in that share</returns>
         public bool ContainsContent(string shareId, ContentInfo info)
         {
-            Share s;
+            IShare s;
             if (GetShare(shareId, out s))
                 return s.ContainsContent(ref info);
             return false;
@@ -118,7 +119,7 @@ namespace FlowLib.Managers
         /// <returns>if share and contentinfo exist. data for this contentinfo will be returned</returns>
         public byte[] GetContent(string shareId, ContentInfo info, long start, long length)
         {
-            Share s;
+            IShare s;
             if (GetShare(shareId, out s))
                 return s.GetContent(info, start, length);
             return null;
@@ -130,7 +131,7 @@ namespace FlowLib.Managers
         /// <returns>Ticks showing when share was last changed, -1 means share was not found or not changed</returns>
         public long GetLastModified(string shareId)
         {
-            Share s;
+            IShare s;
             if (GetShare(shareId, out s))
                 return s.LastModified;
             return -1;
@@ -162,7 +163,7 @@ namespace FlowLib.Managers
                 {
                     if (var == string.Empty)
                         continue;
-                    Share s = new Share(var);
+                    IShare s = new Share(var);
                     s.Load(dir);
                     shares.Add(s.Name, s);
                 }
@@ -171,7 +172,7 @@ namespace FlowLib.Managers
             // If default share doesnt exist, create it.
             if (!shares.ContainsKey("Default"))
             {
-                Share s = new Share("Default");
+                IShare s = new Share("Default");
                 AddShare(s);
             }
             tmpshareNames = null;
@@ -190,7 +191,7 @@ namespace FlowLib.Managers
                 needsRestart = false;
                 try
                 {
-                    foreach (KeyValuePair<string, Share> item in shares)
+                    foreach (KeyValuePair<string, IShare> item in shares)
                     {
                         item.Value.Reload();
                     }
@@ -227,7 +228,7 @@ namespace FlowLib.Managers
             directory = dir;
             SettingsGroup setting = new SettingsGroup();
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
-            foreach (KeyValuePair<string, Share> item in shares)
+            foreach (KeyValuePair<string, IShare> item in shares)
             {
                 sb.Append(item.Key);
                 sb.Append("|");

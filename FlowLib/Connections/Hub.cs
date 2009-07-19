@@ -66,7 +66,7 @@ namespace FlowLib.Connections
         protected int regMode = -1;
         #endregion
         protected HubSetting fav = null;
-        protected Share share = null;
+        protected IShare share = null;
         #endregion
         #region Properties
         /// <summary>
@@ -97,7 +97,7 @@ namespace FlowLib.Connections
         /// <summary>
         /// Share related to this hub
         /// </summary>
-        public override Share Share
+        public override IShare Share
         {
             get { return share; }
             set
