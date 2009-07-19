@@ -133,7 +133,6 @@ namespace ConsoleDemo.Examples
                 e.Handled = true;
                 e.Data = req;
                 transferManager.RemoveTransferReq(req.Key);
-                transferManager.AddTransfer(trans);
             }
         }
 
