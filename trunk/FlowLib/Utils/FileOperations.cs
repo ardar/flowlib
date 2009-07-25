@@ -95,10 +95,11 @@ namespace FlowLib.Utils
                 //File.WriteAllBytes(target, new byte[ size]);
                 // Doing it as below is working on compact .Net and we can handle big files (if you didnt have 2gb of free ram and wanted to write a 3 gb big file this made a problem before)
                 int SEGSIZE = 1024 * 1024;
+                long LONGSEGSIZE = (long)SEGSIZE;
                 using(FileStream fs = new FileStream(target, FileMode.CreateNew, FileAccess.Write, FileShare.None, SEGSIZE))
                 //using (FileStream fs = File.Create(target, SEGSIZE))
                 {
-                    int i = 0;
+                    long i = 0;
                     int segmentSize = SEGSIZE;
                     do
                     {
@@ -117,7 +118,7 @@ namespace FlowLib.Utils
                         fs.Write(new byte[segmentSize], 0, segmentSize);
                         System.Threading.Thread.Sleep(1);
                         i++;
-                    } while ((i * SEGSIZE) < size);
+                    } while ((i * LONGSEGSIZE) < size);
                 }
             }
         }
