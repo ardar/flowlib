@@ -76,9 +76,11 @@ namespace FlowLib.Protocols
         public event FmdcEventHandler Update;
         #endregion
         #region Properties
+        protected string _name = "Adc";
         public string Name
         {
-            get { return "Adc"; }
+            get { return _name; }
+            protected set { _name = value; }
         }
         public Containers.UserInfo Info
         {
@@ -170,6 +172,14 @@ namespace FlowLib.Protocols
             if (hub.Share != null)
                 hub.Share.LastModifiedChanged += new FmdcEventHandler(Share_LastModifiedChanged);
             Hub.RegModeUpdated += new FmdcEventHandler(Hub_RegModeUpdated);
+        }
+
+        public AdcProtocol(Hub hub, bool isSecure)
+            : this(hub)
+        {
+            // We are doing this to keep a good HubSettings
+            if (isSecure)
+                Name = Name + "Secure";
         }
         #endregion
 

@@ -57,9 +57,11 @@ namespace FlowLib.Protocols
         protected Encoding currentEncoding = null;
         #endregion
         #region Properties
+        protected string _name = "Nmdc";
         public string Name
         {
-            get { return "Nmdc"; }
+            get { return _name; }
+            protected set { _name = value; }
         }
         public IConMessage KeepAliveCommand
         {
@@ -114,6 +116,14 @@ namespace FlowLib.Protocols
 
             MessageReceived = new FmdcEventHandler(OnMessageReceived);
             MessageToSend = new FmdcEventHandler(OnMessageToSend);
+        }
+
+        public HubNmdcProtocol(Hub hub, bool isSecure)
+            : this(hub)
+        {
+            // We are doing this to keep a good HubSettings
+            if (isSecure)
+                Name = Name + "Secure";
         }
 
         public void Dispose()

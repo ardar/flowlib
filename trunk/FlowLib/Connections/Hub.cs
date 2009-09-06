@@ -384,11 +384,11 @@ namespace FlowLib.Connections
 #if !COMPACT_FRAMEWORK
 // Security
                     case "AdcSecure":
-                        Protocol = new AdcProtocol(this);
+                        Protocol = new AdcProtocol(this, true);
                         SecureProtocol = FlowLib.Enums.SecureProtocols.TLS;
                         break;
                     case "NmdcSecure":
-                        Protocol = new HubNmdcProtocol(this);
+                        Protocol = new HubNmdcProtocol(this, true);
                         SecureProtocol = FlowLib.Enums.SecureProtocols.TLS;
                         break;
 #endif
