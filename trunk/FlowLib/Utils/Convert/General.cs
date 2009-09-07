@@ -199,11 +199,11 @@ namespace FlowLib.Utils.Convert
         public static bool[] BitArrayToBoolArray(System.Collections.BitArray b)
         {
             // TODO: When we switch to .net 3,5..
-            if (b == null)
+            if (b == null || b.Count == 0)
                 return new bool[] { };
 
-            bool[] tmp = new bool[b.Count - 1];
-            for (int i = 0; i < b.Length; i++)
+            bool[] tmp = new bool[b.Count];
+            for (int i = 0; i < tmp.Length; i++)
             {
                 tmp[i] = b.Get(i);
             }

@@ -637,6 +637,7 @@ namespace FlowLib.Protocols
                     return;
                 }
                 this.rawData = true;
+                trans.ShouldBlockOnSend = true;
             }
             else if (message is FileLength)
             {
@@ -654,6 +655,7 @@ namespace FlowLib.Protocols
                     return;
                 }
                 this.rawData = true;
+                trans.ShouldBlockOnSend = true;
             }
             else if (message is ADCSND)
             {
@@ -676,6 +678,7 @@ namespace FlowLib.Protocols
                     return;
                 }
                 this.rawData = true;
+                trans.ShouldBlockOnSend = true;
             }
             else if (message is Send)
             {

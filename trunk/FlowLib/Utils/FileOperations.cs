@@ -92,34 +92,9 @@ namespace FlowLib.Utils
         {
             if (!PathExists(target))
             {
-                //File.WriteAllBytes(target, new byte[ size]);
-                // Doing it as below is working on compact .Net and we can handle big files (if you didnt have 2gb of free ram and wanted to write a 3 gb big file this made a problem before)
-                int SEGSIZE = 1024 * 1024;
-                long LONGSEGSIZE = (long)SEGSIZE;
-                using(FileStream fs = new FileStream(target, FileMode.CreateNew, FileAccess.Write, FileShare.None, SEGSIZE))
-                //using (FileStream fs = File.Create(target, SEGSIZE))
-                {
-                    long i = 0;
-                    int segmentSize = SEGSIZE;
-                    do
-                    {
-                        // Set length to segment size
-                        segmentSize = SEGSIZE;
-                        // Is segment size bigger then content size?
-                        if (segmentSize > size)
-                        {
-                            segmentSize = (int)size;
-                        }
-                        // Are we at last segment
-                        else if ((1 + i) * segmentSize > size)
-                        {
-                            segmentSize = (int)(size % segmentSize);
-                        }
-                        fs.Write(new byte[segmentSize], 0, segmentSize);
-                        System.Threading.Thread.Sleep(1);
-                        i++;
-                    } while ((i * LONGSEGSIZE) < size);
-                }
+                FileStream fs = new FileStream(target, FileMode.OpenOrCreate);
+                fs.SetLength(size);
+                fs.Close();
             }
         }
 
