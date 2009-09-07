@@ -90,6 +90,13 @@ namespace FlowLib.Interfaces
             set;
         }
 #endif
+
+        bool ShouldBlockOnSend
+        {
+            get;
+            set;
+        }
+
         #endregion
         #region Functions
         /// <summary>

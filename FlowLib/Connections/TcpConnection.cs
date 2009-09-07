@@ -94,6 +94,14 @@ namespace FlowLib.Connections
         protected bool first = true;
         protected bool disposed = false;
         protected bool disposing = false;
+        protected bool shouldBlockSending = false;
+        protected bool isBlockingSending = false;
+
+        public bool ShouldBlockOnSend
+        {
+            get { return shouldBlockSending; }
+            set { shouldBlockSending = value; }
+        }
 
 #if !COMPACT_FRAMEWORK
 // Security
@@ -605,6 +613,10 @@ namespace FlowLib.Connections
                 if (raw == null || raw.Length <= 0)
                     return;
 
+                // This is so we block file transfers
+                if (shouldBlockSending)
+                    isBlockingSending = true;
+
                 // Some how Send doesnt work on my Pocket PC. Because of this we use BeginSend // Flow84
                 AsyncCallback sendData = new AsyncCallback(OnSendData);
 #if !COMPACT_FRAMEWORK
@@ -615,6 +627,16 @@ namespace FlowLib.Connections
                 else
 #endif
                     socket.BeginSend(raw, 0, raw.Length, SocketFlags.None, sendData, socket);
+
+
+                // This is so we block file transfers
+                if (shouldBlockSending)
+                {
+                    while (isBlockingSending)
+                    {
+                        System.Threading.Thread.Sleep(100);
+                    }
+                }
                 return;
             }
             catch (ObjectDisposedException) { }
@@ -641,7 +663,13 @@ namespace FlowLib.Connections
                 }
                 else
 #endif
+                {
                     handler.EndSend(async);
+                }
+                if (shouldBlockSending)
+                {
+                    isBlockingSending = false;
+                }
             }
             catch (ObjectDisposedException) { }
             catch (SocketException se)

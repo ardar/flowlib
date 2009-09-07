@@ -1092,6 +1092,7 @@ namespace FlowLib.Protocols
                     return;
                 }
                 this.rawData = true;
+                trans.ShouldBlockOnSend = true;
             }
             #endregion
         }
