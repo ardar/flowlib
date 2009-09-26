@@ -89,7 +89,7 @@ namespace FlowLib.Connections
         protected IPEndPoint remoteAddress = null;
         protected IPEndPoint localAddress = null;
         protected Socket socket;
-        protected byte[] buffer = new byte[1024];
+        protected byte[] buffer = new byte[1048576];
         protected IProtocol protocol = null;
         protected bool first = true;
         protected bool disposed = false;
@@ -482,7 +482,17 @@ namespace FlowLib.Connections
                     AsyncCallback recieveData = new AsyncCallback(OnRecievedData);
 #if !COMPACT_FRAMEWORK
                     if (secStream != null)
-                        secStream.BeginRead(buffer, 0, buffer.Length, recieveData, secStream);
+                    {
+                        try
+                        {
+                            secStream.BeginRead(buffer, 0, buffer.Length, recieveData, secStream);
+                        }
+                        catch (System.IO.IOException ioex)
+                        {
+                            // Change Connection Status
+                            this.ConnectionStatusChange(this, new FmdcEventArgs(Disconnected, ioex));
+                        }
+                    }
                     else
 #endif
                         sock.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, recieveData, sock);
@@ -518,7 +528,16 @@ namespace FlowLib.Connections
                 if (sock == null)
                 {
                     SslStream handler = ar.AsyncState as SslStream;
-                    nBytesRec = handler.EndRead(ar);
+                    try
+                    {
+                        nBytesRec = handler.EndRead(ar);
+                    }
+                    catch (System.IO.IOException ioex)
+                    {
+                        // Change Connection Status
+                        this.ConnectionStatusChange(this, new FmdcEventArgs(Disconnected));
+                        return;
+                    }
                     // TODO : REMOVE
                     sock = socket;
                 }
@@ -621,9 +640,20 @@ namespace FlowLib.Connections
                 AsyncCallback sendData = new AsyncCallback(OnSendData);
 #if !COMPACT_FRAMEWORK
                 if (secStream != null)
-                    // TODO : Why cant we use async write here?! :S
-                    secStream.Write(raw, 0, raw.Length);
-                    //secStream.BeginWrite(raw, 0, raw.Length, sendData, secStream);
+                {
+                    try
+                    {
+                        // TODO : Why cant we use async write here?! :S
+                        secStream.Write(raw, 0, raw.Length);
+                        //secStream.BeginWrite(raw, 0, raw.Length, sendData, secStream);
+                    }
+                    catch (System.IO.IOException ioex)
+                    {
+                        // Change Connection Status
+                        this.ConnectionStatusChange(this, new FmdcEventArgs(Disconnected, ioex));
+                        return;
+                    }
+                }
                 else
 #endif
                     socket.BeginSend(raw, 0, raw.Length, SocketFlags.None, sendData, socket);

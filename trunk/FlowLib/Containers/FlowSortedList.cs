@@ -22,6 +22,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using FlowLib.Utils;
 
 namespace FlowLib.Containers
 {
@@ -41,6 +42,7 @@ namespace FlowLib.Containers
         protected List<T> list1 = new List<T>();
         protected IComparer<T> comparer;
         protected bool trigger = false;
+        protected bool _allowDuplicates = true;
         #endregion
         #region Events
         public event SingleChangedDelegate ItemAdded;
@@ -65,6 +67,13 @@ namespace FlowLib.Containers
         {
             get { return list1.Count; }
         }
+
+        public bool AllowDuplicates
+        {
+            get { return _allowDuplicates; }
+            set { _allowDuplicates = value; }
+        }
+
         public bool TriggerEvents
         {
             get { return trigger; }
@@ -157,6 +166,11 @@ namespace FlowLib.Containers
             }
         }
 
+        protected int CompareTo(T itemX, T itemY)
+        {
+            return comparer.Compare(itemX, itemY);
+        }
+
         /// <summary>
         /// Adds an object to the list.
         /// </summary>
@@ -166,19 +180,31 @@ namespace FlowLib.Containers
         {
             #region Checks where to add Item
             int pos = 0;
-            if (list1.Count > 0)
+            int count = list1.Count;
+            if (count > 0)
             {
                 // Check against last item in list.
-                if (comparer.Compare(list1[list1.Count - 1], item) <= 0)    // If it is equal or bigger add last.
-                    pos = list1.Count;
+                int intComp = CompareTo(list1[count - 1], item);
+                if (intComp <= 0)    // If it is equal or bigger add last.
+                {
+                    if (!_allowDuplicates && intComp == 0)
+                        throw new FlowLibException("item has already been added to collection. If you want to allow this you must set AllowDuplicates to true.");
+                    pos = count;
+                }
                 else
-                    if (list1.Count == 1)
+                    if (count == 1)
                         pos = 0;
                     else
-                        pos = Find(item, 0, list1.Count - 2);
+                        pos = Find(item, 0, count - 2);
             }
             #endregion
             // TODO : Get pos where to add item.
+            if (pos < count && count != 0)
+            {
+               if (!_allowDuplicates && CompareTo(list1[pos], item) == 0)
+                   throw new FlowLibException("item has already been added to collection. If you want to allow this you must set AllowDuplicates to true.");
+            }
+
             list1.Insert(pos, item);    // This will insert item before the current 0 item.
             if (trigger)
                 ItemAdded(pos, item);
@@ -224,6 +250,7 @@ namespace FlowLib.Containers
             if (pos >= 0 && pos < list1.Count)
             {
                 list1.RemoveAt(pos);
+                // TODO: Add Trigger handing
             }
         }
         /// <summary>
