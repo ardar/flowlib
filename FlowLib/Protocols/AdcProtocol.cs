@@ -1259,10 +1259,16 @@ namespace FlowLib.Protocols
             else if (e.Action.Equals(Actions.StartTransfer) && hub != null)
             {
                 User usr = e.Data as User;
-                if (usr == null || hub.Share == null)
+                UserInfo usrInfo;
+                if (usr != null)
+                    usrInfo = usr.UserInfo;
+                else
+                    usrInfo = e.Data as UserInfo;
+
+                if (usrInfo == null || hub.Share == null)
                     return;
                 // Do user support connecting?
-                if (usr.UserInfo.ContainsKey(UserInfo.IP))
+                if (usrInfo.ContainsKey(UserInfo.IP))
                 {
                     switch (hub.Me.Mode)
                     {
@@ -1271,27 +1277,27 @@ namespace FlowLib.Protocols
                         case ConnectionTypes.Forward:
                             // We are active and they are active. Let them connect to us
                             // TODO : We should really use something else as token
-                            Update(con, new FmdcEventArgs(Actions.TransferRequest, new TransferRequest(usr.ID, hub, usr.UserInfo,true)));
-                            if (usr.UserInfo.ContainsKey(UserInfo.SECURE) && hub.Me.ContainsKey(UserInfo.SECURE))
-                                hub.Send(new CTM(hub, usr.ID, hub.Me.ID, "ADCS/0.10", hub.Share.Port, usr.ID));
+                            Update(con, new FmdcEventArgs(Actions.TransferRequest, new TransferRequest(usrInfo.ID, hub, usrInfo, true)));
+                            if (usrInfo.ContainsKey(UserInfo.SECURE) && hub.Me.ContainsKey(UserInfo.SECURE))
+                                hub.Send(new CTM(hub, usrInfo.ID, hub.Me.ID, "ADCS/0.10", hub.Share.Port, usrInfo.ID));
                             else
-                                hub.Send(new CTM(hub, usr.ID, hub.Me.ID, hub.Share.Port, usr.ID));
+                                hub.Send(new CTM(hub, usrInfo.ID, hub.Me.ID, hub.Share.Port, usrInfo.ID));
                             break;
                         case ConnectionTypes.Passive:
                         case ConnectionTypes.Socket5:
                         case ConnectionTypes.Unknown:
                         default:
                             // We are passive and they are active. Let us connect to them
-                            if (usr.UserInfo.Mode == ConnectionTypes.Passive)
+                            if (usrInfo.Mode == ConnectionTypes.Passive)
                             {
                                 break;
                             }
                             // TODO : We should really use something else as token
-                            Update(con, new FmdcEventArgs(Actions.TransferRequest, new TransferRequest(usr.ID, hub, usr.UserInfo, true)));
-                            if (usr.UserInfo.ContainsKey(UserInfo.SECURE) && hub.Me.ContainsKey(UserInfo.SECURE))
-                                hub.Send(new RCM(usr.ID, hub, "ADCS/0.10", hub.Me.ID, usr.ID));
+                            Update(con, new FmdcEventArgs(Actions.TransferRequest, new TransferRequest(usrInfo.ID, hub, usrInfo, true)));
+                            if (usrInfo.ContainsKey(UserInfo.SECURE) && hub.Me.ContainsKey(UserInfo.SECURE))
+                                hub.Send(new RCM(usrInfo.ID, hub, "ADCS/0.10", hub.Me.ID, usrInfo.ID));
                             else
-                                hub.Send(new RCM(usr.ID, hub, hub.Me.ID, usr.ID));
+                                hub.Send(new RCM(usrInfo.ID, hub, hub.Me.ID, usrInfo.ID));
                             break;
                     }
                 }
@@ -1304,8 +1310,8 @@ namespace FlowLib.Protocols
                         case ConnectionTypes.UPnP:
                         case ConnectionTypes.Forward:
                             // TODO : We should realy use something else as token
-                            Update(con, new FmdcEventArgs(Actions.TransferRequest, new TransferRequest(usr.ID, hub, usr.UserInfo, true)));
-                            hub.Send(new CTM(hub, usr.ID, hub.Me.ID, hub.Share.Port, usr.ID));
+                            Update(con, new FmdcEventArgs(Actions.TransferRequest, new TransferRequest(usrInfo.ID, hub, usrInfo, true)));
+                            hub.Send(new CTM(hub, usrInfo.ID, hub.Me.ID, hub.Share.Port, usrInfo.ID));
                             break;
                     }
                 }
