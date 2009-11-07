@@ -13,6 +13,7 @@ _Note that just because it is on this list it is not a promise that it will be d
   * Algorithm for minimizing data needed to be sent between flowlib "clients/bots"
   * Event when finished file uploading (hackward suggested in FeatureRequests)
   * ~~Use IShare interface for Share references. This is to make it more extendable for developers.~~ 
+    # [http://code.google.com/p/flowlib/issues/detail?id=43 Issue 43]
   * Verify downloaded content
     # Full TIGR extention support
 
