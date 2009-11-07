@@ -21,3 +21,4 @@ _Note that just because it is on this list it is not a promise that it will be d
   * Partial File Sharing (http://strongdc.sourceforge.net/forum/viewtopic.php?f=12&t=5665)
   * Support to collect IP for every user in hub. $UserIP/$UserIP2
   * Total Share Property for Hub (Hackward suggested)
+  * Certificate generation (http://www.bouncycastle.org/csharp/ and http://www.adcportal.com/forums/viewtopic.php?f=39&p=2113)
