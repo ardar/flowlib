@@ -75,6 +75,13 @@ namespace FlowLib.Utils.Connection
             End = 4096
         }
 
+        [Flags]
+        public enum ErrorTypes
+        {
+            None = 0,
+            SocketError_SpecifiedAddressAlreadyInUse = 10048
+        }
+
         #region Variables/Properties
 		public event ProgressChange ProgressChanged;
 		public event ProgressChange SuccessChanged;
@@ -84,6 +91,7 @@ namespace FlowLib.Utils.Connection
         protected TransferManager transferManager = new TransferManager();
 		protected Functions fSuccess = Functions.Start;
 		protected Functions fProgress = Functions.Start;
+        protected ErrorTypes _errors = ErrorTypes.None;
         protected IUPnP upnp = null;
         protected WANIPConnectionService wanipService = null;
         protected WANIPConnectionService.PortMapping mapping = null;
@@ -96,6 +104,12 @@ namespace FlowLib.Utils.Connection
 				fSuccess = value;
 				SuccessChanged(this, fSuccess);
 			}
+        }
+
+        public ErrorTypes Errors
+        {
+            get { return _errors; }
+            set { _errors = value; }
         }
 
         public Functions Progress
@@ -250,6 +264,21 @@ namespace FlowLib.Utils.Connection
                     DoWork();
                     Thread.Sleep(1);
                 } while ((Functions.End & Progress) != Functions.End);
+            }
+            catch (System.Net.Sockets.SocketException se)
+            {
+                // Look if 
+                switch (se.ErrorCode)
+                {
+                    case (int)ErrorTypes.SocketError_SpecifiedAddressAlreadyInUse:
+                        _errors = ErrorTypes.SocketError_SpecifiedAddressAlreadyInUse;
+                        Progress = Functions.End;
+                        break;
+                    default:
+                        // We dont know of this error (rethrow it).
+                        throw;
+                }
+
             }
             catch (System.Threading.ThreadAbortException)
             {

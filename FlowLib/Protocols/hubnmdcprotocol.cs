@@ -561,7 +561,7 @@ namespace FlowLib.Protocols
                 Transfer trans = new Transfer(conToMe.Address, conToMe.Port);
                 trans.Share = this.hub.Share;
                 trans.Me = hub.Me;
-                trans.Source = new Source(hub.RemoteAddress.ToString(), null);
+                trans.Source = new Source(hub.HubSetting.Address + hub.HubSetting.Port.ToString(), null);
                 // Protocol has to be set last.
                 trans.Protocol = new TransferNmdcProtocol(trans);
 #if !COMPACT_FRAMEWORK

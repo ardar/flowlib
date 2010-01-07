@@ -257,6 +257,7 @@ namespace FlowLib.Containers
                             return new SegmentInfo(i, i * SegmentSize, lengthToDownload);
                         }
                     }
+                    tmp = null;
                     return new SegmentInfo(-1);
                 }
                 return new SegmentInfo(-2);
