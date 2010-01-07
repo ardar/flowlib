@@ -419,6 +419,14 @@ namespace FlowLib.Connections
             {
                 this.ConnectionStatusChange(this, new FmdcEventArgs(Disconnected, new FmdcException(msg)));
 
+#if !COMPACT_FRAMEWORK
+                if (secStream != null)
+                {
+                    secStream.Close();
+                    secStream = null;
+                }
+#endif
+
                 socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontLinger,new LingerOption(false, 0));
                 socket.Disconnect(true);
             }

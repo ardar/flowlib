@@ -743,6 +743,7 @@ namespace FlowLib.Protocols.Adc
                 return;
             info.TagInfo.GenerateTag = true;
             info.Set(UserInfo.SID, id);
+            info.TagInfo.Mode = Enums.ConnectionTypes.Passive;
 
             if (typeValid)
                 valid = true;
@@ -871,6 +872,10 @@ namespace FlowLib.Protocols.Adc
                             {
                                 case "ADC0":
                                     info.Set(UserInfo.SECURE, "");
+                                    break;
+                                case "TCP4":
+                                case "TCP6":
+                                    info.TagInfo.Mode = Enums.ConnectionTypes.Direct;
                                     break;
                             }
                         }
