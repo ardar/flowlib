@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Favorites>
+	<Hubs>
+		<Hub Name="Nmdc" Connect="1" Description="127.0.0.1" Nick="StrongDC++230" Password="" Server="127.0.0.1" UserDescription="" Encoding="Swedish_Sweden.1252" ChatUserSplit="5447" StealthMode="0" UserListState="1" HubFrameOrder="0,1,6,2,5,3,7,8,9,4,10,11" HubFrameWidths="109,75,75,80,203,75,100,100,50,40,40,40" HubFrameVisible="1,1,0,1,1,1,0,0,0,1,0,0" RawOne="" RawTwo="" RawThree="" RawFour="" RawFive="" Mode="0" IP="127.0.0.1" SearchInterval="30"/>
+		<Hub Name="ADC" Connect="1" Description="" Nick="StrongDC++230" Password="" Server="adc://127.0.0.1:2780" UserDescription="" Encoding="Swedish_Sweden.1252" ChatUserSplit="7500" StealthMode="0" UserListState="1" HubFrameOrder="0,1,6,2,5,3,7,8,9,4,10,11" HubFrameWidths="100,75,75,80,203,75,100,100,50,40,40,40" HubFrameVisible="1,1,1,1,1,1,1,1,1,1,1,1" RawOne="" RawTwo="" RawThree="" RawFour="" RawFive="" Mode="0" IP="" SearchInterval="30"/>
+		<Hub Name="ADCS" Connect="1" Description="" Nick="StrongDC++230" Password="" Server="adcs://127.0.0.1:2781" UserDescription="" Encoding="Swedish_Sweden.1252" ChatUserSplit="7500" StealthMode="0" UserListState="1" HubFrameOrder="0,1,6,2,5,3,7,8,9,4,10,11" HubFrameWidths="100,75,75,80,203,75,100,100,50,40,40,40" HubFrameVisible="1,1,1,1,1,1,1,1,1,1,1,1" RawOne="" RawTwo="" RawThree="" RawFour="" RawFive="" Mode="0" IP="" SearchInterval="30"/>
+	</Hubs>
+	<Users/>
+	<UserCommands/>
+	<FavoriteDirs/>
+</Favorites>

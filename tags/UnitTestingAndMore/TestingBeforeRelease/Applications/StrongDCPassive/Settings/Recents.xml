@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Recents>
+	<Hubs>
+		<Hub Name="YnHub - 1.036 (127.0.0.1)" Description="*" Users="0" Shared="0" Server="127.0.0.1"/>
+		<Hub Name="127.0.0.1:23" Description="" Users="0" Shared="0" Server="127.0.0.1:23"/>
+		<Hub Name="127.0.0.1:1411" Description="" Users="0" Shared="0" Server="127.0.0.1:1411"/>
+		<Hub Name="127.0.0.1:1337" Description="" Users="0" Shared="0" Server="127.0.0.1:1337"/>
+		<Hub Name="127.0.0.1:1336" Description="" Users="0" Shared="0" Server="127.0.0.1:1336"/>
+		<Hub Name="127.0.0.1:1335" Description="" Users="0" Shared="0" Server="127.0.0.1:1335"/>
+		<Hub Name="127.0.0.1:4111" Description="*" Users="0" Shared="0" Server="127.0.0.1:4111"/>
+		<Hub Name="adc://127.0.0.1:4111" Description="*" Users="0" Shared="0" Server="adc://127.0.0.1:4111"/>
+		<Hub Name="hub of Mattias (adc://127.0.0.1:4112)" Description="*" Users="3" Shared="868220099" Server="adc://127.0.0.1:4112"/>
+		<Hub Name="127.0.0.1:443" Description="*" Users="0" Shared="0" Server="127.0.0.1:443"/>
+		<Hub Name="adc://127.0.0.1:443" Description="*" Users="0" Shared="0" Server="adc://127.0.0.1:443"/>
+		<Hub Name="hub of Mattias (adcs://127.0.0.1:443)" Description="hub of Mattias (adc://127.0.0.1:443)" Users="3" Shared="0" Server="adcs://127.0.0.1:443"/>
+		<Hub Name="adcs://192.168.1.5:443" Description="hub of Mattias (adc://127.0.0.1:443)" Users="0" Shared="0" Server="adcs://192.168.1.5:443"/>
+		<Hub Name="adcs://127.0.0.1:2781" Description="" Users="0" Shared="0" Server="adcs://127.0.0.1:2781"/>
+		<Hub Name="ADCH++ - ADCH++ Test hub (adc://127.0.0.1:2780)" Description="" Users="0" Shared="0" Server="adc://127.0.0.1:2780"/>
+	</Hubs>
+</Recents>
