@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<HashStore Version="2">
+	<Trees>
+		<Hash Type="TTH" Index="8312" BlockSize="2097152" Size="724353024" Root="YKAXVAPOYI3QGWS3S3FICTD7IYFRFMBUTQQI7FA"/>
+		<Hash Type="TTH" Index="16616" BlockSize="65536" Size="1352967" Root="Y4GPI7FQMPMZN7CN4RS2EHO3TVPNIT6VYKRQXIY"/>
+	</Trees>
+	<Files>
+		<File Name="c:\share\strongdc\ubuntu-9.10-desktop-amd64.iso" TimeStamp="1264841810" Root="YKAXVAPOYI3QGWS3S3FICTD7IYFRFMBUTQQI7FA"/>
+		<File Name="c:\share\strongdc\flowlib20090103.zip" TimeStamp="1264960610" Root="Y4GPI7FQMPMZN7CN4RS2EHO3TVPNIT6VYKRQXIY"/>
+	</Files>
+</HashStore>

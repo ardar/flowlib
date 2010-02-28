@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Favorites>
+	<Hubs>
+		<Hub Name="Nmdc" Connect="1" Description="" Nick="DC++75" Password="" Server="127.0.0.1" UserDescription="" Encoding="Swedish_Sweden.1252"/>
+		<Hub Name="ADC" Connect="1" Description="" Nick="DC++75" Password="" Server="adc://127.0.0.1:2780" UserDescription="" Encoding="Swedish_Sweden.1252"/>
+		<Hub Name="ADCS" Connect="1" Description="" Nick="DC++75" Password="" Server="adcs://127.0.0.1:2781" UserDescription="" Encoding="Swedish_Sweden.1252"/>
+		<Hub Name="-Flowertwig-" Connect="1" Description="Caprica S01E00 pilot != S01E01, små skillnader finns även om det är samma avsnitt. " Nick="blomman@laptop" Password="password" Server="adcs://adcs.flowertwig.org:443" UserDescription="" Encoding="Swedish_Sweden.1252"/>
+	</Hubs>
+	<Users/>
+	<UserCommands/>
+	<FavoriteDirs/>
+</Favorites>

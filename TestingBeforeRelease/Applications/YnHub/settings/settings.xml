@@ -6,8 +6,8 @@
     <MaxUsers>3000</MaxUsers>
     <UsersPeak>3</UsersPeak>
     <SharePeak>1213114150371</SharePeak>
-    <UptimePeak>5012297</UptimePeak>
-    <WorkPace>3</WorkPace>
+    <UptimePeak>66526346</UptimePeak>
+    <WorkPace>4</WorkPace>
     <AutoStart enable="true"/>
     <PromptOnShutDown enable="false"/>
     <MinmizeToTray enable="true"/>
@@ -81,18 +81,18 @@
       <NotifyIncorrectPass enable="true">3</NotifyIncorrectPass>
     </General>
     <Autobans>
-      <AutoBanIncorrectPassword enable="true" count="5" hours="24"/>
-      <AutoBanOnKick enable="true" count="5" hours="6"/>
+      <AutoBanIncorrectPassword enable="false" count="5" hours="24"/>
+      <AutoBanOnKick enable="false" count="5" hours="6"/>
     </Autobans>
     <Spam>
       <MaxSpamWarnings>6</MaxSpamWarnings>
-      <SearchSpamMaxCount enable="1" count="4" interval="10000"/>
-      <MainChatSpamMaxCount enable="1" count="5" interval="10000"/>
-      <PMSpamCheck enable="1" count="5" interval="10000"/>
-      <NickListSpamCheck enable="1" count="3" interval="10000"/>
-      <MyINFOSpamCheck enable="1" count="15" interval="60000"/>
-      <JunkData enable="true">512</JunkData>
-      <JunkDataDK enable="true">1024</JunkDataDK>
+      <SearchSpamMaxCount enable="0" count="4" interval="10000"/>
+      <MainChatSpamMaxCount enable="0" count="5" interval="10000"/>
+      <PMSpamCheck enable="0" count="5" interval="10000"/>
+      <NickListSpamCheck enable="0" count="3" interval="10000"/>
+      <MyINFOSpamCheck enable="0" count="15" interval="60000"/>
+      <JunkData enable="false">512</JunkData>
+      <JunkDataDK enable="false">1024</JunkDataDK>
     </Spam>
   </Security>
   <Restrictions>

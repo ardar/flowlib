@@ -63,6 +63,17 @@ namespace FlowLib.Protocols
             get { return _name; }
             protected set { _name = value; }
         }
+        protected bool _isReady;
+        public bool IsReady
+        {
+            get { return _isReady; }
+            set
+            {
+                _isReady = value;
+                Update(hub, new FmdcEventArgs(Actions.IsReady, value));
+            }
+        }
+
         public IConMessage KeepAliveCommand
         {
             get { return new HubMessage(hub, Seperator); }
@@ -75,7 +86,6 @@ namespace FlowLib.Protocols
 
         public System.Text.Encoding Encoding
         {
-            //get { return System.Text.Encoding.Default; }
             get
 			{
                 if (currentEncoding == null)
@@ -198,6 +208,7 @@ namespace FlowLib.Protocols
 					// Sets MyInfo Interval to 0 when connection is disconnected
 					this.myInfoLastUpdated = 0;
 					lastMyInfo = null;
+                    IsReady = false;
 					break;
                 case TcpConnection.Connected:
                     h = new HubStatus(HubStatus.Codes.Connected);
@@ -487,7 +498,7 @@ namespace FlowLib.Protocols
                 {
                     UserInfo userInfo = new UserInfo();
                     userInfo.DisplayName = userid;
-                    userInfo.Set(UserInfo.STOREID, hub.HubSetting.Address + hub.HubSetting.Port.ToString() + userid);
+                    userInfo.Set(UserInfo.STOREID, hub.StoreId + userid);
                     if (hub.GetUserById(userid) == null)
                         Update(hub, new FmdcEventArgs(Actions.UserOnline, userInfo));
                 }
@@ -499,7 +510,7 @@ namespace FlowLib.Protocols
                 {
                     UserInfo userInfo = new UserInfo();
                     userInfo.DisplayName = userid;
-                    userInfo.Set(UserInfo.STOREID, hub.HubSetting.Address + hub.HubSetting.Port.ToString() + userid);
+                    userInfo.Set(UserInfo.STOREID, hub.StoreId + userid);
                     userInfo.IsOperator = true;
                     User usr = null;
                     if ((usr = hub.GetUserById(userid)) == null)
@@ -543,6 +554,11 @@ namespace FlowLib.Protocols
                     usr.UserInfo.IsOperator = op;
                     Update(hub, new FmdcEventArgs(Actions.UserInfoChange, usr.UserInfo));
                 }
+
+                if (hub.RegMode >= 0 && string.Equals(myinfo.From, hub.Me.ID))
+                {
+                    IsReady = true;
+                }
             }
             else if (message is Hello)
             {
@@ -561,7 +577,7 @@ namespace FlowLib.Protocols
                 Transfer trans = new Transfer(conToMe.Address, conToMe.Port);
                 trans.Share = this.hub.Share;
                 trans.Me = hub.Me;
-                trans.Source = new Source(hub.HubSetting.Address + hub.HubSetting.Port.ToString(), null);
+                trans.Source = new Source(hub.StoreId, null);
                 // Protocol has to be set last.
                 trans.Protocol = new TransferNmdcProtocol(trans);
 #if !COMPACT_FRAMEWORK

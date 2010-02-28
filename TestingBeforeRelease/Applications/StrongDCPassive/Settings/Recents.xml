@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Recents>
 	<Hubs>
-		<Hub Name="YnHub - 1.036 (127.0.0.1)" Description="*" Users="2" Shared="0" Server="127.0.0.1"/>
+		<Hub Name="YnHub - 1.036 (127.0.0.1)" Description="*" Users="0" Shared="0" Server="127.0.0.1"/>
 		<Hub Name="127.0.0.1:23" Description="" Users="0" Shared="0" Server="127.0.0.1:23"/>
 		<Hub Name="127.0.0.1:1411" Description="" Users="0" Shared="0" Server="127.0.0.1:1411"/>
 		<Hub Name="127.0.0.1:1337" Description="" Users="0" Shared="0" Server="127.0.0.1:1337"/>

@@ -56,6 +56,7 @@ namespace FlowLib.Protocols
             if (trans.DownloadItem != null && trans.CurrentSegment != null)
             {
                 // Clean up here please :)
+                FlowLib.Utils.FileOperations.ForceClose(trans.DownloadItem.ContentInfo.Get(ContentInfo.STORAGEPATH));
                 trans.DownloadItem.Finished(trans.CurrentSegment.Index, trans.Source);
                 trans.CurrentSegment = null;
             }

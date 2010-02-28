@@ -34,4 +34,18 @@ namespace FlowLib.Utils
         {
         }
     }
+
+    public class FlowLibException : Exception
+    {
+        public FlowLibException()
+            : base()
+        {
+        }
+
+        public FlowLibException(string msg)
+            : base(msg)
+        {
+        }
+    }
+
 }

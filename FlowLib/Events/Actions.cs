@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2010 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -125,6 +125,16 @@ namespace FlowLib.Events
         /// object is User
         /// </summary>
         public const int StartTransfer = 21;
+
+        public const int UploadStarted = 22;
+
+        public const int UploadFinished = 23;
+        /// <summary>
+        /// Connection is ready to be used.
+        /// You can now send messages and so on.
+        /// object is bool
+        /// </summary>
+        public const int IsReady = 24;
 
 #if !COMPACT_FRAMEWORK
         /// <summary>

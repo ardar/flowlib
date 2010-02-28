@@ -243,6 +243,9 @@ namespace FlowLib.Protocols
                     b = tmp;
                     length += old.Length;
                     received = string.Empty;
+
+                    tmp = null;
+                    old = null;
                 }
 
                 // Do we have a working byte array?
@@ -269,34 +272,46 @@ namespace FlowLib.Protocols
                                     Utils.FileOperations.AllocateFile(trans.DownloadItem.ContentInfo.Get(ContentInfo.STORAGEPATH), trans.DownloadItem.ContentInfo.Size);
                                 }
 
-                                // Create the file.
-                                //using (System.IO.FileStream fs = System.IO.File.OpenWrite(trans.DownloadItem.ContentInfo.Get(ContentInfo.STORAGEPATH)))
-                                using (System.IO.FileStream fs = new System.IO.FileStream(trans.DownloadItem.ContentInfo.Get(ContentInfo.STORAGEPATH), System.IO.FileMode.OpenOrCreate, System.IO.FileAccess.Write, System.IO.FileShare.Write))
+                                SegmentInfo curInfo = trans.CurrentSegment;
+                                try
                                 {
-                                    try
-                                    {
-                                        // Lock this segment of file
-                                        fs.Lock(trans.CurrentSegment.Start, trans.CurrentSegment.Length);
-                                        // Set position
-                                        fs.Position = trans.CurrentSegment.Start + trans.CurrentSegment.Position;
-                                        // Write this byte array to file
-                                        fs.Write(b, 0, length);
-                                        trans.CurrentSegment.Position += length;
-                                        // Saves and unlocks file
-                                        fs.Flush();
-                                        fs.Unlock(trans.CurrentSegment.Start, trans.CurrentSegment.Length);
-                                    }
-                                    catch (System.Exception exp)
-                                    {
-                                        //trans.DownloadItem.Cancel(trans.CurrentSegment.Index, trans.Source);
-                                        trans.Disconnect("Exception thrown when trying to write to file: " + exp.ToString());
-                                        return;
-                                    }
-                                    finally
-                                    {
-                                        fs.Dispose();
-                                        fs.Close();
-                                    }
+                                    Utils.FileOperations.WriteContent(trans.DownloadItem.ContentInfo.Get(ContentInfo.STORAGEPATH), ref curInfo, b, length);
+                                }
+                                catch (System.Exception exp)
+                                {
+                                    //trans.DownloadItem.Cancel(trans.CurrentSegment.Index, trans.Source);
+                                    trans.Disconnect("Exception thrown when trying to write to file: " + exp.ToString());
+                                    return;
+                                }
+                                curInfo = null;
+
+                                // Create the file.
+                                //using (System.IO.FileStream fs = new System.IO.FileStream(trans.DownloadItem.ContentInfo.Get(ContentInfo.STORAGEPATH), System.IO.FileMode.OpenOrCreate, System.IO.FileAccess.Write, System.IO.FileShare.Write))
+                                //{
+                                //    try
+                                //    {
+                                //        // Lock this segment of file
+                                //        fs.Lock(trans.CurrentSegment.Start, trans.CurrentSegment.Length);
+                                //        // Set position
+                                //        fs.Position = trans.CurrentSegment.Start + trans.CurrentSegment.Position;
+                                //        // Write this byte array to file
+                                //        fs.Write(b, 0, length);
+                                //        trans.CurrentSegment.Position += length;
+                                //        // Saves and unlocks file
+                                //        fs.Flush();
+                                //        fs.Unlock(trans.CurrentSegment.Start, trans.CurrentSegment.Length);
+                                //    }
+                                //    catch (System.Exception exp)
+                                //    {
+                                //        //trans.DownloadItem.Cancel(trans.CurrentSegment.Index, trans.Source);
+                                //        trans.Disconnect("Exception thrown when trying to write to file: " + exp.ToString());
+                                //        return;
+                                //    }
+                                //    finally
+                                //    {
+                                //        fs.Dispose();
+                                //        fs.Close();
+                                //    }
                                     if (trans.CurrentSegment.Position >= trans.CurrentSegment.Length)
                                     {
                                         EnsureCurrentSegmentFinishing();
@@ -309,7 +324,7 @@ namespace FlowLib.Protocols
                                         else
                                             trans.Disconnect("All content downloaded");
                                     }
-                                }
+                                //}
                             }
                         }
                         else
@@ -443,6 +458,7 @@ namespace FlowLib.Protocols
 
                     trans.DownloadItem = eArgs.Data as DownloadItem;
                 }
+                usrInfo = null;
             }
             download = (trans.DownloadItem != null && (trans.CurrentSegment = trans.DownloadItem.GetAvailable(trans.Source)).Index != -1);
             return download;
@@ -569,8 +585,20 @@ namespace FlowLib.Protocols
             {
                 MyNick myNick = (MyNick)message;
 
+                if (trans.Source !=null && !string.IsNullOrEmpty(trans.Source.ConnectionId))
+                {
+                    string conId = trans.Source.ConnectionId;
+                    string usrId = trans.Source.UserId;
+                    if (string.IsNullOrEmpty(usrId))
+                    {
+                        // connection Id + User Id will give us the users StoredId
+                        trans.Source = new Source(conId, conId + myNick.Info.ID);
+                    }
+                }
+
                 trans.User = myNick.Info;
-                TransferRequest req = new TransferRequest(myNick.Info.ID, null, null);
+                TransferRequest req = new TransferRequest(trans.Source);
+                //TransferRequest req = new TransferRequest(myNick.Info.ID, null, null);
 
                 FmdcEventArgs eArgs = new FmdcEventArgs(0, req);
                 RequestTransfer(trans, eArgs);
@@ -602,7 +630,7 @@ namespace FlowLib.Protocols
                 else
                 {
                     trans.User = myNick.Info;
-                    trans.Source.UserId = trans.Source.ConnectionId.Replace(":", string.Empty) + trans.User.StoreID;
+                    //trans.Source.UserId = trans.Source.ConnectionId.Replace(":", string.Empty) + trans.User.StoreID;
 
                     // Do we want to specify a Share for this connection?
                     if (eArgs.Handled && req.Share != null)

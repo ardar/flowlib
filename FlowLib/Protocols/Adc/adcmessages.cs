@@ -743,7 +743,8 @@ namespace FlowLib.Protocols.Adc
                 return;
             info.TagInfo.GenerateTag = true;
             info.Set(UserInfo.SID, id);
-            info.TagInfo.Mode = Enums.ConnectionTypes.Passive;
+			// We set connection mode to unknown until we get a SU field.
+            info.TagInfo.Mode = Enums.ConnectionTypes.Unknown;
 
             if (typeValid)
                 valid = true;
@@ -866,6 +867,8 @@ namespace FlowLib.Protocols.Adc
                     case "SU":
                         info.Set(key, value);
                         string[] supports = value.Split(',');
+						// Set connection to passive by default.
+						info.TagInfo.Mode = Enums.ConnectionTypes.Passive;
                         foreach (string sup in supports)
                         {
                             switch (sup)

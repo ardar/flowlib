@@ -36,7 +36,7 @@
 		<LogFormatSystem type="string">[%Y-%m-%d %H:%M] %[message]</LogFormatSystem>
 		<LogFormatStatus type="string">[%Y-%m-%d %H:%M] %[message]</LogFormatStatus>
 		<DirectoryListingFrameOrder type="string">0,1,2,3,4</DirectoryListingFrameOrder>
-		<DirectoryListingFrameWidths type="string">300,60,80,100,300</DirectoryListingFrameWidths>
+		<DirectoryListingFrameWidths type="string">255,60,80,100,300</DirectoryListingFrameWidths>
 		<Language type="string">C</Language>
 		<DownloadsOrder type="string">0,1,2,3,4,5,6</DownloadsOrder>
 		<DownloadsWidth type="string">200,300,150,200,125,80,80</DownloadsWidth>
@@ -72,11 +72,11 @@
 		<MinUploadSpeed type="int">0</MinUploadSpeed>
 		<GetUserInfo type="int">1</GetUserInfo>
 		<UrlHandler type="int">0</UrlHandler>
-		<MainWindowState type="int">3</MainWindowState>
-		<MainWindowSizeX type="int">958</MainWindowSizeX>
-		<MainWindowSizeY type="int">551</MainWindowSizeY>
-		<MainWindowPosX type="int">-1</MainWindowPosX>
-		<MainWindowPosY type="int">-2</MainWindowPosY>
+		<MainWindowState type="int">1</MainWindowState>
+		<MainWindowSizeX type="int">960</MainWindowSizeX>
+		<MainWindowSizeY type="int">619</MainWindowSizeY>
+		<MainWindowPosX type="int">288</MainWindowPosX>
+		<MainWindowPosY type="int">61</MainWindowPosY>
 		<AutoAway type="int">0</AutoAway>
 		<SocksResolve type="int">1</SocksResolve>
 		<KeepLists type="int">0</KeepLists>
@@ -154,8 +154,10 @@
 		<ConfirmADLSRemoval type="int">0</ConfirmADLSRemoval>
 		<TransfersPanedPos type="int">699</TransfersPanedPos>
 		<QueuePanedPos type="int">300</QueuePanedPos>
-		<TotalUpload type="int64">13176061245</TotalUpload>
-		<TotalDownload type="int64">7330551</TotalDownload>
+		<TotalUpload type="int64">13176168157</TotalUpload>
+		<TotalDownload type="int64">2383959783</TotalDownload>
 	</Settings>
-	<Share/>
+	<Share>
+		<Directory Virtual="DCpp">C:\Share\DCpp\</Directory>
+	</Share>
 </DCPlusPlus>

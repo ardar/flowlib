@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2008 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,7 +53,11 @@ namespace ConsoleDemo.Examples
 
             // Send Search
             SearchInfo searchInfo = new SearchInfo();
-            searchInfo.Set(SearchInfo.SEARCH, "Ubuntu");
+            
+            searchInfo.Set(SearchInfo.SEARCH, "D3OXTTT7AIKMIHCP72QMUVJBT5K4M5ZYD73FTRA");
+            searchInfo.Set(SearchInfo.TYPE, "2");
+            //searchInfo.Set(SearchInfo.SEARCH, "battlestar.galactica.416.hdtv-0tv.nfo");
+            //searchInfo.Set(SearchInfo.TYPE, "0");
 
             UpdateBase(this, new FlowLib.Events.FmdcEventArgs(Actions.Search, searchInfo));
         }

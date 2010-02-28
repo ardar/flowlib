@@ -22,6 +22,8 @@ using System.IO;
 using System.Collections.Generic;
 using System.Xml;
 using System.Xml.Serialization;
+using FlowLib.Containers;
+using System;
 
 namespace FlowLib.Utils
 {
@@ -56,6 +58,9 @@ namespace FlowLib.Utils
 
     public static class FileOperations
     {
+        static SortedList<string, FileStreamContainer> _openStreams = new SortedList<string, FileStreamContainer>(5);
+        static System.Threading.Timer _openstreamTimer;
+
         public static bool IsValidFilePath(string path)
         {
             char[] forbiddenChars = System.IO.Path.GetInvalidPathChars();
@@ -88,13 +93,46 @@ namespace FlowLib.Utils
             return true;
         }
 
-        public static void AllocateFile(string target, long size)
+        //public static void AllocateFile(string target, long size)
+        //{
+        //    if (!PathExists(target))
+        //    {
+        //        FileStream fs = new FileStream(target, FileMode.OpenOrCreate);
+        //        fs.SetLength(size);
+        //        fs.Close();
+        //    }
+        //}
+
+        public static void AllocateFile(string path, long size)
         {
-            if (!PathExists(target))
+            if (!PathExists(path))
             {
-                FileStream fs = new FileStream(target, FileMode.OpenOrCreate);
+                FileStreamContainer fsc = null;
+                FileStream fs = null;
+
+                // Make sure FileStreamContainer is not removed while we are trying to access it.
+                lock (_openStreams)
+                {
+                    if (_openStreams.ContainsKey(path))
+                    {
+                        fsc = _openStreams[path];
+                        fs = fsc.FileStream;
+                    }
+                    else
+                    {
+                        fs = new FileStream(path, System.IO.FileMode.OpenOrCreate, System.IO.FileAccess.Write, System.IO.FileShare.Write);
+                        fsc = new FileStreamContainer
+                        {
+                            FileStream = fs,
+
+                        };
+                        _openStreams.Add(path, fsc);
+                    }
+                    fsc.LastAccessed = DateTime.Now.Ticks;
+                }
+
                 fs.SetLength(size);
-                fs.Close();
+                fsc.LastAccessed = DateTime.Now.Ticks;
             }
         }
 
@@ -111,6 +149,102 @@ namespace FlowLib.Utils
                 }
             }
             return System.IO.File.Exists(target);
+        }
+
+        public static void CheckFileStreamContainers(object sender)
+        {
+            lock (_openStreams)
+            {
+                List<string> keys = new List<string>();
+                long maxTime = DateTime.Now.Subtract(new TimeSpan(0, 0, 30)).Ticks;
+                foreach (KeyValuePair<string, FileStreamContainer> pair in _openStreams)
+                {
+                    if (pair.Value.LastAccessed < maxTime)
+                    {
+                        FileStream fs = pair.Value.FileStream;
+                        lock (fs)
+                        {
+                            fs.Dispose();
+                            fs.Close();
+                            keys.Add(pair.Key);
+                        }
+                    }
+                }
+
+                foreach (string key in keys)
+                {
+                    _openStreams.Remove(key);
+                }
+            }
+        }
+
+        public static void ForceClose(string path)
+        {
+            lock (_openStreams)
+            {
+                FileStreamContainer fsc = null;
+                FileStream fs = null;
+                if (_openStreams.ContainsKey(path))
+                {
+                    fsc = _openStreams[path];
+                    fs = fsc.FileStream;
+                    lock (fs)
+                    {
+                        fs.Dispose();
+                        fs.Close();
+                    }
+                    _openStreams.Remove(path);
+                }
+            }
+        }
+
+        public static void WriteContent(string path, ref SegmentInfo currentSegment, byte[] data, int length)
+        {
+            FileStreamContainer fsc = null;
+            FileStream fs = null;
+            // Make sure FileStreamContainer is not removed while we are trying to access it.
+            lock (_openStreams)
+            {
+                if (_openStreams.ContainsKey(path))
+                {
+                    fsc = _openStreams[path];
+                    fs = fsc.FileStream;
+                }
+                else
+                {
+                    fs = new FileStream(path, System.IO.FileMode.OpenOrCreate, System.IO.FileAccess.Write, System.IO.FileShare.Write);
+                    fsc = new FileStreamContainer
+                    {
+                        FileStream = fs
+                    };
+                    _openStreams.Add(path, fsc);
+                }
+                fsc.LastAccessed = DateTime.Now.Ticks;
+            }
+
+            // Make sure we are the only ones writing to this file
+            lock (fs)
+            {
+                // Lock this segment of file
+                fs.Lock(currentSegment.Start, currentSegment.Length);
+                // Set position
+                fs.Position = currentSegment.Start + currentSegment.Position;
+                // Write this byte array to file
+                fs.Write(data, 0, length);
+                currentSegment.Position += length;
+                // Saves and unlocks file
+                fs.Flush();
+                fs.Unlock(currentSegment.Start, currentSegment.Length);
+            }
+
+            fsc.LastAccessed = DateTime.Now.Ticks;
+
+
+            if (_openstreamTimer == null)
+            {
+                const int interval = 10 * 1000;
+                _openstreamTimer = new System.Threading.Timer(new System.Threading.TimerCallback(CheckFileStreamContainers), null, interval, interval);
+            }
         }
     }
 }

@@ -114,6 +114,16 @@ namespace FlowLib.Connections
                 }
             }
         }
+        public string StoreId
+        {
+            get
+            {
+                if (HubSetting == null)
+                    return null;
+                return HubSetting.Address + HubSetting.Port.ToString();
+            }
+        }
+
         /// <summary>
         /// Settings used by this hub for connection.
         /// </summary>

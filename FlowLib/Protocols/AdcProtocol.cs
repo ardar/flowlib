@@ -45,18 +45,18 @@ namespace FlowLib.Protocols
         #region Variables
         // Variables to remember
         protected string gpaString = "";        // GPA Random data
-        protected SUP supports = null;          // Current support
+        protected SUP supports;          // Current support
         protected bool hasSentSUP = false;      // have we sent SUP?
         protected UserInfo info = new UserInfo();     // Hub/User Info (Name and description and so on).
-        protected IConnection con = null;       // Current Connection where this protocol is used
-        protected Hub hub = null;               // Current hub where this protocol is used
+        protected IConnection con;       // Current Connection where this protocol is used
+        protected Hub hub;               // Current hub where this protocol is used
         protected string received = "";
         protected bool download = true;
         protected int connectionStatus = -1;
         protected bool firstMsg = true;
         protected bool rawData = false;
         protected bool disposed = false;
-        protected Encoding currentEncoding = null;
+        protected Encoding currentEncoding;
 
         // INF updating
         protected long infLastUpdated = 0;
@@ -86,6 +86,17 @@ namespace FlowLib.Protocols
         {
             get { return info; }
             set { info = value; }
+        }
+
+        protected bool _isReady;
+        public bool IsReady
+        {
+            get { return _isReady; }
+            set
+            {
+                _isReady = value;
+                Update(hub, new FmdcEventArgs(Actions.IsReady, value));
+            }
         }
 
         public static string TransferSupport
@@ -393,33 +404,47 @@ namespace FlowLib.Protocols
                                 }
 
                                 // Create the file.
-                                //using (System.IO.FileStream fs = System.IO.File.OpenWrite(trans.DownloadItem.ContentInfo.Get(ContentInfo.STORAGEPATH)))
-                                using (System.IO.FileStream fs = new System.IO.FileStream(trans.DownloadItem.ContentInfo.Get(ContentInfo.STORAGEPATH), System.IO.FileMode.OpenOrCreate, System.IO.FileAccess.Write, System.IO.FileShare.Write))
+                                SegmentInfo curInfo = trans.CurrentSegment;
+                                try
                                 {
-                                    try
-                                    {
-                                        // Lock this segment of file
-                                        fs.Lock(trans.CurrentSegment.Start, trans.CurrentSegment.Length);
-                                        // Set position
-                                        fs.Position = trans.CurrentSegment.Start + trans.CurrentSegment.Position;
-                                        // Write this byte array to file
-                                        fs.Write(b, 0, length);
-                                        trans.CurrentSegment.Position += length;
-                                    }
-                                    catch (System.Exception exp)
-                                    {
-                                        //trans.DownloadItem.Cancel(trans.CurrentSegment.Index, trans.Source);
-                                        trans.Disconnect("Exception thrown when trying to write to file: " + exp.ToString());
-                                        return;
-                                    }
-                                    finally
-                                    {
-                                        // Saves and unlocks file
-                                        fs.Flush();
-                                        fs.Unlock(trans.CurrentSegment.Start, trans.CurrentSegment.Length);
-                                        fs.Dispose();
-                                        fs.Close();
-                                    }
+                                    Utils.FileOperations.WriteContent(trans.DownloadItem.ContentInfo.Get(ContentInfo.STORAGEPATH), ref curInfo, b, length);
+                                }
+                                catch (System.Exception exp)
+                                {
+                                    //trans.DownloadItem.Cancel(trans.CurrentSegment.Index, trans.Source);
+                                    trans.Disconnect("Exception thrown when trying to write to file: " + exp.ToString());
+                                    return;
+                                }
+                                curInfo = null;
+
+
+                                //using (System.IO.FileStream fs = System.IO.File.OpenWrite(trans.DownloadItem.ContentInfo.Get(ContentInfo.STORAGEPATH)))
+                                //using (System.IO.FileStream fs = new System.IO.FileStream(trans.DownloadItem.ContentInfo.Get(ContentInfo.STORAGEPATH), System.IO.FileMode.OpenOrCreate, System.IO.FileAccess.Write, System.IO.FileShare.Write))
+                                //{
+                                    //try
+                                    //{
+                                    //    // Lock this segment of file
+                                    //    fs.Lock(trans.CurrentSegment.Start, trans.CurrentSegment.Length);
+                                    //    // Set position
+                                    //    fs.Position = trans.CurrentSegment.Start + trans.CurrentSegment.Position;
+                                    //    // Write this byte array to file
+                                    //    fs.Write(b, 0, length);
+                                    //    trans.CurrentSegment.Position += length;
+                                    //}
+                                    //catch (System.Exception exp)
+                                    //{
+                                    //    //trans.DownloadItem.Cancel(trans.CurrentSegment.Index, trans.Source);
+                                    //    trans.Disconnect("Exception thrown when trying to write to file: " + exp.ToString());
+                                    //    return;
+                                    //}
+                                    //finally
+                                    //{
+                                    //    // Saves and unlocks file
+                                    //    fs.Flush();
+                                    //    fs.Unlock(trans.CurrentSegment.Start, trans.CurrentSegment.Length);
+                                    //    fs.Dispose();
+                                    //    fs.Close();
+                                    //}
                                     if (trans.CurrentSegment.Position >= trans.CurrentSegment.Length)
                                     {
                                         EnsureCurrentSegmentFinishing();
@@ -432,7 +457,7 @@ namespace FlowLib.Protocols
                                         else
                                             trans.Disconnect("All content downloaded");
                                     }
-                                }
+                                //}
                             }
                         }
                         else
@@ -624,13 +649,19 @@ namespace FlowLib.Protocols
                 else if (hub != null)
                 {
                     User usr = null;
-                    if ((usr = hub.GetUserById(inf.Id)) == null)
-                        Update(con, new FmdcEventArgs(Actions.UserOnline, inf.UserInfo));
-                    else
-                    {
-                        usr.UserInfo = inf.UserInfo;
-                        Update(con, new FmdcEventArgs(Actions.UserInfoChange, usr.UserInfo));
-                    }
+					if ((usr = hub.GetUserById(inf.Id)) == null)
+					{
+						if (inf.UserInfo.Mode == ConnectionTypes.Unknown)
+						{
+							inf.UserInfo.Mode = ConnectionTypes.Passive;
+						}
+						Update(con, new FmdcEventArgs(Actions.UserOnline, inf.UserInfo));
+					}
+					else
+					{
+						usr.UserInfo = inf.UserInfo;
+						Update(con, new FmdcEventArgs(Actions.UserInfoChange, usr.UserInfo));
+					}
                     // This is so we update our own reg/op hub count.
                     if (string.Equals(hub.Me.ID,inf.Id))
                     {
@@ -666,6 +697,8 @@ namespace FlowLib.Protocols
                         }
                         if (regmodeChanged)
                             UpdateInf();
+
+                        IsReady = true;
                     }
                 }
             }

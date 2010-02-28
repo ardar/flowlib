@@ -1353,9 +1353,26 @@ namespace FlowLib.Containers
         //public IEnumerator<KeyValuePair<string, ContentInfo>> GetEnumerator()
         IEnumerator<KeyValuePair<string, ContentInfo>> IEnumerable<KeyValuePair<string, ContentInfo>>.GetEnumerator()
         {
-            lock (share)
+            if (share.Count != 0)
             {
-                return share.GetEnumerator();
+                lock (share)
+                {
+                    return share.GetEnumerator();
+                }
+            }
+            else if (tthNames.Count != 0)
+            {
+                lock (tthNames)
+                {
+                    return tthNames.GetEnumerator();
+                }
+            }
+            else
+            {
+                lock (virtualNames)
+                {
+                    return virtualNames.GetEnumerator();
+                }
             }
         }
         #endregion

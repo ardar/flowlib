@@ -156,7 +156,7 @@ namespace ConsoleDemo
                 if (filelist != null)
                 {
                     filelist.CreateShare();
-                    Share userShare = filelist.Share;
+                    IShare userShare = filelist.Share;
 
                     if (user != null)
                     {
