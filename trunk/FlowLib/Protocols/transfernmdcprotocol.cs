@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2010 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -179,8 +179,12 @@ namespace FlowLib.Protocols
 
         void OnTimer(object stateInfo)
         {
-            //long interval = 30 * 1000 + trans.LastEventTimeStamp;  // 30 seconds
+//#if DEBUG
+//            // We want to have a longer timeout when we are debuging.
+//            long interval = 120 * 1000 * 10000 + trans.LastEventTimeStamp;  // 2 minutes
+//#else
             long interval = 30 * 1000 * 10000 + trans.LastEventTimeStamp;  // 30 seconds
+//#endif
             // We are checking against socket != null. This is if we havnt connect.
             if (connectionStatus != TcpConnection.Disconnected && System.DateTime.Now.Ticks > interval)
             {
@@ -225,6 +229,7 @@ namespace FlowLib.Protocols
                 if (this.received.Length > 0)
                 {
                     byte[] old = this.Encoding.GetBytes(this.received);
+					received = string.Empty;
 #if !COMPACT_FRAMEWORK
                     long size = (long)length + old.LongLength;
 
@@ -242,7 +247,9 @@ namespace FlowLib.Protocols
 #endif
                     b = tmp;
                     length += old.Length;
-                    received = string.Empty;
+
+                    tmp = null;
+                    old = null;
                 }
 
                 // Do we have a working byte array?
@@ -256,61 +263,46 @@ namespace FlowLib.Protocols
                     {
                         if (this.download)
                         {
-                            if (trans.DownloadItem != null && trans.CurrentSegment != null && trans.CurrentSegment.Index != -1)
-                            {
-                                if (trans.CurrentSegment.Length < length)
-                                {
-                                    trans.Disconnect("You are sending more then i want.. Why?!");
-                                    return;
-                                }
+							if (trans.DownloadItem != null && trans.CurrentSegment != null && trans.CurrentSegment.Index != -1)
+							{
+								if (trans.CurrentSegment.Length < length)
+								{
+									trans.Disconnect("You are sending more then i want.. Why?!");
+									return;
+								}
 
-                                if (trans.CurrentSegment.Position == 0 && !Utils.FileOperations.PathExists(trans.DownloadItem.ContentInfo.Get(ContentInfo.STORAGEPATH)))
-                                {
-                                    Utils.FileOperations.AllocateFile(trans.DownloadItem.ContentInfo.Get(ContentInfo.STORAGEPATH), trans.DownloadItem.ContentInfo.Size);
-                                }
+								if (trans.CurrentSegment.Position == 0 && !Utils.FileOperations.PathExists(trans.DownloadItem.ContentInfo.Get(ContentInfo.STORAGEPATH)))
+								{
+									Utils.FileOperations.AllocateFile(trans.DownloadItem.ContentInfo.Get(ContentInfo.STORAGEPATH), trans.DownloadItem.ContentInfo.Size);
+								}
 
-                                // Create the file.
-                                //using (System.IO.FileStream fs = System.IO.File.OpenWrite(trans.DownloadItem.ContentInfo.Get(ContentInfo.STORAGEPATH)))
-                                using (System.IO.FileStream fs = new System.IO.FileStream(trans.DownloadItem.ContentInfo.Get(ContentInfo.STORAGEPATH), System.IO.FileMode.OpenOrCreate, System.IO.FileAccess.Write, System.IO.FileShare.Write))
-                                {
-                                    try
-                                    {
-                                        // Lock this segment of file
-                                        fs.Lock(trans.CurrentSegment.Start, trans.CurrentSegment.Length);
-                                        // Set position
-                                        fs.Position = trans.CurrentSegment.Start + trans.CurrentSegment.Position;
-                                        // Write this byte array to file
-                                        fs.Write(b, 0, length);
-                                        trans.CurrentSegment.Position += length;
-                                        // Saves and unlocks file
-                                        fs.Flush();
-                                        fs.Unlock(trans.CurrentSegment.Start, trans.CurrentSegment.Length);
-                                    }
-                                    catch (System.Exception exp)
-                                    {
-                                        //trans.DownloadItem.Cancel(trans.CurrentSegment.Index, trans.Source);
-                                        trans.Disconnect("Exception thrown when trying to write to file: " + exp.ToString());
-                                        return;
-                                    }
-                                    finally
-                                    {
-                                        fs.Dispose();
-                                        fs.Close();
-                                    }
-                                    if (trans.CurrentSegment.Position >= trans.CurrentSegment.Length)
-                                    {
-                                        EnsureCurrentSegmentFinishing();
-                                        //// Searches for a download item and a segment id
-                                        // Request new segment from user. IF we have found one. ELSE disconnect.
-                                        if (GetSegment(true))
-                                        {
-                                            OnDownload();
-                                        }
-                                        else
-                                            trans.Disconnect("All content downloaded");
-                                    }
-                                }
-                            }
+								// Create the file.
+								SegmentInfo curInfo = trans.CurrentSegment;
+								try
+								{
+									Utils.FileOperations.WriteContent(trans.DownloadItem.ContentInfo.Get(ContentInfo.STORAGEPATH), ref curInfo, b, length);
+								}
+								catch (System.Exception exp)
+								{
+									//trans.DownloadItem.Cancel(trans.CurrentSegment.Index, trans.Source);
+									trans.Disconnect("Exception thrown when trying to write to file: " + exp.ToString());
+									return;
+								}
+								curInfo = null;
+
+								if (trans.CurrentSegment.Position >= trans.CurrentSegment.Length)
+								{
+									EnsureCurrentSegmentFinishing();
+									//// Searches for a download item and a segment id
+									// Request new segment from user. IF we have found one. ELSE disconnect.
+									if (GetSegment(true))
+									{
+										OnDownload();
+									}
+									else
+										trans.Disconnect("All content downloaded");
+								}
+							}
                         }
                         else
                         {
@@ -337,6 +329,7 @@ namespace FlowLib.Protocols
                 received = string.Empty;
             }
             int pos = 0;
+
             // Loop through Commands.
             while ((pos = raw.IndexOf(Seperator)) > 0 && this.connectionStatus != TcpConnection.Disconnected)
             {
@@ -443,6 +436,7 @@ namespace FlowLib.Protocols
 
                     trans.DownloadItem = eArgs.Data as DownloadItem;
                 }
+                usrInfo = null;
             }
             download = (trans.DownloadItem != null && (trans.CurrentSegment = trans.DownloadItem.GetAvailable(trans.Source)).Index != -1);
             return download;
@@ -569,8 +563,23 @@ namespace FlowLib.Protocols
             {
                 MyNick myNick = (MyNick)message;
 
+				if (trans.Source != null && !string.IsNullOrEmpty(trans.Source.ConnectionId))
+				{
+					string conId = trans.Source.ConnectionId;
+					string usrId = trans.Source.UserId;
+					if (string.IsNullOrEmpty(usrId))
+					{
+						// connection Id + User Id will give us the users StoredId
+						trans.Source = new Source(conId, conId + myNick.Info.ID);
+					}
+				}
+				else
+				{
+					trans.Source = new Source(null, myNick.Info.ID);
+				}
+
                 trans.User = myNick.Info;
-                TransferRequest req = new TransferRequest(myNick.Info.ID, null, null);
+                TransferRequest req = new TransferRequest(trans.Source);
 
                 FmdcEventArgs eArgs = new FmdcEventArgs(0, req);
                 RequestTransfer(trans, eArgs);
@@ -602,7 +611,7 @@ namespace FlowLib.Protocols
                 else
                 {
                     trans.User = myNick.Info;
-                    trans.Source.UserId = trans.Source.ConnectionId.Replace(":", string.Empty) + trans.User.StoreID;
+                    //trans.Source.UserId = trans.Source.ConnectionId.Replace(":", string.Empty) + trans.User.StoreID;
 
                     // Do we want to specify a Share for this connection?
                     if (eArgs.Handled && req.Share != null)

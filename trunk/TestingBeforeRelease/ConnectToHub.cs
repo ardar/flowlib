@@ -9,6 +9,7 @@ using FlowLib.Interfaces;
 using System.Threading;
 using FlowLib.Events;
 using FlowLib.Containers.Security;
+using TestingBeforeRelease.Utils;
 
 namespace TestingBeforeRelease
 {
@@ -21,7 +22,7 @@ namespace TestingBeforeRelease
         private HubSetting _settings;
 
         [TestMethod]
-        public void YnHub_UsingAutoProtocol()
+        public void ConnectToHub_YnHub_UsingAutoProtocol()
         {
             HubTest("Auto");
 
@@ -32,7 +33,7 @@ namespace TestingBeforeRelease
         }
 
         [TestMethod]
-        public void YnHub_UsingNmdcProtocol()
+        public void ConnectToHub_YnHub_UsingNmdcProtocol()
         {
             HubTest("Nmdc");
 
@@ -43,7 +44,7 @@ namespace TestingBeforeRelease
         }
 
         [TestMethod]
-        public void Adc_UsingAutoProtocol()
+        public void ConnectToHub_Adc_UsingAutoProtocol()
         {
             _settings.Address = "127.0.0.1";
             _settings.Port = 2780;
@@ -56,11 +57,26 @@ namespace TestingBeforeRelease
         }
 
         [TestMethod]
-        public void Adcs_UsingAdcsProtocol()
+        public void ConnectToHub_Adc_UsingAdcProtocol()
         {
             _settings.Address = "127.0.0.1";
-            _settings.Port = 2781;
-            HubTest("AdcSecure");
+            _settings.Port = 2780;
+            HubTest("Adc");
+
+            if (!_isConnected)
+                throw new AssertFailedException("Unable to connect to Adchpp using Adc Protocol");
+            if (!_isFinished)
+                throw new AssertFailedException("Connection established but no valid handshake to Adchpp using Adc Protocol");
+        }
+
+        [TestMethod]
+        public void ConnectToHub_Adcs_UsingAdcsProtocol()
+        {
+			//_settings.Address = "127.0.0.1";
+			//_settings.Port = 2781;
+			_settings.Address = "devpublic.adcportal.com";
+			_settings.Port = 16591;
+			HubTest("AdcSecure");
 
             if (!_isConnected)
                 throw new AssertFailedException("Unable to connect to Adchpp using Adcs Protocol");
@@ -70,12 +86,13 @@ namespace TestingBeforeRelease
         [TestInitialize()]
         public void Init()
         {
-            Util.InitilizeAll();
+            Application.InitilizeAll();
 
             _settings = new HubSetting();
             _settings.Address = "127.0.0.1";
             _settings.Port = 411;
             _settings.DisplayName = "FlowLib";
+            _settings.Password = "Password";
         }
 
         [TestCleanup()]
@@ -127,11 +144,13 @@ namespace TestingBeforeRelease
         void Hub_RegModeUpdated(object sender, FmdcEventArgs e)
         {
             Hub hub = sender as Hub;
-            _regMode = (int)e.Action;
-            if (_regMode >= 0)
+            if (_settings == hub.HubSetting)
             {
-                _isFinished = true;
-
+                _regMode = (int)e.Action;
+                if (_regMode >= 0)
+                {
+                    _isFinished = true;
+                }
             }
         }
         

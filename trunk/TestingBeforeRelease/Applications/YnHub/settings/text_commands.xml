@@ -1,2 +1,37 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
-<TextCommands version="1.036"/>
+<TextCommands version="1.036">
+  <TextCommand>
+    <Name>Loop</Name>
+    <OverrideMuted enable="false"/>
+    <Enabled enable="true"/>
+    <EditLevel>5</EditLevel>
+    <AccessMinLevel>0</AccessMinLevel>
+    <AccessMaxLevel>9</AccessMaxLevel>
+    <ShowMinLevel>0</ShowMinLevel>
+    <ShowMaxLevel>9</ShowMaxLevel>
+    <MainchatCommandVisibility>4</MainchatCommandVisibility>
+    <Schedule>1</Schedule>
+    <Autorun>2</Autorun>
+    <BroadCast>2</BroadCast>
+    <MessageType>2</MessageType>
+    <Parameters>0</Parameters>
+    <Content>Loop!</Content>
+  </TextCommand>
+  <TextCommand>
+    <Name>YouAreLogedIn</Name>
+    <OverrideMuted enable="false"/>
+    <Enabled enable="true"/>
+    <EditLevel>5</EditLevel>
+    <AccessMinLevel>0</AccessMinLevel>
+    <AccessMaxLevel>9</AccessMaxLevel>
+    <ShowMinLevel>0</ShowMinLevel>
+    <ShowMaxLevel>9</ShowMaxLevel>
+    <MainchatCommandVisibility>4</MainchatCommandVisibility>
+    <Schedule>1</Schedule>
+    <Autorun>2</Autorun>
+    <BroadCast>0</BroadCast>
+    <MessageType>2</MessageType>
+    <Parameters>0</Parameters>
+    <Content>YouAreLogedIn!</Content>
+  </TextCommand>
+</TextCommands>

@@ -30,6 +30,7 @@ using FlowLib.Events;
 using FlowLib.Containers;
 using FlowLib.Connections;
 using FlowLib.Enums;
+using FlowLib.Utils;
 
 #if COMPACT_FRAMEWORK
 using FlowLib.Utils.CompactFramworkExtensionMethods;
@@ -37,6 +38,13 @@ using FlowLib.Utils.CompactFramworkExtensionMethods;
 
 namespace FlowLib.Protocols
 {
+	public enum ParsningActions
+	{
+		None,
+		ChangeToBinary,
+		ChangeToNmdc
+	}
+
     /// <summary>
     /// ADC Protocol
     /// </summary>
@@ -45,18 +53,18 @@ namespace FlowLib.Protocols
         #region Variables
         // Variables to remember
         protected string gpaString = "";        // GPA Random data
-        protected SUP supports = null;          // Current support
+        protected SUP supports;          // Current support
         protected bool hasSentSUP = false;      // have we sent SUP?
         protected UserInfo info = new UserInfo();     // Hub/User Info (Name and description and so on).
-        protected IConnection con = null;       // Current Connection where this protocol is used
-        protected Hub hub = null;               // Current hub where this protocol is used
+        protected IConnection con;       // Current Connection where this protocol is used
+        protected Hub hub;               // Current hub where this protocol is used
         protected string received = "";
         protected bool download = true;
         protected int connectionStatus = -1;
         protected bool firstMsg = true;
-        protected bool rawData = false;
+        //protected bool rawData = false;
         protected bool disposed = false;
-        protected Encoding currentEncoding = null;
+        protected Encoding currentEncoding;
 
         // INF updating
         protected long infLastUpdated = 0;
@@ -76,6 +84,23 @@ namespace FlowLib.Protocols
         public event FmdcEventHandler Update;
         #endregion
         #region Properties
+		protected bool _rawData = false;
+		public bool IsRawData
+		{
+			get
+			{
+				//System.Console.WriteLine("GET: " + _rawData.ToString());
+				return _rawData;
+			}
+			set
+			{
+                if (_rawData != value)
+                {
+                    System.Console.WriteLine("IsRawData: " + value.ToString());
+                }
+				_rawData = value;
+			}
+		}
         protected string _name = "Adc";
         public string Name
         {
@@ -86,6 +111,17 @@ namespace FlowLib.Protocols
         {
             get { return info; }
             set { info = value; }
+        }
+
+        protected bool _isReady;
+        public bool IsReady
+        {
+            get { return _isReady; }
+            set
+            {
+                _isReady = value;
+                Update(con, new FmdcEventArgs(Actions.IsReady, value));
+            }
         }
 
         public static string TransferSupport
@@ -155,6 +191,8 @@ namespace FlowLib.Protocols
             :this()
         {
             this.con = con;
+
+            con.ShouldBlockOnSend = true;
         }
 
         public AdcProtocol(Transfer trans)
@@ -339,8 +377,11 @@ namespace FlowLib.Protocols
             if (this.connectionStatus == TcpConnection.Disconnected)
                 return;
 
-            if (rawData)
+            if (IsRawData)
             {
+                System.Console.WriteLine("Bytes:" + length);
+
+
                 if (length < 0)
                     throw new System.ArgumentOutOfRangeException("length has to be above zero");
 
@@ -348,6 +389,7 @@ namespace FlowLib.Protocols
                 if (this.received.Length > 0)
                 {
                     byte[] old = this.Encoding.GetBytes(this.received);
+					this.received = string.Empty;
 #if !COMPACT_FRAMEWORK
                     long size = (long)length + old.LongLength;
 
@@ -364,76 +406,65 @@ namespace FlowLib.Protocols
                         System.Array.Copy(b, 0, tmp, old.Length, length);
 #endif
                     b = tmp;
-                    length += old.Length;
-                    received = string.Empty;
-                }
+                    length = tmp.Length;
+
+					tmp = null;
+					old = null;
+				}
 
                 // Do we have a working byte array?
                 if (b != null && length != 0)
                 {
                     BinaryMessage conMsg = new BinaryMessage(con, b, length);
                     // Plugin handling here
+
                     FmdcEventArgs e = new FmdcEventArgs(Actions.CommandIncomming, conMsg);
                     MessageReceived(con, e);
                     if (!e.Handled)
                     {
                         if (this.download && trans != null)
                         {
-                            if (trans.DownloadItem != null && trans.CurrentSegment != null && trans.CurrentSegment.Index != -1)
-                            {
-                                if (trans.CurrentSegment.Length < length)
-                                {
-                                    trans.Disconnect("You are sending more then i want.. Why?!");
-                                    return;
-                                }
+							if (trans.DownloadItem != null && trans.CurrentSegment != null && trans.CurrentSegment.Index != -1)
+							{
+								if (trans.CurrentSegment.Length < length)
+								{
+									trans.Disconnect("You are sending more then i want.. Why?!");
+									return;
+								}
 
-                                if (trans.CurrentSegment.Position == 0 && !Utils.FileOperations.PathExists(trans.DownloadItem.ContentInfo.Get(ContentInfo.STORAGEPATH)))
-                                {
-                                    Utils.FileOperations.AllocateFile(trans.DownloadItem.ContentInfo.Get(ContentInfo.STORAGEPATH), trans.DownloadItem.ContentInfo.Size);
-                                }
+								if (trans.CurrentSegment.Position == 0 && !Utils.FileOperations.PathExists(trans.DownloadItem.ContentInfo.Get(ContentInfo.STORAGEPATH)))
+								{
+									Utils.FileOperations.AllocateFile(trans.DownloadItem.ContentInfo.Get(ContentInfo.STORAGEPATH), trans.DownloadItem.ContentInfo.Size);
+								}
 
-                                // Create the file.
-                                //using (System.IO.FileStream fs = System.IO.File.OpenWrite(trans.DownloadItem.ContentInfo.Get(ContentInfo.STORAGEPATH)))
-                                using (System.IO.FileStream fs = new System.IO.FileStream(trans.DownloadItem.ContentInfo.Get(ContentInfo.STORAGEPATH), System.IO.FileMode.OpenOrCreate, System.IO.FileAccess.Write, System.IO.FileShare.Write))
-                                {
-                                    try
-                                    {
-                                        // Lock this segment of file
-                                        fs.Lock(trans.CurrentSegment.Start, trans.CurrentSegment.Length);
-                                        // Set position
-                                        fs.Position = trans.CurrentSegment.Start + trans.CurrentSegment.Position;
-                                        // Write this byte array to file
-                                        fs.Write(b, 0, length);
-                                        trans.CurrentSegment.Position += length;
-                                    }
-                                    catch (System.Exception exp)
-                                    {
-                                        //trans.DownloadItem.Cancel(trans.CurrentSegment.Index, trans.Source);
-                                        trans.Disconnect("Exception thrown when trying to write to file: " + exp.ToString());
-                                        return;
-                                    }
-                                    finally
-                                    {
-                                        // Saves and unlocks file
-                                        fs.Flush();
-                                        fs.Unlock(trans.CurrentSegment.Start, trans.CurrentSegment.Length);
-                                        fs.Dispose();
-                                        fs.Close();
-                                    }
-                                    if (trans.CurrentSegment.Position >= trans.CurrentSegment.Length)
-                                    {
-                                        EnsureCurrentSegmentFinishing();
-                                        //// Searches for a download item and a segment id
-                                        // Request new segment from user. IF we have found one. ELSE disconnect.
-                                        if (GetSegment(true))
-                                        {
-                                            OnDownload();
-                                        }
-                                        else
-                                            trans.Disconnect("All content downloaded");
-                                    }
-                                }
-                            }
+								// Create the file.
+								SegmentInfo curInfo = trans.CurrentSegment;
+								try
+								{
+									Utils.FileOperations.WriteContent(trans.DownloadItem.ContentInfo.Get(ContentInfo.STORAGEPATH), ref curInfo, b, length);
+                                    trans.CurrentSegment.Position += length;
+								}
+								catch (System.Exception exp)
+								{
+									//trans.DownloadItem.Cancel(trans.CurrentSegment.Index, trans.Source);
+									trans.Disconnect("Exception thrown when trying to write to file: " + exp.ToString());
+									return;
+								}
+								curInfo = null;
+
+								if (trans.CurrentSegment.Position >= trans.CurrentSegment.Length)
+								{
+									EnsureCurrentSegmentFinishing();
+									//// Searches for a download item and a segment id
+									// Request new segment from user. IF we have found one. ELSE disconnect.
+									if (GetSegment(true))
+									{
+										OnDownload();
+									}
+									else
+										trans.Disconnect("All content downloaded");
+								}
+							}
                         }
                         else
                         {
@@ -441,27 +472,40 @@ namespace FlowLib.Protocols
                         }
                     }
                 }
-
             }
             else
             {
-                if (ParseRaw(Encoding.GetString(b, 0, length)))
+				ParsningActions value = ParseRaw(Encoding.GetString(b, 0, length));
+                switch (value)
                 {
-                    if (trans != null)
-                    {
-                        ITransfer tmpTrans = trans;
-                        trans.Protocol = new TransferNmdcProtocol(trans);
-                        tmpTrans.Protocol.ParseRaw(b, length);
-                    }
+                    case ParsningActions.None:
+                        break;
+                    case ParsningActions.ChangeToBinary:
+                        ParseRaw(null, 0);
+                        break;
+                    case ParsningActions.ChangeToNmdc:
+                        if (trans != null)
+                        {
+                            ITransfer tmpTrans = trans;
+                            trans.Protocol = new TransferNmdcProtocol(trans);
+                            tmpTrans.Protocol.ParseRaw(b, length);
+                        }
+                        break;
                 }
             }
         }
 
-        public bool ParseRaw(string raw)
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="raw"></param>
+		/// <returns></returns>
+        protected ParsningActions ParseRaw(string raw)
         {
+            string raw2 = raw;
             // If raw lenght is 0. Ignore
             if (raw.Length == 0)
-                return false;
+                return  ParsningActions.None;
 
             // Should we read buffer?
             if (received.Length > 0)
@@ -469,15 +513,14 @@ namespace FlowLib.Protocols
                 raw = received + raw;
                 received = string.Empty;
             }
-            int pos;
-
+            int pos = 0;
 
             // If wrong Protocol type has been set. change it to Nmdc
             if (firstMsg && raw.StartsWith("$"))
             {
                 if (trans != null)
                 {
-                    return true;
+                    return ParsningActions.ChangeToNmdc;
                 }
                 else if (hub != null)
                 {
@@ -490,26 +533,39 @@ namespace FlowLib.Protocols
             firstMsg = false;
 
             // Loop through Commands.
-            //while ((pos = raw.IndexOf(Seperator)) > 0)
             while ((pos = raw.IndexOf(Seperator)) != -1 && this.connectionStatus != TcpConnection.Disconnected)
             {
-                // We have received a command that tells us to read binary
-                if (rawData)
-                    break;
-
                 pos++;
+
                 StrMessage msg = ParseMessage(raw.Substring(0, pos));
+                //if (!msg.IsValid)
+                //{
+                    //System.Console.WriteLine(raw.Substring(0, pos));
+                //}
+                //else
+                //{
+                    //System.Console.WriteLine(msg.Raw);
+                //}
+
                 raw = raw.Remove(0, pos);
                 // Plugin handling here
                 FmdcEventArgs e = new FmdcEventArgs(Actions.CommandIncomming, msg);
                 MessageReceived(con, e);
                 if (!e.Handled && msg.IsValid)
                     ActOnInMessage(msg);
-            }
+
+                // We have received a command that tells us to read binary
+                if (IsRawData)
+                    break;
+			}
+
+
             // If Something is still left. Save it to buffer for later use.
             if (raw.Length > 0)
                 received = raw;
-			return false;
+			if (IsRawData)
+				return ParsningActions.ChangeToBinary;
+			return ParsningActions.None;
         }
         protected StrMessage ParseMessage(string raw)
         {
@@ -624,13 +680,19 @@ namespace FlowLib.Protocols
                 else if (hub != null)
                 {
                     User usr = null;
-                    if ((usr = hub.GetUserById(inf.Id)) == null)
-                        Update(con, new FmdcEventArgs(Actions.UserOnline, inf.UserInfo));
-                    else
-                    {
-                        usr.UserInfo = inf.UserInfo;
-                        Update(con, new FmdcEventArgs(Actions.UserInfoChange, usr.UserInfo));
-                    }
+					if ((usr = hub.GetUserById(inf.Id)) == null)
+					{
+						if (inf.UserInfo.Mode == ConnectionTypes.Unknown)
+						{
+							inf.UserInfo.Mode = ConnectionTypes.Passive;
+						}
+						Update(con, new FmdcEventArgs(Actions.UserOnline, inf.UserInfo));
+					}
+					else
+					{
+						usr.UserInfo = inf.UserInfo;
+						Update(con, new FmdcEventArgs(Actions.UserInfoChange, usr.UserInfo));
+					}
                     // This is so we update our own reg/op hub count.
                     if (string.Equals(hub.Me.ID,inf.Id))
                     {
@@ -666,6 +728,8 @@ namespace FlowLib.Protocols
                         }
                         if (regmodeChanged)
                             UpdateInf();
+
+                        IsReady = true;
                     }
                 }
             }
@@ -1091,7 +1155,7 @@ namespace FlowLib.Protocols
                     trans.Disconnect("Why would i want to get a diffrent length of bytes then i asked for?");
                     return;
                 }
-                this.rawData = true;
+                this.IsRawData = true;
                 trans.ShouldBlockOnSend = true;
             }
             #endregion
@@ -1183,7 +1247,7 @@ namespace FlowLib.Protocols
                 long size = -1;
                 try
                 {
-                    size = int.Parse(info.Get(SearchInfo.SIZE));
+                    size = long.Parse(info.Get(SearchInfo.SIZE));
                 }
                 catch { }
                 if (info.ContainsKey(SearchInfo.SIZETYPE) && size != -1)
@@ -1358,7 +1422,7 @@ namespace FlowLib.Protocols
                     }
 
                     // Set that we are actually downloading stuff
-                    rawData = false;
+					IsRawData = false;
 
                     /// $UGetZBlock needs both SupportGetZBlock and SupportXmlBZList.
                     /// $UGetBlock needs SupportXmlBZList.

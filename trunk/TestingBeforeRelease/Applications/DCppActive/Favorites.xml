@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Favorites>
+	<Hubs>
+		<Group Name="Auto-connect group (converted)" Private="0" Connect="1"/>
+		<Hub Name="Nmdc" Description="" Nick="DC++75" Password="" Server="127.0.0.1" UserDescription="" Encoding="Swedish_Sweden.1252" Group="Auto-connect group (converted)"/>
+		<Hub Name="ADC" Description="" Nick="DC++75" Password="" Server="adc://127.0.0.1:2780" UserDescription="" Encoding="Swedish_Sweden.1252" Group="Auto-connect group (converted)"/>
+		<Hub Name="ADCS" Description="" Nick="DC++75" Password="" Server="adcs://127.0.0.1:2781" UserDescription="" Encoding="Swedish_Sweden.1252" Group="Auto-connect group (converted)"/>
+		<Hub Name="-Flowertwig-" Description="adcs://192.168.1.5:443" Nick="blomman@laptop" Password="password" Server="adcs://adcs.flowertwig.org:443" UserDescription="" Encoding="Swedish_Sweden.1252" Group="Auto-connect group (converted)"/>
+	</Hubs>
+	<Users/>
+	<UserCommands/>
+	<FavoriteDirs/>
+</Favorites>

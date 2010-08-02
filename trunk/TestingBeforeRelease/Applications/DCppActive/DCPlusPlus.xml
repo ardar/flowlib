@@ -1,29 +1,32 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <DCPlusPlus>
 	<Settings>
-		<Nick type="string">DC++705</Nick>
+		<Nick type="string">DCpp770</Nick>
 		<UploadSpeed type="string">1</UploadSpeed>
-		<ExternalIp type="string">127.0.0.1</ExternalIp>
 		<Font type="string">MS Shell Dlg,-11,400,0</Font>
 		<ConnectionsOrder type="string">0,1,2,3,4,5,6,7,8</ConnectionsOrder>
-		<ConnectionsWidths type="string">125,100,385,100,125,125,80,150,100</ConnectionsWidths>
+		<ConnectionsWidths type="string">125,100,453,100,125,125,80,150,100</ConnectionsWidths>
 		<HubFrameOrder type="string">0,1,2,3,4,5,6,7</HubFrameOrder>
-		<HubFrameWidths type="string">120,80,75,193,75,100,100,300</HubFrameWidths>
-		<FavHubsFrameOrder type="string">0,1,2,3,4,5</FavHubsFrameOrder>
-		<FavHubsFrameWidths type="string">200,290,125,100,120,125</FavHubsFrameWidths>
+		<HubFrameWidths type="string">120,80,188,193,75,100,100,300</HubFrameWidths>
+		<FavHubsFrameOrder type="string">0,1,2,3,4,5,6</FavHubsFrameOrder>
+		<FavHubsFrameWidths type="string">200,290,125,100,120,125,100</FavHubsFrameWidths>
 		<QueueFrameOrder type="string">0,1,2,3,4,5,6,7,8,9,10,11</QueueFrameOrder>
 		<QueueFrameWidths type="string">200,300,80,110,75,200,200,100,200,100,300,60</QueueFrameWidths>
-		<FinishedULFilesOrder type="string">0,1,2,3,4,5,6,7,8</FinishedULFilesOrder>
-		<FinishedULFilesWidths type="string">125,250,210,108,80,80,100,80,125</FinishedULFilesWidths>
-		<FinishedULUsersOrder type="string">0,1,2,3,4,5</FinishedULUsersOrder>
-		<FinishedULUsersWidths type="string">125,125,80,100,300,125</FinishedULUsersWidths>
+		<FinishedDLFilesOrder type="string">0,1,2,3,4,5,6,7,8,9</FinishedDLFilesOrder>
+		<FinishedDLFilesWidths type="string">125,250,250,80,80,80,100,80,125,125</FinishedDLFilesWidths>
+		<FinishedDLUsersOrder type="string">0,1,2,3,4,5,6</FinishedDLUsersOrder>
+		<FinishedDLUsersWidths type="string">125,125,80,100,300,125,125</FinishedDLUsersWidths>
+		<FinishedULFilesOrder type="string">0,1,2,3,4,5,6,7,8,9</FinishedULFilesOrder>
+		<FinishedULFilesWidths type="string">166,127,115,108,80,80,100,80,125,125</FinishedULFilesWidths>
+		<FinishedULUsersOrder type="string">0,1,2,3,4,5,6</FinishedULUsersOrder>
+		<FinishedULUsersWidths type="string">125,125,80,100,300,125,125</FinishedULUsersWidths>
 		<UsersFrameOrder type="string">0,1,2,3,4</UsersFrameOrder>
 		<UsersFrameWidths type="string">200,300,150,200,300</UsersFrameWidths>
 		<LogFormatPostDownload type="string">%Y-%m-%d %H:%M: %[target] nedladdad från %[userNI] (%[userCID]), %[fileSI] (%[fileSIchunk]), %[speed], %[time], %[fileTR]</LogFormatPostDownload>
 		<LogFormatPostUpload type="string">%Y-%m-%d %H:%M: %[source] uppladdad till %[userNI] (%[userCID]), %[fileSI] (%[fileSIchunk]), %[speed], %[time], %[fileTR]</LogFormatPostUpload>
 		<LogFormatMainChat type="string">[%Y-%m-%d %H:%M] %[message]</LogFormatMainChat>
 		<LogFormatPrivateChat type="string">[%Y-%m-%d %H:%M] %[message]</LogFormatPrivateChat>
-		<ConfigVersion type="string">0.75</ConfigVersion>
+		<ConfigVersion type="string">0.770</ConfigVersion>
 		<ADLSearchFrameOrder type="string">0,1,2,3,4</ADLSearchFrameOrder>
 		<ADLSearchFrameWidths type="string">1198,90,90,100,100</ADLSearchFrameWidths>
 		<CID type="string">DA2D74TAHVPOS7YCAMALLMH6AITHQG2WC3IU62W</CID>
@@ -36,13 +39,13 @@
 		<LogFormatSystem type="string">[%Y-%m-%d %H:%M] %[message]</LogFormatSystem>
 		<LogFormatStatus type="string">[%Y-%m-%d %H:%M] %[message]</LogFormatStatus>
 		<DirectoryListingFrameOrder type="string">0,1,2,3,4</DirectoryListingFrameOrder>
-		<DirectoryListingFrameWidths type="string">300,60,80,100,300</DirectoryListingFrameWidths>
+		<DirectoryListingFrameWidths type="string">255,60,80,100,300</DirectoryListingFrameWidths>
 		<Language type="string">C</Language>
 		<DownloadsOrder type="string">0,1,2,3,4,5,6</DownloadsOrder>
 		<DownloadsWidth type="string">200,300,150,200,125,80,80</DownloadsWidth>
 		<IncomingConnections type="int">0</IncomingConnections>
 		<InPort type="int">1337</InPort>
-		<Slots type="int">10</Slots>
+		<Slots type="int">3</Slots>
 		<AutoFollow type="int">1</AutoFollow>
 		<ClearSearch type="int">1</ClearSearch>
 		<BackgroundColor type="int">16777215</BackgroundColor>
@@ -72,11 +75,11 @@
 		<MinUploadSpeed type="int">0</MinUploadSpeed>
 		<GetUserInfo type="int">1</GetUserInfo>
 		<UrlHandler type="int">0</UrlHandler>
-		<MainWindowState type="int">3</MainWindowState>
-		<MainWindowSizeX type="int">958</MainWindowSizeX>
-		<MainWindowSizeY type="int">551</MainWindowSizeY>
-		<MainWindowPosX type="int">-1</MainWindowPosX>
-		<MainWindowPosY type="int">-2</MainWindowPosY>
+		<MainWindowState type="int">1</MainWindowState>
+		<MainWindowSizeX type="int">900</MainWindowSizeX>
+		<MainWindowSizeY type="int">746</MainWindowSizeY>
+		<MainWindowPosX type="int">379</MainWindowPosX>
+		<MainWindowPosY type="int">14</MainWindowPosY>
 		<AutoAway type="int">0</AutoAway>
 		<SocksResolve type="int">1</SocksResolve>
 		<KeepLists type="int">0</KeepLists>
@@ -105,32 +108,25 @@
 		<UseCTRLForLineHistory type="int">1</UseCTRLForLineHistory>
 		<OpenNewWindow type="int">0</OpenNewWindow>
 		<UDPPort type="int">1337</UDPPort>
+		<HubLastLogLines type="int">10</HubLastLogLines>
+		<PMLastLogLines type="int">10</PMLastLogLines>
+		<AdcDebug type="int">1</AdcDebug>
 		<ToggleActiveWindow type="int">1</ToggleActiveWindow>
 		<SearchHistory type="int">10</SearchHistory>
 		<LowestPrio type="int">0</LowestPrio>
 		<AutoDropAll type="int">0</AutoDropAll>
 		<AutoDropFilelists type="int">0</AutoDropFilelists>
 		<AutoDropDisconnect type="int">0</AutoDropDisconnect>
-		<OpenPublic type="int">0</OpenPublic>
-		<OpenFavoriteHubs type="int">0</OpenFavoriteHubs>
-		<OpenFavoriteUsers type="int">0</OpenFavoriteUsers>
-		<OpenQueue type="int">0</OpenQueue>
-		<OpenFinishedDownloads type="int">0</OpenFinishedDownloads>
-		<OpenFinishedUploads type="int">0</OpenFinishedUploads>
-		<OpenSearchSpy type="int">0</OpenSearchSpy>
-		<OpenNetworkStatistics type="int">0</OpenNetworkStatistics>
-		<OpenNotepad type="int">0</OpenNotepad>
 		<NoIpOverride type="int">0</NoIpOverride>
 		<BoldFinishedDownloads type="int">1</BoldFinishedDownloads>
 		<BoldFinishedUploads type="int">1</BoldFinishedUploads>
 		<BoldQueue type="int">1</BoldQueue>
 		<BoldHub type="int">1</BoldHub>
 		<BoldPm type="int">1</BoldPm>
+		<BoldFL type="int">1</BoldFL>
 		<BoldSearch type="int">1</BoldSearch>
 		<BoldSearchSpy type="int">1</BoldSearchSpy>
-		<OpenWaitingUsers type="int">0</OpenWaitingUsers>
 		<BoldWaitingUsers type="int">1</BoldWaitingUsers>
-		<OpenSystemLog type="int">0</OpenSystemLog>
 		<BoldSystemLog type="int">1</BoldSystemLog>
 		<UseTLS type="int">1</UseTLS>
 		<AltSortOrder type="int">0</AltSortOrder>
@@ -146,16 +142,69 @@
 		<OwnerDrawnMenus type="int">1</OwnerDrawnMenus>
 		<Coral type="int">1</Coral>
 		<MaxTabChars type="int">20</MaxTabChars>
+		<FinishedDLOnlyFull type="int">1</FinishedDLOnlyFull>
 		<ConfirmExit type="int">0</ConfirmExit>
 		<ConfirmHubClosing type="int">0</ConfirmHubClosing>
 		<ConfirmHubRemoval type="int">1</ConfirmHubRemoval>
 		<ConfirmUserRemoval type="int">1</ConfirmUserRemoval>
 		<ConfirmItemRemoval type="int">0</ConfirmItemRemoval>
 		<ConfirmADLSRemoval type="int">0</ConfirmADLSRemoval>
-		<TransfersPanedPos type="int">699</TransfersPanedPos>
+		<KeepFinishedFiles type="int">0</KeepFinishedFiles>
+		<MinMessageLines type="int">1</MinMessageLines>
+		<MaxMessageLines type="int">10</MaxMessageLines>
+		<BandwidthLimitStart type="int">1</BandwidthLimitStart>
+		<BandwidthLimitEnd type="int">1</BandwidthLimitEnd>
+		<TimeDependentThrottle type="int">0</TimeDependentThrottle>
+		<MaxDownloadSpeedRealTime type="int">0</MaxDownloadSpeedRealTime>
+		<MaxUploadSpeedTime type="int">0</MaxUploadSpeedTime>
+		<MaxDownloadSpeedPrimary type="int">0</MaxDownloadSpeedPrimary>
+		<MaxUploadSpeedPrimary type="int">0</MaxUploadSpeedPrimary>
+		<SlotsAlternateLimiting type="int">1</SlotsAlternateLimiting>
+		<SlotsPrimaryLimiting type="int">3</SlotsPrimaryLimiting>
+		<TransfersPanedPos type="int">787</TransfersPanedPos>
 		<QueuePanedPos type="int">300</QueuePanedPos>
-		<TotalUpload type="int64">13176061245</TotalUpload>
-		<TotalDownload type="int64">7330551</TotalDownload>
+		<TotalUpload type="int64">20102297708</TotalUpload>
+		<TotalDownload type="int64">2385043076</TotalDownload>
 	</Settings>
-	<Share/>
+	<SearchTypes>
+		<SearchType Id="5">bmp;ico;jpg;jpeg;png;gif;tga;ai;ps;pict;eps;img;pct;psp;tif;rle;pcx;sfw;psd;cdr</SearchType>
+		<SearchType Id="4">exe;com;bat;cmd;dll;vbs;ps1;msi</SearchType>
+		<SearchType Id="6">mpg;avi;mkv;wmv;mov;mp4;3gp;qt;asx;divx;asf;pxp;ogm;flv;rm;rmvb;webm;mpeg</SearchType>
+		<SearchType Id="1">mp3;flac;ogg;mpc;ape;wma;wav;m4a;mp2;mid;au;aiff;ra</SearchType>
+		<SearchType Id="3">doc;xls;ppt;docx;xlsx;pptx;odf;odt;ods;odp;pdf;xps;htm;html;xml;txt;nfo;rtf</SearchType>
+		<SearchType Id="2">rar;7z;zip;tar;gz;bz2;z;ace;lha;lzh;arj</SearchType>
+	</SearchTypes>
+	<Share>
+		<Directory Virtual="DCpp">C:\Share\DCpp\</Directory>
+	</Share>
+	<Windows>
+		<Window Id="FavHubs"/>
+		<Window Id="Hub">
+			<Param Id="Title">-Flowertwig- (adcs://adcs.flowertwig.org:443)</Param>
+			<Param Id="Address">adcs://adcs.flowertwig.org:443</Param>
+		</Window>
+	</Windows>
+	<Recent>
+		<Configuration Id="Hub" MaxItems="10"/>
+		<Window Id="Hub">
+			<Param Id="Title">-Flowertwig- (adcs://adcs.flowertwig.org:443)</Param>
+			<Param Id="Address">adcs://adcs.flowertwig.org:443</Param>
+		</Window>
+		<Window Id="Hub">
+			<Param Id="Title">adcs://192.168.1.5:443</Param>
+			<Param Id="Address">adcs://192.168.1.5:443</Param>
+		</Window>
+		<Window Id="Hub">
+			<Param Id="Title">adcs://127.0.0.1:2781</Param>
+			<Param Id="Address">adcs://127.0.0.1:2781</Param>
+		</Window>
+		<Window Id="Hub">
+			<Param Id="Title">adc://127.0.0.1:2780</Param>
+			<Param Id="Address">adc://127.0.0.1:2780</Param>
+		</Window>
+		<Window Id="Hub">
+			<Param Id="Title">127.0.0.1</Param>
+			<Param Id="Address">127.0.0.1</Param>
+		</Window>
+	</Recent>
 </DCPlusPlus>

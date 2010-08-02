@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2010 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,11 +26,12 @@ namespace FlowLib.Containers
 {
     public class TransferRequest
     {
-        UserInfo user = null;
-        Hub hub = null;
-        IShare share = null;
-        string key = null;
+        UserInfo user;
+        Hub hub;
+        IShare share;
+        string key;
         int meDownload = -1;      // Not set (We dont know who is going to download)
+        Source _source;
 
         public bool Download
         {
@@ -52,12 +53,16 @@ namespace FlowLib.Containers
         {
             get
             {
-                string conId = null;
-                if (hub != null || hub.HubSetting != null)
+                if (_source == null)
                 {
-                    conId = hub.HubSetting.Address + hub.HubSetting.Port;
+                    string conId = null;
+                    if (hub != null || hub.HubSetting != null)
+                    {
+                        conId = hub.StoreId;
+                    }
+                    _source = new Source(conId, user.StoreID);
                 }
-                return new Source(conId, user.StoreID);
+                return _source;
             }
         }
 
@@ -102,6 +107,12 @@ namespace FlowLib.Containers
                 meDownload = 1;
             else
                 meDownload = 0;
+        }
+
+        public TransferRequest(Source src)
+            : this(src.UserId, null, null)
+        {
+            _source = src;
         }
 
         /// <summary>
