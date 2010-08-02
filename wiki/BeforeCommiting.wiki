@@ -8,5 +8,7 @@ Add your content here.
 
 = Rules =
 
-  # Code must be licensed under GPL v2 and under the name Mattias Blomqvist (This is for copyright claims) Please note that you will give away any rights you have.
-  # Code must be runnable on .NET Compact Framework 3.5 AND .NET Framework 3.5.
+  * Code must be licensed under GPL v2 and under the name Mattias Blomqvist (This is for copyright claims) Please note that you will give away any rights you have.
+  * Code must be runnable on .NET Compact Framework 3.5 AND .NET Framework 3.5.
+  * Only add functionality that is writen here: http://code.google.com/p/flowlib/wiki/Todo (Stuff can be added if you talk to main developer first).
+  * Do not break any public functionality that already exist (public/protected classes and methods).
