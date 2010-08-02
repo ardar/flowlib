@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2010 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -114,6 +114,16 @@ namespace FlowLib.Connections
                 }
             }
         }
+        public string StoreId
+        {
+            get
+            {
+                if (HubSetting == null)
+                    return null;
+                return HubSetting.Address + HubSetting.Port.ToString();
+            }
+        }
+
         /// <summary>
         /// Settings used by this hub for connection.
         /// </summary>
@@ -345,7 +355,28 @@ namespace FlowLib.Connections
             return null;
         }
 
-        #region Connection
+		/// <summary>
+		/// Returns first user in userlist with the specified storedId.
+		/// </summary>
+		/// <param name="storedId">StoredId for the user we want to get</param>
+		/// <returns>User that have the specified storedId or null if not found</returns>
+		public User GetUserByStoredId(string storedId)
+		{
+			// TODO : Make this more effective.
+			lock (userlist)
+			{
+				foreach (KeyValuePair<string, User> kpair in userlist)
+				{
+					if (storedId.Equals(kpair.Value.StoreID))
+					{
+						return kpair.Value;
+					}
+				}
+			}
+			return null;
+		}
+
+		#region Connection
         /// <summary>
         /// Tells listener object that hub is will reconnect and then reconnects.
         /// </summary>

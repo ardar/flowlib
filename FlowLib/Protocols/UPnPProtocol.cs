@@ -1,7 +1,7 @@
 ﻿
 /*
  *
- * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2010 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@ namespace FlowLib.Protocols
         public event FlowLib.Events.FmdcEventHandler Update;
 
         protected FlowLib.Interfaces.IUPnP con = null;
+		protected string searchStringToUse = "upnp:rootdevice";
         protected bool disposed = false;
 
         public bool IsDisposed
@@ -72,7 +73,7 @@ namespace FlowLib.Protocols
                     null,
                     "M-SEARCH * HTTP/1.1\r\n" +
                     "Host:" + con.EndPoint.Address.ToString() + ":" + con.EndPoint.Port.ToString() + "\r\n" +
-                     "ST:upnp:rootdevice\r\n" +
+                     "ST:" + searchStringToUse + "\r\n" +
                     "Man:\"ssdp:discover\"\r\n" +
                     "MX:3\r\n" +
                      "\r\n" +
@@ -83,7 +84,12 @@ namespace FlowLib.Protocols
             }
         }
 
-        public UPnPProtocol(FlowLib.Connections.UPnP connection)
+		/// <summary>
+		/// Creates a UPnP protocol to use on the specified connection.
+		/// "upnp:rootdevice" is used to find upnp-devices.
+		/// </summary>
+		/// <param name="connection">Connection to use</param>
+		public UPnPProtocol(FlowLib.Connections.UPnP connection)
         {
             this.MessageReceived = new FmdcEventHandler(OnMessageReceived);
             this.MessageToSend = new FmdcEventHandler(OnMessageToSend);
@@ -92,6 +98,29 @@ namespace FlowLib.Protocols
             Encoding = System.Text.Encoding.ASCII;
             con = connection;
         }
+
+		/// <summary>
+		/// Creates a UPnP protocol to use on the specified connection.
+		/// Specied searchTarget is used to find upnp-devices.
+		/// </summary>
+		/// <param name="connection">Connection to use</param>
+		/// <param name="searchTarget">
+		/// Can be one of the below:
+		/// ssdp:all			=	Search for all devices and services.
+		/// upnp:rootdevice		=	Search for root devices only.
+		/// uuid:device-UUID	=	Search for a particular device. Device UUID specified by UPnP vendor.
+		/// urn:schemas-upnp-org:device:deviceType:v	=	Search for any device of this type. Device type and version defined by UPnP Forum working committee.
+		/// urn:schemas-upnp-org:service:serviceType:v	=	Search for any service of this type. Service type and version defined by UPnP Forum working committee.
+		/// urn:domain-name:device:deviceType:v			=	Search for any device of this type. Domain name, device type and version defined by UPnP vendor. Period characters in the domain name must be replaced with hyphens in accordance with RFC 2141.
+		/// urn:domain-name:service:serviceType:v		=	Search for any service of this type. Domain name, service type and version defined by UPnP vendor. Period characters in the domain name must be replaced with hyphens in accordance with RFC 2141.
+		/// 
+		/// See UPnP Architecture spec for more info (http://upnp.org/specs/arch/UPnP-arch-DeviceArchitecture-v1.0.pdf)
+		/// </param>
+		public UPnPProtocol(FlowLib.Connections.UPnP connection, string searchTarget)
+			: this(connection)
+		{
+			searchStringToUse = searchTarget;
+		}
 
         void OnUpdate(object sender, FmdcEventArgs e) { }
         void OnMessageToSend(object sender, FmdcEventArgs e) { }
@@ -143,7 +172,7 @@ namespace FlowLib.Protocols
                 if ((pos = lines[lineNr].IndexOf(':')) != -1)
                 {
                     string key = lines[lineNr].Substring(0, pos++).ToLower();
-                    string value = lines[lineNr].Substring(pos).TrimEnd('\r');
+                    string value = lines[lineNr].Substring(pos).Trim('\r', ' ');
                     switch (key)
                     {
                         case "st":
@@ -175,11 +204,16 @@ namespace FlowLib.Protocols
                         case "cache-control":
                             if (value.StartsWith("max-age="))
                             {
-                                try
-                                {
-                                    device.Information.MaxAge = int.Parse(value.Replace("max-age=", string.Empty));
-                                }
-                                catch { }
+								//try
+								//{
+									int tmpAge;
+									if (int.TryParse(value.Replace("max-age=", string.Empty), out tmpAge))
+									{
+										device.Information.MaxAge = tmpAge;
+									}
+                                    //device.Information.MaxAge = int.Parse(value.Replace("max-age=", string.Empty));
+								//}
+								//catch { }
                             }
                             break;
                         case "server":

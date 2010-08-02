@@ -1,7 +1,7 @@
 ﻿
 /*
  *
- * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2010 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -207,7 +207,8 @@ namespace FlowLib.Utils.Connection
 			ProgressChanged = new ProgressChange(OnProgressChanged);
 			SuccessChanged = new ProgressChange(OnSuccessChanged);
             UpdateBase = new FmdcEventHandler(OnUpdateBase);
-            upnp = new UPnP(this);
+			// We are only interested to find the IGD device.
+			upnp = new UPnP(this, "urn:schemas-upnp-org:service:WANIPConnection:1");
             upnp.ProtocolUPnP.Update += new FmdcEventHandler(OnUPnPUpdate);
             Port = 31173;
         }
@@ -353,7 +354,8 @@ namespace FlowLib.Utils.Connection
                     transfer.Me = me;
                     // TODO: We shouldn't limit ourself to IPv4. 
                     transfer.Source = new Source("127.0.0.1", "loopback");
-                    transferManager.AddTransferReq(new TransferRequest("loopback", null, new UserInfo()));
+                    //transferManager.AddTransferReq(new TransferRequest("loopback", null, new UserInfo()));
+					transferManager.AddTransferReq(new TransferRequest(transfer.Source));
 
                     transfer.Protocol = new TransferNmdcProtocol(transfer);
                     transferManager.StartTransfer(transfer);
@@ -466,8 +468,8 @@ namespace FlowLib.Utils.Connection
                 switch (e.Action)
                 {
                     case Actions.UPnPRootDeviceFound:
-                        //FlowLib.Events.FmdcEventArgs e3 = new FlowLib.Events.FmdcEventArgs(Actions.UPnPDeviceDescription, device.Information.Sender.ToString());
-                        //UpdateBase(this, e3);
+						//FlowLib.Events.FmdcEventArgs e3 = new FlowLib.Events.FmdcEventArgs(Actions.UPnPDeviceDescription, device.Information.Sender.ToString());
+						//UpdateBase(this, e3);
                         Success |= Functions.UPnPDevices;
                         break;
                     case Actions.UPnPDeviceUpdated:

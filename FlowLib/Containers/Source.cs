@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2010 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,8 @@ namespace FlowLib.Containers
     public class Source
         : System.Collections.Generic.IComparer<Source>,
         System.Collections.IComparer,
-        System.IComparable
+        System.IComparable,
+		System.Collections.Generic.IEqualityComparer<Source>
     {
         protected string conId = string.Empty;
         protected string userId = string.Empty;
@@ -152,5 +153,15 @@ namespace FlowLib.Containers
             return this.Compare(this, obj);
         }
         #endregion
-    }
+
+		public bool Equals(Source x, Source y)
+		{
+			return Compare(x, y) == 0;
+		}
+
+		public int GetHashCode(Source obj)
+		{
+            return base.GetHashCode();
+		}
+	}
 }

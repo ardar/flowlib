@@ -1,7 +1,7 @@
 ﻿
 /*
  *
- * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2010 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -66,10 +66,12 @@ namespace FlowLib.Connections
             set;
         }
 
-        public UPnP() : this(null, null) { }
+        public UPnP() : this(null, null, null) { }
         public UPnP(IPEndPoint point) : this(point, null) { }
         public UPnP(IBaseUpdater updater) : this(null, updater) { }
-        public UPnP(IPEndPoint point, IBaseUpdater updater)
+		public UPnP(IPEndPoint point, IBaseUpdater updater) : this(point, updater, null) { }
+		public UPnP(IBaseUpdater updater, string searchTarget) : this(null, updater, searchTarget) { }
+		public UPnP(IPEndPoint point, IBaseUpdater updater, string searchTarget)
         {
             RootDevices = new SortedList<string, UPnPDevice>();
             if (point == null)
@@ -82,7 +84,14 @@ namespace FlowLib.Connections
             }
             client = new Socket(AddressFamily.InterNetwork,
             SocketType.Dgram, ProtocolType.Udp);
-            ProtocolUPnP = new UPnPProtocol(this);
+			if (string.IsNullOrEmpty(searchTarget))
+			{
+				ProtocolUPnP = new UPnPProtocol(this);
+			}
+			else
+			{
+				ProtocolUPnP = new UPnPProtocol(this, searchTarget);
+			}
         }
 
         protected virtual void OnUpdateBase(object sender, FlowLib.Events.FmdcEventArgs e)

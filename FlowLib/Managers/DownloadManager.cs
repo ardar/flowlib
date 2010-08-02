@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2010 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -367,8 +367,14 @@ namespace FlowLib.Managers
 
         private void d_DownloadCompleted(object sender, FmdcEventArgs e)
         {
-            RemoveDownload((DownloadItem)sender);
-            DownloadCompleted(sender, e);
+            DownloadItem dwnItm = sender as DownloadItem;
+            if (dwnItm != null)
+            {
+                //RemoveDownload((DownloadItem)sender);
+                RemoveDownload(dwnItm);
+                FlowLib.Utils.FileOperations.ForceClose(dwnItm.ContentInfo.Get(ContentInfo.STORAGEPATH));
+                DownloadCompleted(sender, e);
+            }
         }
 
         // TODO : Add match source

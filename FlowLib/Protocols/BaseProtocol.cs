@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2010 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -56,10 +56,10 @@ namespace FlowLib.Protocols
             if (trans.DownloadItem != null && trans.CurrentSegment != null)
             {
                 // Clean up here please :)
+                //FlowLib.Utils.FileOperations.ForceClose(trans.DownloadItem.ContentInfo.Get(ContentInfo.STORAGEPATH));
                 trans.DownloadItem.Finished(trans.CurrentSegment.Index, trans.Source);
                 trans.CurrentSegment = null;
             }
         }
-
     }
 }

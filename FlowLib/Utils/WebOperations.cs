@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2010 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,9 +22,28 @@ using System.Collections.Generic;
 using System.Net;
 using System.IO;
 using System.Text;
+using System.Xml.Serialization;
 
 namespace FlowLib.Utils
 {
+	public static class WebOperations<T>
+	{
+		public static T GetObjectFromPage(string url)
+		{
+			XmlSerializer s = new XmlSerializer(typeof(T));
+			T obj;
+			string strContent = WebOperations.GetPage(url);
+
+			if (string.IsNullOrEmpty(strContent))
+				return default(T);
+			MemoryStream ms = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(strContent));
+			ms.Position = 0;
+			obj = (T)s.Deserialize(ms);
+			ms.Close();
+			return obj;
+		}
+	}
+
     public static class WebOperations
     {
         private static string ReplaceInput(string input)
@@ -107,19 +126,15 @@ namespace FlowLib.Utils
         {
             return GetPage(url, null, null, null);
         }
-
         public static string GetPage(string url, ref WebHeaderCollection responseHeaders)
         {
             return GetPage(url, null, null, null, ref responseHeaders);
         }
-
         public static string GetPage(string url, string method, string contentType, SortedList<string, string> values)
         {
             WebHeaderCollection responseHeaders = null;
             return GetPage(url, method, contentType, values, ref responseHeaders);
         }
-
-
         public static string GetPage(string url, string method, string contentType, SortedList<string, string> values, ref WebHeaderCollection responseHeaders)
         {
             string tmp = string.Empty;
@@ -191,6 +206,5 @@ namespace FlowLib.Utils
             }
             return tmp;
         }
-
     }
 }

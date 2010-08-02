@@ -4,7 +4,7 @@
 		<Nick type="string">StongDC</Nick>
 		<UploadSpeed type="string">100</UploadSpeed>
 		<DownloadDirectory type="string">C:\Download\Code\StrongDC\App\Downloads\</DownloadDirectory>
-		<ExternalIp type="string">192.168.1.10</ExternalIp>
+		<ExternalIp type="string">127.0.0.1</ExternalIp>
 		<Font type="string">MS Shell Dlg,-11,400,0</Font>
 		<MainFrameOrder type="string">0,1,2,3,4,5,6,7,8,9,10</MainFrameOrder>
 		<MainFrameWidths type="string">94,150,250,65,190,355,100,200,100,150,50</MainFrameWidths>
@@ -56,7 +56,7 @@
 		<DirectoryListingFrameVisible type="string">1,1,1,1,1</DirectoryListingFrameVisible>
 		<ToolbarSettings type="string">240,60160,0;664,60161,1;200,60162,0;</ToolbarSettings>
 		<IncomingConnections type="int">3</IncomingConnections>
-		<InPort type="int">28212</InPort>
+		<InPort type="int">6731</InPort>
 		<Slots type="int">10</Slots>
 		<AutoFollow type="int">1</AutoFollow>
 		<ClearSearch type="int">1</ClearSearch>
@@ -88,11 +88,11 @@
 		<MinUploadSpeed type="int">0</MinUploadSpeed>
 		<GetUserInfo type="int">1</GetUserInfo>
 		<UrlHandler type="int">1</UrlHandler>
-		<MainWindowState type="int">3</MainWindowState>
-		<MainWindowSizeX type="int">678</MainWindowSizeX>
+		<MainWindowState type="int">1</MainWindowState>
+		<MainWindowSizeX type="int">850</MainWindowSizeX>
 		<MainWindowSizeY type="int">470</MainWindowSizeY>
-		<MainWindowPosX type="int">213</MainWindowPosX>
-		<MainWindowPosY type="int">225</MainWindowPosY>
+		<MainWindowPosX type="int">378</MainWindowPosX>
+		<MainWindowPosY type="int">34</MainWindowPosY>
 		<AutoAway type="int">0</AutoAway>
 		<SocksPort type="int">1080</SocksPort>
 		<SocksResolve type="int">1</SocksResolve>
@@ -266,7 +266,7 @@
 		<ProgressSegmentColor type="int">12937777</ProgressSegmentColor>
 		<OpenNewWindow type="int">0</OpenNewWindow>
 		<FileSlots type="int">15</FileSlots>
-		<UDPPort type="int">31740</UDPPort>
+		<UDPPort type="int">22305</UDPPort>
 		<MultiChunk type="int">1</MultiChunk>
 		<UserListDoubleClick type="int">6</UserListDoubleClick>
 		<TransferListDoubleClick type="int">0</TransferListDoubleClick>
@@ -308,7 +308,7 @@
 		<PromptPassword type="int">1</PromptPassword>
 		<AllowUntrustedHubs type="int">1</AllowUntrustedHubs>
 		<AllowUntrustedClients type="int">1</AllowUntrustedClients>
-		<TLSPort type="int">22227</TLSPort>
+		<TLSPort type="int">18002</TLSPort>
 		<FastHash type="int">1</FastHash>
 		<DownConnPerSec type="int">2</DownConnPerSec>
 		<HighestPrioSize type="int">64</HighestPrioSize>
@@ -326,10 +326,12 @@
 		<UseDHT type="int">0</UseDHT>
 		<DHTPort type="int">6245</DHTPort>
 		<UpdateIP type="int">0</UpdateIP>
-		<TotalUpload type="int64">20450597942</TotalUpload>
-		<TotalDownload type="int64">5317991</TotalDownload>
+		<TotalUpload type="int64">20450686645</TotalUpload>
+		<TotalDownload type="int64">5980628</TotalDownload>
 	</Settings>
-	<Share/>
+	<Share>
+		<Directory Virtual="StrongDC">C:\Share\StrongDC\</Directory>
+	</Share>
 	<NoShare/>
 	<PreviewApps/>
 </DCPlusPlus>

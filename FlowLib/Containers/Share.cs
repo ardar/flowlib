@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2010 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1353,9 +1353,26 @@ namespace FlowLib.Containers
         //public IEnumerator<KeyValuePair<string, ContentInfo>> GetEnumerator()
         IEnumerator<KeyValuePair<string, ContentInfo>> IEnumerable<KeyValuePair<string, ContentInfo>>.GetEnumerator()
         {
-            lock (share)
+            if (share.Count != 0)
             {
-                return share.GetEnumerator();
+                lock (share)
+                {
+                    return share.GetEnumerator();
+                }
+            }
+            else if (tthNames.Count != 0)
+            {
+                lock (tthNames)
+                {
+                    return tthNames.GetEnumerator();
+                }
+            }
+            else
+            {
+                lock (virtualNames)
+                {
+                    return virtualNames.GetEnumerator();
+                }
             }
         }
         #endregion

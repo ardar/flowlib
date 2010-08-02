@@ -40,6 +40,14 @@ namespace FlowLib.Utils.Hash
         private byte[][] HashValues; //array for hash values.
         private FileStream FilePtr;    //dest file stream pointer.
 
+        public byte[][] GetTTHLeafs(string Filename)
+        {
+            byte[] topkey = GetTTH(Filename);
+            if (topkey == null)
+                return null;
+            return HashValues;
+        }
+
         public byte[] GetTTH(string Filename)
         {
             byte[] TTH = null;

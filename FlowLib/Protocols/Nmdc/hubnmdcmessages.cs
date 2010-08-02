@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2010 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -260,7 +260,7 @@ namespace FlowLib.Protocols.HubNmdc
                     string[] sections = temp.Split('$');
                     info = new UserInfo();
                     info.DisplayName = from;
-                    info.Set(UserInfo.STOREID, hub.HubSetting.Address + hub.HubSetting.Port + from);
+                    info.Set(UserInfo.STOREID, hub.StoreId + from);
                     if (sections.Length == 6)
                     {
                         int pos = 0;
@@ -446,6 +446,8 @@ namespace FlowLib.Protocols.HubNmdc
         public Search(Hub hub, string raw)
             : base(hub, raw)
         {
+			bool validAddress = false;
+
             int searchPos = 0;
             #region Get From
             int pos1 =0, pos2 = 0;
@@ -455,6 +457,8 @@ namespace FlowLib.Protocols.HubNmdc
                 pos1 += 4;
                 pos2 -= 1;
                 from = raw.Substring(pos1, pos2 - pos1);
+
+				validAddress = true;
             }
             else if (((pos1=0) == 0) && Utils.StringOperations.Find(raw, "$Search ", " ", ref pos1, ref pos2))
             {
@@ -462,28 +466,26 @@ namespace FlowLib.Protocols.HubNmdc
                 pos1 += 8;
                 pos2 -= 1;
                 string[] tmp = raw.Substring(pos1, pos2 - pos1).Split(':');
-                if (tmp.Length == 2)
-                {
-                    System.Net.IPAddress ip = null;
-                    int port = -1;
-                    try
-                    {
-                        ip = System.Net.IPAddress.Parse(tmp[0]);
-                    }
-                    catch { }
-                    try
-                    {
-                        port = int.Parse(tmp[1]);
-                        if (port < 0 || port > 65535)
-                            port = 0;
-                    }
-                    catch { }
+				if (tmp.Length == 2)
+				{
+					System.Net.IPAddress ip = null;
+					int port = -1;
+					try
+					{
+						ip = System.Net.IPAddress.Parse(tmp[0]);
+					}
+					catch { }
 
-                    if (ip != null)
-                    {
-                        address = new System.Net.IPEndPoint(ip, port);
-                    }
-                }
+					int.TryParse(tmp[1], out port);
+					//if (port < 	 || port > System.Net.IPEndPoint.MaxPort)
+					//    port = -1;
+
+					if (ip != null && (System.Net.IPEndPoint.MinPort <= port &&  port <= System.Net.IPEndPoint.MaxPort))
+					{
+						address = new System.Net.IPEndPoint(ip, port);
+						validAddress = true;
+					}
+				}
             }
             #endregion
             #region Search Info
@@ -579,7 +581,12 @@ namespace FlowLib.Protocols.HubNmdc
                     else
                         info.Set(SearchInfo.SEARCH, sections[4]);
                     #endregion
-                    valid = true;
+
+					// A search is only valid if it has a valid Adress
+					if (validAddress)
+					{
+						valid = true;
+					}
                 }
             }
             #endregion

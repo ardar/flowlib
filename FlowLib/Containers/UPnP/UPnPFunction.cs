@@ -1,7 +1,7 @@
 ﻿
 /*
  *
- * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2010 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
  */
 
 using System.Collections.Generic;
+using System.Text;
 
 namespace FlowLib.Containers.UPnP
 {
@@ -57,5 +58,26 @@ namespace FlowLib.Containers.UPnP
             Arguments = new SortedList<string, string>();
             ErrorCode = 0;
         }
+
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+			if (Service != null && Service.Device != null && Service.Device.Information != null)
+			{
+				sb.Append("Device: ");
+				sb.Append(Service.Device.Information.Sender);
+				sb.Append(" (");
+				sb.Append(Service.Device.Information.DeviceType);
+				sb.AppendLine(")");
+			}
+			sb.Append(Name);
+			sb.AppendLine("(");
+			foreach (KeyValuePair<string, string> item in Arguments)
+			{
+				sb.AppendFormat("\t{0} = {1}\r\n", item.Key, item.Value);
+			}
+			sb.AppendLine(")");
+			return sb.ToString();
+		}
     }
 }

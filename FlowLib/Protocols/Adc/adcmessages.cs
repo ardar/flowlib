@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2010 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -65,8 +65,8 @@ namespace FlowLib.Protocols.Adc
                 identifier = param[1];
                 try
                 {
-                    long start = int.Parse(param[2]);
-                    long length = int.Parse(param[3]);
+                    long start = long.Parse(param[2]);
+                    long length = long.Parse(param[3]);
                     segment = new SegmentInfo(-1, start, length);
                     valid = true;
                 }
@@ -135,8 +135,8 @@ namespace FlowLib.Protocols.Adc
                 identifier = param[1];
                 try
                 {
-                    long start = int.Parse(param[2]);
-                    long length = int.Parse(param[3]);
+                    long start = long.Parse(param[2]);
+                    long length = long.Parse(param[3]);
                     segment = new SegmentInfo(-1, start, length);
                     valid = true;
                 }
@@ -162,7 +162,7 @@ namespace FlowLib.Protocols.Adc
                 throw new System.ArgumentException("ContentInfo must contain any of: REQUEST, TTH or VIRTUAL");
 
             // TODO : Add support for list also
-            Raw = string.Format("CGET {0} {1} {2} {3}\n", type, req, segment.Position, segment.Length);
+            Raw = string.Format("CGET {0} {1} {2} {3}\n", type, req, segment.Start, segment.Length);
         }
     }
     public class RCM : AdcBaseMessage
@@ -743,7 +743,8 @@ namespace FlowLib.Protocols.Adc
                 return;
             info.TagInfo.GenerateTag = true;
             info.Set(UserInfo.SID, id);
-            info.TagInfo.Mode = Enums.ConnectionTypes.Passive;
+			// We set connection mode to unknown until we get a SU field.
+            info.TagInfo.Mode = Enums.ConnectionTypes.Unknown;
 
             if (typeValid)
                 valid = true;
@@ -866,6 +867,8 @@ namespace FlowLib.Protocols.Adc
                     case "SU":
                         info.Set(key, value);
                         string[] supports = value.Split(',');
+						// Set connection to passive by default.
+						info.TagInfo.Mode = Enums.ConnectionTypes.Passive;
                         foreach (string sup in supports)
                         {
                             switch (sup)

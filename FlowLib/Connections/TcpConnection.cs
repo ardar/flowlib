@@ -1,7 +1,7 @@
 
 /*
  *
- * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2010 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@ using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using FlowLib.Containers.Security;
 using FlowLib.Enums;
+using System.IO;
 #endif
 
 #if COMPACT_FRAMEWORK
@@ -195,7 +196,10 @@ namespace FlowLib.Connections
             {
                 SecureUpdate(this, new FmdcEventArgs(Actions.SecurityAuthenticationError, pe));
             }
-
+            catch (IOException ioe)
+            {
+				SecureUpdate(this, new FmdcEventArgs(Actions.SecurityAuthenticationError, ioe));
+            }
         }
 #endif
         public bool IsDisposed
@@ -427,7 +431,7 @@ namespace FlowLib.Connections
                 }
 #endif
 
-                socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontLinger,new LingerOption(false, 0));
+                //socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontLinger,new LingerOption(false, 0));
                 socket.Disconnect(true);
             }
             catch (Exception) { }
@@ -481,7 +485,7 @@ namespace FlowLib.Connections
                 {
                     // Determin Protocol to use here.
                     //if (Protocol != null && sock.Connected && first)
-                    if (Protocol != null && first && !importedSocket)
+                    if (first && !importedSocket && Protocol != null)
                     {
                         first = false;
                         if (Protocol.FirstCommand != null)
@@ -740,9 +744,17 @@ namespace FlowLib.Connections
             FmdcEventArgs args = new FmdcEventArgs(Actions.SecurityValidateRemoteCertificate, info);
             SecureUpdate(this, args);
             info = args.Data as CertificateValidationInfo;
-            if (info == null)
-                return false;
-            return info.Accepted;
+            if (args.Handled)
+            {
+                if (info == null)
+                    return false;
+                return info.Accepted;
+            }
+            else
+            {
+                // If developer havnt added logic to support this. Assume Accepted.
+                return true;
+            }
         }
 
         protected X509Certificate OnLocalCertificateSelection(

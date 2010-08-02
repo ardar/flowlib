@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2010 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,4 +34,18 @@ namespace FlowLib.Utils
         {
         }
     }
+
+    public class FlowLibException : Exception
+    {
+        public FlowLibException()
+            : base()
+        {
+        }
+
+        public FlowLibException(string msg)
+            : base(msg)
+        {
+        }
+    }
+
 }
