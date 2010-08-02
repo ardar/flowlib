@@ -1,0 +1,13 @@
+#summary Before commiting
+#labels Deprecated
+
+= Introduction =
+
+Add your content here.
+
+
+= Rules =
+
+  # Code must be licensed under GPL v2 and under the name Mattias Blomqvist (This is for copyright claims) Please note that you will give away any rights you have.
+  # Code must be runnable on .NET Compact Framework 2.0 AND .NET Framework 2.0 (This is for mobile and backward compability).
+  # 
