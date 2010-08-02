@@ -9,6 +9,7 @@ Hope you will have a fun time :)
 = Rules =
 
   * Code must be licensed under GPL v2 and under the name Mattias Blomqvist (This is for copyright claims) Please note that you will give away any rights you have.
+    * You will of course get all credit for the feature in the changelog
   * Code must be runnable on .NET Compact Framework 3.5 AND .NET Framework 3.5.
   * Code must be C#, no other language allowed.
   * External assamblies are not allowed (Exceptions can be made if you talk to main developer).
