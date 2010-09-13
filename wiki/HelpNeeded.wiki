@@ -3,10 +3,10 @@
 
 = Introduction =
 
-Do you want your name in the FlowLib changelog?
-Do you want to help FlowLib moving forward?
-Do you want me to stop hitting my head against the wall?
-You want to receive a small gift?
+  * Do you want your name in the FlowLib changelog?
+  * Do you want to help FlowLib moving forward?
+  * Do you want me to stop hitting my head against the wall?
+  * Do you want to receive a small gift?
 
 If you answer yes to any of the questions above you should continue to read the details below :)
 
