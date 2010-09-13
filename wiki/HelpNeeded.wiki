@@ -12,12 +12,10 @@ If you answer yes to any of the questions above you should continue to read the 
 
 = Details =
 
-FlowLib currently have a annoying bug occurring when downloading files from a user.
-Sometimes (For me it seems random) FlowLib is switching to command mode when it should be receiving data.
+FlowLib currently has an annoying bug which occurs when downloading files from a user. Sometimes (For me it seems random) FlowLib is switching to command mode when it should be receiving data.
 
-This seem to happen for both ADC and NMDC so it seem to be a general error in handling.
-It also seem to occur around the *GET* and *SND* commands.
+This seems to happen for both ADC and NMDC protocols. This seems to be a general error in handling. It also seems to occur around the GET and SND commands.
 
-If you find this bug please let me know
+If you find this bug please let me know ASAP
 
 /Regards Mattias
