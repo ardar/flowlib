@@ -4,7 +4,7 @@
 = Introduction =
 
   * Do you want your name in the FlowLib changelog?
-  * Do you want to help FlowLib moving forward?
+  * Do you want to help keep FlowLib moving forward?
   * Do you want me to stop hitting my head against the wall?
   * Do you want to receive a small gift?
 
