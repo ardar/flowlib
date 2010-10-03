@@ -15,6 +15,7 @@
   * [CodeExamplesActiveDownloadFilelistFromUser Download filelist from user (A)]
   * [CodeExampleSearchPassive Search for content (P)]
   * [CodeExampleSearchActive Search for content (A)]
+  * [CodeExampleSearchAndDownloadPassive Search and download content (P)]
   * [CodeExampleEncryptedTraffic Encrypted Communicaion]
   * [CodeExampleWhatConnectionIsPossible Determine possible connection?]
   * [CodeExamplesCollectTransferedInformationFromActiveDownloadFilelistFromUser Get download speed]
