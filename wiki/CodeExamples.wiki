@@ -19,7 +19,7 @@ Every example will have a description to tell little about what problem it solve
 || [CodeExamplesPassiveDownloadFilelistFromUser Download filelist from user (Passive)] ||
 || [CodeExamplesActiveDownloadFilelistFromUser Download filelist from user (Active)] ||
 || [CodeExampleSearchPassive Search for content (Passive)] ||
-|| [CodeExampleSeachPassive Search and download content (Passive)] ||
+|| [CodeExampleSearchAndDownloadPassive Search and download content (Passive)] ||
 || [CodeExampleSearchActive Search for content (Active)] ||
 || [CodeExampleEncryptedTraffic Encrypted Communicaion] ||
 || [CodeExampleWhatConnectionIsPossible What connection mode can user have?] ||
