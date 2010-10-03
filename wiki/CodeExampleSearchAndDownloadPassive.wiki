@@ -102,7 +102,7 @@ namespace FlowLibApp
                         if (isReady)
                         {
                             SearchInfo searchInfo = new SearchInfo();
-                            searchInfo.Set(SearchInfo.SEARCH, "Ubunut");
+                            searchInfo.Set(SearchInfo.SEARCH, "Ubuntu");
                             searchInfo.Set(SearchInfo.TYPE, "0");
                             UpdateBase(this, new FlowLib.Events.FmdcEventArgs(Actions.Search, searchInfo));
                         }
