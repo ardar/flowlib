@@ -14,3 +14,4 @@
    * FlowConverter
    * [http://cube3d.pikarde.com/website/dcsync.aspx dcSync]
    * CapT Bot 
+   * [http://seriebot.googlecode.com/ SerieBot]
