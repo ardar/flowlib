@@ -1,0 +1,145 @@
+2010-01-10 02:59:08: adchpp: ADCH++ v2.4.0 (r 222) Release started from console
+2010-01-10 02:59:08: SocketManager: Starting
+2010-01-10 02:59:08: ScriptManager: Starting
+2010-01-10 02:59:08: LuaScript: Loaded access.lua
+2010-01-10 02:59:08: LuaScript: Loaded history.lua
+2010-01-10 02:59:08: PluginManager: Script.dll loaded
+2010-01-10 02:59:08: BloomManager: Starting
+2010-01-10 02:59:08: PluginManager: Bloom.dll loaded
+2010-01-10 04:03:12: adchpp: ADCH++ v2.4.0 (r 222) Release shut down
+2010-01-10 04:03:12: BloomManager: Shutting down
+2010-01-10 04:03:12: ScriptManager: Shutting down
+2010-01-10 16:10:24: adchpp: ADCH++ v2.4.0 (r 222) Release started from console
+2010-01-10 16:10:24: SocketManager: Starting
+2010-01-10 16:10:24: ScriptManager: Starting
+2010-01-10 16:10:24: LuaScript: Loaded access.lua
+2010-01-10 16:10:24: LuaScript: Loaded history.lua
+2010-01-10 16:10:24: PluginManager: Script.dll loaded
+2010-01-10 16:10:24: BloomManager: Starting
+2010-01-10 16:10:24: PluginManager: Bloom.dll loaded
+2010-01-10 16:10:38: adchpp: ADCH++ v2.4.0 (r 222) Release started from console
+2010-01-10 16:10:38: SocketManager: Starting
+2010-01-10 16:10:38: ScriptManager: Starting
+2010-01-10 16:10:38: LuaScript: Loaded access.lua
+2010-01-10 16:10:38: LuaScript: Loaded history.lua
+2010-01-10 16:10:38: PluginManager: Script.dll loaded
+2010-01-10 16:10:38: BloomManager: Starting
+2010-01-10 16:10:38: PluginManager: Bloom.dll loaded
+2010-01-10 17:03:05: adchpp: ADCH++ v2.4.0 (r 222) Release started from console
+2010-01-10 17:03:05: SocketManager: Starting
+2010-01-10 17:03:05: ScriptManager: Starting
+2010-01-10 17:03:05: LuaScript: Loaded access.lua
+2010-01-10 17:03:05: LuaScript: Loaded history.lua
+2010-01-10 17:03:05: PluginManager: Script.dll loaded
+2010-01-10 17:03:05: BloomManager: Starting
+2010-01-10 17:03:05: PluginManager: Bloom.dll loaded
+2010-01-10 17:06:32: adchpp: ADCH++ v2.4.0 (r 222) Release shut down
+2010-01-10 17:06:32: BloomManager: Shutting down
+2010-01-10 17:06:32: ScriptManager: Shutting down
+2010-01-25 22:52:45: adchpp: ADCH++ v2.4.0 (r 222) Release started from console
+2010-01-25 22:52:45: SocketManager: Starting
+2010-01-25 22:52:45: ScriptManager: Starting
+2010-01-25 22:52:45: LuaScript: Loaded access.lua
+2010-01-25 22:52:45: LuaScript: Loaded history.lua
+2010-01-25 22:52:45: PluginManager: Script.dll loaded
+2010-01-25 22:52:45: BloomManager: Starting
+2010-01-25 22:52:45: PluginManager: Bloom.dll loaded
+2010-01-25 23:01:46: adchpp: ADCH++ v2.4.0 (r 222) Release started from console
+2010-01-25 23:01:46: ScriptManager: Starting
+2010-01-25 23:01:46: LuaScript: Error loading file: cannot open access.lua: No such file or directory
+2010-01-25 23:01:46: LuaScript: Error loading file: cannot open history.lua: No such file or directory
+2010-01-25 23:01:46: PluginManager: Script.dll loaded
+2010-01-25 23:01:46: BloomManager: Starting
+2010-01-25 23:01:46: PluginManager: Bloom.dll loaded
+2010-01-25 23:01:46: SocketManager: Starting
+2010-01-25 23:01:47: SocketManager: Error while loading server on port 2781: An invalid argument was supplied
+2010-01-25 23:06:06: adchpp: ADCH++ v2.4.0 (r 222) Release shut down
+2010-01-25 23:06:06: BloomManager: Shutting down
+2010-01-25 23:06:06: ScriptManager: Shutting down
+2010-01-25 23:07:13: adchpp: ADCH++ v2.4.0 (r 222) Release started from console
+2010-01-25 23:07:13: ScriptManager: Starting
+2010-01-25 23:07:13: LuaScript: Error loading file: cannot open access.lua: No such file or directory
+2010-01-25 23:07:13: LuaScript: Error loading file: cannot open history.lua: No such file or directory
+2010-01-25 23:07:13: PluginManager: Script.dll loaded
+2010-01-25 23:07:13: BloomManager: Starting
+2010-01-25 23:07:13: PluginManager: Bloom.dll loaded
+2010-01-25 23:07:13: SocketManager: Starting
+2010-01-25 23:07:14: SocketManager: Error while loading server on port 2781: An invalid argument was supplied
+2010-01-25 23:09:55: adchpp: ADCH++ v2.4.0 (r 222) Release shut down
+2010-01-25 23:09:55: BloomManager: Shutting down
+2010-01-25 23:09:55: ScriptManager: Shutting down
+2010-01-25 23:10:47: adchpp: ADCH++ v2.4.0 (r 222) Release started from console
+2010-01-25 23:10:47: ScriptManager: Starting
+2010-01-25 23:10:47: LuaScript: Error loading file: cannot open access.lua: No such file or directory
+2010-01-25 23:10:47: LuaScript: Error loading file: cannot open history.lua: No such file or directory
+2010-01-25 23:10:47: PluginManager: Script.dll loaded
+2010-01-25 23:10:47: BloomManager: Starting
+2010-01-25 23:10:47: PluginManager: Bloom.dll loaded
+2010-01-25 23:10:47: SocketManager: Starting
+2010-01-25 23:10:47: SocketManager: Error while loading server on port 2781: An invalid argument was supplied
+2010-01-25 23:11:12: adchpp: ADCH++ v2.4.0 (r 222) Release shut down
+2010-01-25 23:11:12: BloomManager: Shutting down
+2010-01-25 23:11:12: ScriptManager: Shutting down
+2010-01-25 23:12:14: adchpp: ADCH++ v2.4.0 (r 222) Release started from console
+2010-01-25 23:12:14: ScriptManager: Starting
+2010-01-25 23:12:14: LuaScript: Error loading file: cannot open access.lua: No such file or directory
+2010-01-25 23:12:14: LuaScript: Error loading file: cannot open history.lua: No such file or directory
+2010-01-25 23:12:14: PluginManager: Script.dll loaded
+2010-01-25 23:12:14: BloomManager: Starting
+2010-01-25 23:12:14: PluginManager: Bloom.dll loaded
+2010-01-25 23:12:14: SocketManager: Starting
+2010-01-25 23:12:15: SocketManager: Error while loading server on port 2781: An invalid argument was supplied
+2010-01-25 23:13:32: adchpp: ADCH++ v2.4.0 (r 222) Release shut down
+2010-01-25 23:13:32: BloomManager: Shutting down
+2010-01-25 23:13:32: ScriptManager: Shutting down
+2010-01-25 23:15:20: adchpp: ADCH++ v2.4.0 (r 222) Release started from console
+2010-01-25 23:15:20: ScriptManager: Starting
+2010-01-25 23:15:20: LuaScript: Error loading file: cannot open access.lua: No such file or directory
+2010-01-25 23:15:20: LuaScript: Error loading file: cannot open history.lua: No such file or directory
+2010-01-25 23:15:20: PluginManager: Script.dll loaded
+2010-01-25 23:15:20: BloomManager: Starting
+2010-01-25 23:15:20: PluginManager: Bloom.dll loaded
+2010-01-25 23:15:20: SocketManager: Starting
+2010-01-25 23:15:20: SocketManager: Error while loading server on port 2781: An invalid argument was supplied
+2010-01-25 23:17:34: adchpp: ADCH++ v2.4.0 (r 222) Release started from console
+2010-01-25 23:17:34: ScriptManager: Starting
+2010-01-25 23:17:34: LuaScript: Error loading file: cannot open access.lua: No such file or directory
+2010-01-25 23:17:34: LuaScript: Error loading file: cannot open history.lua: No such file or directory
+2010-01-25 23:17:34: PluginManager: Script.dll loaded
+2010-01-25 23:17:34: BloomManager: Starting
+2010-01-25 23:17:34: PluginManager: Bloom.dll loaded
+2010-01-25 23:17:34: SocketManager: Starting
+2010-01-25 23:17:35: SocketManager: Error while loading server on port 2781: An invalid argument was supplied
+2010-01-25 23:20:55: adchpp: ADCH++ v2.4.0 (r 222) Release started from console
+2010-01-25 23:20:55: ScriptManager: Starting
+2010-01-25 23:20:55: LuaScript: Error loading file: cannot open access.lua: No such file or directory
+2010-01-25 23:20:55: LuaScript: Error loading file: cannot open history.lua: No such file or directory
+2010-01-25 23:20:55: PluginManager: Script.dll loaded
+2010-01-25 23:20:55: BloomManager: Starting
+2010-01-25 23:20:55: PluginManager: Bloom.dll loaded
+2010-01-25 23:20:55: SocketManager: Starting
+2010-01-25 23:20:55: SocketManager: Error while loading server on port 2781: An invalid argument was supplied
+2010-01-25 23:28:26: adchpp: ADCH++ v2.4.0 (r 222) Release started from console
+2010-01-25 23:28:26: SocketManager: Starting
+2010-01-25 23:28:26: ScriptManager: Starting
+2010-01-25 23:28:26: LuaScript: Error loading file: cannot open access.lua: No such file or directory
+2010-01-25 23:28:26: LuaScript: Error loading file: cannot open history.lua: No such file or directory
+2010-01-25 23:28:26: PluginManager: Script.dll loaded
+2010-01-25 23:28:26: BloomManager: Starting
+2010-01-25 23:28:26: PluginManager: Bloom.dll loaded
+2010-01-25 23:29:42: adchpp: ADCH++ v2.4.0 (r 222) Release started from console
+2010-01-25 23:29:42: SocketManager: Starting
+2010-01-25 23:29:42: ScriptManager: Starting
+2010-01-25 23:29:42: LuaScript: Error loading file: cannot open access.lua: No such file or directory
+2010-01-25 23:29:43: LuaScript: Error loading file: cannot open history.lua: No such file or directory
+2010-01-25 23:29:43: PluginManager: Script.dll loaded
+2010-01-25 23:29:43: BloomManager: Starting
+2010-01-25 23:29:43: PluginManager: Bloom.dll loaded
+2010-01-25 23:30:47: adchpp: ADCH++ v2.4.0 (r 222) Release started from console
+2010-01-25 23:30:47: SocketManager: Starting
+2010-01-25 23:30:47: ScriptManager: Starting
+2010-01-25 23:30:47: LuaScript: Error loading file: cannot open access.lua: No such file or directory
+2010-01-25 23:30:47: LuaScript: Error loading file: cannot open history.lua: No such file or directory
+2010-01-25 23:30:47: PluginManager: Script.dll loaded
+2010-01-25 23:30:47: BloomManager: Starting
+2010-01-25 23:30:47: PluginManager: Bloom.dll loaded

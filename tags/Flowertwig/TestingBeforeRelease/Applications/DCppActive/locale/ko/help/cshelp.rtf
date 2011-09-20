@@ -1,0 +1,324 @@
+When checked, matches to this search will be put into your "Download Queue".
+Sets the output folder for a search. Multiple folders with different names can exist simultaneously. Each folder name gets wrapped in <<< and >>>.
+Marks the search as active or inactive.
+Sets the upper limits for file size. This is unused for "Directory" searches.
+Sets the lower limits for file size. This is unused for "Directory" searches.
+This is the set of search strings to search for.
+Sets the units for the search sizes.
+"Filename": Matches search against filename; "Directory": Matches against current subdirectory and places the whole structure in the special folder; "Full Path": Matches against whole directory + filename.
+Move down selected ADLSearch entries in the list.
+Move up selected ADLSearch entries in the list.
+Create a new ADLSearch entry.
+Change pre-existing ADLSearch properties for the selected entries.
+Removes selected ADLSearch entries from the list.
+이 버튼을 누르면 변경 사항을 저장하지 않고,이 대화 상자를 닫습니다.
+이 버튼을 누르면 도움말 파일을 실행합니다.
+이 버튼을 누르면 변경 사항을 저장하고이 대화 상자를 닫습니다.
+Connect to selected hubs.
+Open the "Favorite hub groups" dialog where you can add, edit, remove groups.\line More information about the use of favorite hub groups in the help topics associated to the "Favorite hub groups" dialog.
+Move down selected hubs in the list.
+Move up selected hubs in the list.
+Create a new favorite hub.
+Change pre-existing hub properties for the selected hub.
+Removes selected hubs from the favorite hubs list.
+The address for the hub.
+Description of the hub.
+Select a favorite hub group to be associated to the hub.\line More information about the use of favorite hub groups can be found in the help topics associated to the "Favorite hub groups" dialog.
+Specifies what name the hub has.
+If you would like to use a special nick for a specific hub. Leave this blank for default.
+If you have a password attached together with your nick. Used for operators or other registered people.
+If you would like to use a special user description (shown in the user list) for a specific hub. Leave this blank for default.
+Add the current group definition to the list of favorite hub groups. No other group shall have the same name as the one trying to be added.
+If this option is enabled, all of the hubs contained in this group will be opened each time DC++ is started, regardless of their state when the program was closed.
+Lists currently defined favorite hub groups.
+Unique name to identify this group; must not be already in use by another group.
+If this option is enabled, DC++ will not round-trip to other connected hubs when trying to match an online user from a hub in this group, for actions like private messaging, transferring files and so on.\line In the future, when DC++ is able to share lists of favorite hubs with other peers, this will also prevent it from sharing addresses to private hubs.
+Remove the currently selected groups. When the groups being removed already contain favorite hubs, a question will be asked to find out what to do about them; whether to remove them as well as the group, or to keep them.
+Update the currently selected group by changing its properties as defined in the "Group properties" portion of this dialog.
+Folders available in the current file list. Left-click on a folder to show the contents of that folder in the window on the right; right-click to open a menu that allows you to download the whole folder.
+Shows the contents of the folder selected in the folder list (window on the left). Right-click to get menu options.
+Find items based on search strings you can specify.
+Search the list for items you are currently downloading; found items will be automatically added as sources for your current downloads.
+Continue the search for items based on search strings you have specified by pressing the "Find" button.
+Compare this list to another list, and only show the differences between each. Useful to see new items added by an user to his file list.
+The amount in bytes that you have downloaded (received).
+The amount of items that you have downloaded (received).
+When this check-box is checked (which is the case in the default configuration), only files that are fully downloaded (which are not anymore in the "Download queue") appear in the "Finished downloads grouped by files" list.\line When this check-box is not checked, an item appears in that list as soon as a chunk of the corresponding file has finished downloading.
+The average speed of the files you have downloaded (received).
+The amount in bytes that you have uploaded (sent).
+The amount of items that you have uploaded (sent).
+The average speed of the files you have uploaded (sent).
+Shows the amount of average share in the hub.
+The main chat window displays messages sent by the hub. You can chat with other users in this "public area" by writing a message in the field below the main chat and pressing either Enter or Alt+S to send your message. You may also use "/commands" (send /help to list those available). You can right click to the users' nicks to bring up the user context menu described below.\line Note; this is not the place to search for files. Open a "Search window" to do that.\line This window can be focused with Alt+C.
+Here, you can filter the users list so you will only see specific users. Eg, selecting 'Nick' in the drop down, and writing "foo" in the filter, will only display users that have "foo" in their nick.\line Note; users will only be visually filtered, not disconnected. You can revert to showing all users at any time by cleaning the text you have written in the filter.
+Write a message here to chat with other users connected to the hub. You can press either Enter or Alt+S to send your message. You may also use "/commands" (send /help to list those available).\line When composing a multiline message, this box resizes itself automatically according to the "Height of the message editing box" settings.\line This window can be focused with Alt+M.
+Indicates the total amount of bytes shared by the users.
+Show or hide the users list using this check-box.
+You can see here the last status message or a kick message sent by the hub. To see more from the recent kick/status messages you can move the mouse pointer above the status bar - the last few messages will be shown as a tooltip shortly.
+Shows the number of users connected to the hub.
+Shows "AWAY" when DC++ is in "away mode".\line Double-click to switch away mode on and off.
+Shows the current overall download speed and the number of current download connections in parentheses (updated in every second).\line Double-click to open the "Network Statistics" window.
+Shows the current maximum download rate. Zero speed value means that download limiting is disabled.
+Shows the total number of bytes received in the current session, including file transfers, hub-client communication and hublists.\line Double-click to open the "Network Statistics" window.
+Shows the number of hubs you are currently connected to in the following format: x/y/z, where:\line x = number of connected hubs where you're not a registered user;\line y = number of connected hubs where you're registered in;\line z = number of connected hubs where you're an operator;\line just the same way as in the "DC++ tags" of the users listed on a hub.
+Indicates the number of currently free upload slots out of the total number of slots opened.
+Use this control, which consists of 2 arrows, to increase (up arrow) or decrease (down arrow) the number of upload slots you want to have opened.
+The first part of the status bar contains the last system message with a timestamp. To see more from the recent system messages you can move the mouse pointer above the statusbar - the last 10 lines of the messages will be shown as a tooltip shortly. To see all system messages of the current session open the "System Log" window from the "View menu" or simply double-click on this part of the status bar.
+Shows the current overall upload speed and the number of current upload connections in parentheses (updated in every second).\line Double-click to open the "Network Statistics" window.
+Shows the current maximum upload rate. Zero speed value means that upload limiting is disabled.
+Shows the total number of bytes sent in the current session, including file transfers and hub-client communication.\line Double-click to open the "Network Statistics" window.
+The private chat window displays messages sent during your private conversation with a specific user (to know which one, take a look at the title bar of the main DC++ window). You can chat with the other user in this "private area" by writing a message in the field below the private chat and pressing either Enter or Alt+S to send your message. You may also use "/commands" (send /help to list those available).
+Write a message here to chat with the user you are currently in private conversation with (to know which one, take a look at the title bar of the main DC++ window). You can press either Enter or Alt+S to send your message. You may also use "/commands" (send /help to list those available).\line When composing a multiline message, this box resizes itself automatically according to the "Height of the message editing box" settings.
+Here, you can filter the hublist so you will only see specific hubs in the hublist. Eg, selecting 'address' in the drop down, and writing "foo" in the filter, will only display hubs that have "foo" in their address. When a filter is in effect, the number of hubs filtered out is shown in the status bar.\line This window can be focused with Alt+I.
+The total number of individual hubs in the current hub list. When the hublist is filtered, it shows the number of hubs filtered out as well.
+In the dropdown, you may select different hublists you want to see. If the hublist was downloaded before you will have the cached version displayed. Click Refresh to get the fresh version of the hublist.\line If you click on 'Configure', you will be able to change, add and remove hublists. The order in "Configured Public Hub Lists" determines the order hublists are displayed in the dropdown mentioned above.
+Download a fresh version of the hublist. If the download fails click Refresh again to get the next available hublist in the dropdown. DC++ uses "The Coral Content Distribution Network" to get hublists by default. This improves reliability and makes it possible to download hublists even when the original hublist server is out of service.
+Shows status messages about the loading of public hub lists; "downloading": hub list is currently being downloaded from the server, this may take a while; "downloaded": hub list has been successfully downloaded from the server, and is currently being displayed; you're looking at a fresh version of the hub list; "loaded from chache": a previously saved hub list has been successfully loaded from your DC++ cache directory, and is currently being displayed; that version might be out-dated, if you want to refresh it, click on the "Refresh" button; error messages may also appear in this area: when a hub list download has failed, DC++ will automatically switch to the next hub list.
+Sum of the users numbers of every hubs in the current hub list.
+Add the hub list(s) specified in the field on the top left to your list of public hub lists.
+Open a dialog to edit addresses to selected hub lists.
+Write here the address to the hub list you want to add. You can add muliple hub lists at once by separating them with a semi-colon (';').
+Lists your current hub lists. The hub list on top will be tried first.
+Move selected hub lists downwards in the list. The hub list on top will be tried first.
+Move selected hub lists upwards in the list. The hub list on top will be tried first.
+Remove selected hub lists from your list of public hub lists.
+The total size (in bytes) of selected items.
+The amount of selected items.
+This will toggle the appearance of the "left screen".
+The total amount of bytes queued.
+The total amount of files queued.
+Search only selected hubs.
+If checked (default), when multiple search results are received for the same file (same TTH root), these search results will be merged into 1 entry.\line If unchecked, each search result will have its own entry in the search results list.
+Clear the contents of the "search history".
+Start searching for the set of search strings defined above. Note; you may not start too many searches in a small amount of time.
+This is the set of search strings to search for. Words beginning with "-" will be filtered away.
+Filter away files that are already in share.
+Filter away files depending on their file size.
+Filter away files depending on the user's free slots.
+Filter away files depending on their file type (extension). Not all possible extensions are included in some file type groups. If you search for newer or obscure file types, then it is recommended to use the {\i Any} option and include the file extension in the search string instead. Options other than {\i Any}, {\i Directory} & {\i TTH} are ignored for searches on ADC hubs.
+This controls the interval at which your shared directories are rescanned for new and changed content. This is measured in minutes. (default: 60 minutes)
+This will limit the amount of sources a file can have before it will no longer be auto searched for. For example, if this option is set to 2, if a file has more than or exactly 2 sources, the file will be excluded from the auto-search list.
+This setting allows you to bind DC++ to a particular IP address on your machine. Most users do not need to change the default value, 0.0.0.0. However, if you have more than one network interface connected to the internet, you can force DC++ to use a particular connection by entering its IP here. If binding fails, it will do so silently and INADDR_ANY will be used instead. If you experience connection problems make sure that this is set to default. (default: 0.0.0.0)\line {\i  This feature requires a restart to be fully effective.}
+This controls the size of the chunks that DC++ writes to disk for downloads. Measured in kibibytes. (default: 16 KiB)
+This setting controls the size of the maximum file list that DC++ will open, in mebibytes. This setting helps protect against malformed file lists that require large amounts of memory to decode. You may need to reduce or increase the value of this setting based on personal experience. (default: 512 MiB)
+This is the speed at which DC++ will hash your files, in MiB/s. It is limited by the speed of your disk subsystem, but it can be used to make hashing slower and less noticable. A "normal" hash speed may be anywhere from 20 to 50 MiB/s. (no default)
+This defines the size of the "mini slot". The minimum value for this setting is 64 KiB. (default: 64 KiB)
+This is your unique private ID (PID). This will later with an algorithm be used to identify you on ADC hubs. {\b Do not share this with other users.}
+The size of the buffer DC++ use to read sockets. Measured in bytes. (default: 8192 bytes)
+The size of the buffer DC++ use to write to sockets. Measured in bytes. (default: 8192 bytes)
+If you download files directly to a shared directory, enabling this option will add the files to your share as soon as they're finished. Searches will return the file, and users can download it. It will not appear in your file list until the next refresh.
+If you're using the "ADLSearch" features, keeping this option enabled will make a file show up in only the first search it matches. If disabled, it may appear multiple times, if it matches more than one search. {\i Disable if unsure.}
+Switch to away mode whenever the client is minimized (and to back whenever restored).
+A connected hub can send out a redirect request, asking your client to disconnect from the current hub and joining another one. Enable this to automatically join that other hub. (You will be disconnected from the current hub no matter what.) If you leave it disabled, you can use the Follow Redirect button to manually follow the redirect.
+The Direct Connect spirit is all about sharing. You are only sharing when you are connected to one or more hubs. In the past, users of questionable integrity and spirit logged onto a hub, selected a download, and disconnected from the hub again. If everyone did that, there would be nothing to download. Enable this option to avert that kind of behaviour. Note that you might need to disable this option if you're connected to a hub that has a bad connection. The user will regain his/her slot if he/she reconnects within 10 minutes, but you might have opened up another slot for another user in the mean time. This could cause a situation where you have way more upload slots in use than you selected in the settings. Also, if you quit the hub, people downloading from you will not be disconnected.
+With this option enabled, and "Automatically disconnect users who leave the hub", users who are in your "Favorite users" page are not disconnected.
+After each search, your search terms will be cleared. The last terms will be accessible through the drop-down. You can set how many terms that you want to save by using "Search history".
+When transfering data with a compatible client, DC++ will try to use ZLIB compression with integrity checks. This uses some CPU cycles, but can dramatically speed up transfers of uncompressed files as well as ensure file integrity (reduce the chance of corruption to near zero).{\i Enable if unsure.}
+With this option enabled, DC++ uses "The Coral Content Distribution Network" when establishing HTTP connections.\line If the download fails, DC++ tries again with the non-Coralized address.
+When enabled, it will make DC++ use a newer, different disk reading strategy for hashing files. This should be potentially more compatible with some disk devices.
+This option lets you enable or disable DC++'s ability to retrieve custom commands from a remote hub. Custom User Commands may show when you click on the hub's tab, or on a user in the Transfer View, Search Window, or User List, and can enable you to read the rules, perform operator functions, interact with hub bots, etcetera.
+If this option is disabled, DC++ will delete the contents of the file list directory, where file lists are stored, when exiting. However, you can open already downloaded file lists instead of downloading them again. These file lists have a chance of being out of date, but for users on slow connections, keeping file lists can save time. Since the file list isn't curent, don't be surprised if the files you enqueue to download have been removed by the user, or moved.
+Decides whether to remove duplicate files from your share or to list them but subtract their size from your total reported share size. Duplicate files never count towards your share size, no matter what this is set to.
+When set, DC++ will register itself to handle magnet: links. These links will let you search the Direct Connect network for a file matching a given file hash, given that the magnet link contains information appropriate for the Direct Connect network. Disabling will make DC++ remove the key from the Windows registry.
+When in away mode, don't send the away message to users that appear to be bots. Having this option disabled is very annoying if you get messages from bots that link chat from multiple users (the most well known example is the Operator Chat facility found in many hubs). Users are judged to be bots if they have an empty Connection type. {\i Enable if unsure.}
+Have DC++ draw its own menus, which allows icons and titles to be added. Disable to revert to classic Windows menus.
+With this option enabled, DC++ uses segmented downloading. i.e. it downloads each file in many parts simultaneously from all available sources.
+Enable this to send "/commands" that DC++ does not recognize to the hub as normal chat.
+Simple File Verification (SFV) is a scheme in which a set of files are accompanied by a so-called sfv-file which contains CRC32 checksums of each file. If there is an sfv-file included, DC++ will check that your download is free of corruption and retry the download that wasn't the case.
+When set, DC++ will be the default handler for all dchub://, adc:// and adcs:// links. These links can appear on web pages, internet shortcuts on your computer, or be typed and run as a program from the Start Menu. Disable this if you prefer for a different application to handle Direct Connect hub links. Disabling will make DC++ remove the keys from the Windows registry.
+Press up arrow while holding down CTRL to scroll through line history. If not enabled, you can still use ALT.
+Instead of the system's beep sound, you can select a different beep or tune for all above options. To assign a custom sound to one of them select the option in the list and click Browse. You can add only Wave (embedded) sound files (typically with .wav extension).
+You can preview the background color and text style before applying them.
+This will set the coloring for the download progress bars (default: RGB(55, 170, 85)).
+This setting determines the color and font used in many DC++ windows.
+This setting determines the background color of the windows in DC++.
+When set, the system's "Default Beep" sound will play when a main chat message is received.
+When set, the system's "Default Beep" sound will play when a private message is received.
+When set, the system's "Default Beep" sound will play when a private message window is opened.
+This will set the coloring for the upload progress bars (default: RGB(205, 60, 55)).
+With this option enabled, DC++ will sort the downloads and uploads; Current download(s), waiting download(s), current upload(s) and waiting upload(s).\line With this option disabled, DC++ will sort downloads and uploads; Current download(s), current uploads(s), waiting download(s) and waiting upload(s).
+When enabled, the tray icon will be always shown, regardless of the visibility state of DC++ program window.
+This is the default away message that will appear when someone PMs you for the first time while you are in the away mode. You can activate away mode by using the "/away <message> and /back chat commands" or "Auto-away on Minimize option". All time formatting variables are available, see "Logs". Use Ctrl + Enter to create a new line.\line (default: "I'm away. State your business and I might answer later if you're lucky.")
+With this option enabled, only the joining and parting of "Favorite Users" are shown.
+When enabled, kick, debug and other spam messages are hidden from main chat. These messages are generally not useful and make reading the chat more troublesome.
+When selected, country codes for your uploaders and downloaders appear in the "Connections" window. This function uses the "GeoIPCountryWhois.csv" database provided by "MaxMind".
+This drop-down list allows you to choose which language DC++ should use for its user interface and messages. "Default" means "use the same language as my operating system".
+Use these 2 boxes to control how much you want message editing boxes (in "Hub" and "사적인 메시지" windows) to resize themselves when you are composing a multiline message. Both settings can have the same value, in which case the message editing box will never redraw itself. Minimum value: 1. Default values: 1 and 10.
+When enabled, minimizing DC++ will cause it to appear as an icon in the windows system tray. If you left click, it will be returned to its previous status. If you right click on the icon, it will give you a small menu.
+Note: Most of these options require that you restart DC++. (Fonts, colors and icons are loaded at startup only. Window settings are loaded when opening a new window.)
+Show an entry in main chat whenever someone joins or leaves the hub. Use the "/showjoins chat command" to enable or disable it on already open hubs. {\i On large hubs, you don't want this enabled.}
+With this option enabled, those users who are "favorite users" will be sorted first in user lists.
+Show some messages destined for the Status Bar in main chat as well. {\i It's generally a good idea to leave this enabled.}
+This option will show time stamps on chat lined in newly opened hubs. In order to show them in an already open hub, use the "/ts chat command". To customize the format of the time stamps, see the "Set Timestamps" option below.
+This lets you select the format of the time stamps that can appear in the chat and private message windows. For the available formatting variables, please see "Logs".\line (default: %H:%M)
+Enable this option to use a monospaced font more suitable for viewing NFO files in the built-in text viewer (the "View as Text" function).
+If you have this option on, DC++ will use the per-extension icons from Windows Explorer. {\i Turning on this option slows browsing file lists a bit.}
+This specifies the maximum download rate value in KiB/s. Zero value means no limiting at all. (default: 0)
+This specifies the maximum download rate value for the alternative limiting period in KiB/s. Zero value means no limiting at all. (default: 0)
+With this function you can specify alternate bandwidth limiting and upload slot values to be used in a certain time interval of a day. Note that setting the same time value for beginning and ending will disable the function.
+Here you can set the number of opened upload slots for the alternative limiting period. (default: 1)
+This specifies the maximum upload rate value for the alternative limiting period in KiB/s. Zero value means no limiting at all. (default: 0)
+This specifies the maximum upload rate value in KiB/s. Zero value means no limiting at all. (default: 0)
+With this option disabled, all client you connect to must have a certificate in your Trusted certificate folder.
+With this option disabled, all hubs you connect to must have a certificate in your Trusted certificate folder.
+This file is the certificate file you should give to other users and hubs that you want to consider "trusted".
+This file is your personal and private certificate file. {\b Do not share this with other users or hubs.} If you do, you risk allowing others to use your certificate and in essence pose as you.
+Where trusted certificates from users or hubs will be stored. (default: the "Certificates\\" subdirectory of where you've installed the application.)
+When this option is enabled, DC++ will connect to remote clients on an ADC hub that support SSL using SSL. This option is an experimental one, and shouldn't imply that DC++ is secure in any way.
+After a download is complete, DC++ tries to move your just finished file to this directory. The default location of the directory depends on what kind of installation method used to install DC++. If you used the installer (.exe) then your finished downloads will be placed to a folder in your Windows user profile. In a typical case the default path of the finished downloads is\line {\i C:\\Documents And Settings\\[your username]\\Application Data\\DC++\\Downloads\\} for {\ul Windows 2k and XP}; {\i C:\\Users\\[your username]\\Downloads\\} in case of {\ul Windows Vista or Windows 7}.\line If you installed the portable (zip archive) version of DC++ then the finished downloads folder defaults to the "Downloads\\" subdirectory under where the DC++ executable is located. The directory will be automatically created if needed in both cases.\line Make sure you have enough disk space for your downloads, have write access to the directory and have an appropriate file system if you download large files (note that maximum possible size for a file on a FAT32 volume is 4 GiB).\line If the target volume runs out of space, DC++ will keep your downloaded files in the Unfinished Downloads Directory having renamed them to their original filename.
+This limits the number of simultaneous downloads. A value of 0 means no limit. (default: 3)
+These settings are to avoid overloading your internet connection with a large number of simulatenous downloads. However, for both values listed below, certain conditions can result in the limits not being obeyed. Specifically, up to 3 files that are set to the 'highest' priority can be transferred while other downloads are going. File lists and small files (64 kibibytes or smaller) are queued with 'highest' as their priority. When either of the limits are hit, DC++ shows "All download slots taken" next to each source in the status column of the Connections tab.
+This is another method of limiting simultaneous downloads, designed to prevent new downloads if your existing downloads exceed a specific threshold. It's measured in kibibytes per second, and a value of zero will disable this limit.\line Note; because of changing download speeds, this is not 100% accurate...
+This HTTP proxy will {\ul only} be used to request the Public Hub List specified above. It's {\ul not} used for uploads, downloads, or connecting to a hub.
+All incomplete downloads will be stored in this directory. If you leave it empty, temporary downloads will be stored in the default unfinished files folder. The default location of the Incomplete folder depends on what kind of installation method used to install DC++. If you used the installer (.exe) then your finished downloads will be placed to a folder in your Windows user profile. In a typical case the default path of the unfinished downloads is\line {\i C:\\Documents And Settings\\[your username]\\Local Settings\\Application Data\\DC++\\Incomplete} for {\ul Windows 2k and XP}; {\i C:\\Users\\[your username]\\AppData\\Local\\DC++\\Incomplete} in case of {\ul Windows Vista or Windows 7}.\line If you installed the portable (zip archive) version of DC++ then the finished downloads folder defaults to the "Incomplete\\" subdirectory under where the DC++ executable is located. The directory will be automatically created if needed in both cases.\line Make sure you have enough disk space for your unfinished downloads, have write access to the directory and have an appropriate file system if you download large files (note that maximum possible size for a file on a FAT32 volume is 4 GiB). From version 0.700 on of DC++, the antifragmentation method must always be used for segmented downloads to work correctly. Hence DC++ tries to reserve the full space needed for the file when starting the download. In case of an error (eg. when the drive that holds your Unfinished Downloads runs out of space), you will get an error message going like "Not enough space on the disk" even if your target drive does have enough free space! Incomplete file names follow the following rule: <filename>.<ext>.<TTH>.dctmp.\line You can use the {\b %[targetdrive]} variable in order to have unfinished download directories in all of your target drives. This way, unfinished download directories will be distributed amongst all of your drives, resulting in a smaller chance of runnig out of disk space.\line {\ul Example}: when %[targetdrive]DCUnfinished\\ is set as the unfinished downloads directory, DC++ creates incomplete files in E:\\DCUnfinished\\ when you download to any target folder located on drive E: and so on...\line The %[targetdrive] variable is also useful if you often download larger files to a drive other than the one that contains your usual unfinished directory. At the end of a successful download, moving a large file from the unfinished folder to its target can be very time and resource consuming, especially when moving files to another partition of the same physical drive.
+Browse for a new folder to add to the list. After selecting the directory to add, you will be able to define the virtual name under which it will appear in the menu.
+To add directories to your "Download to" menu (file context menu in the "Search" window), you can use the Add and Remove buttons, or drag and drop folders from a Windows Explorer window.
+Remove the selected folder(s).
+Rename the selected folder(s).
+This drop-down contains a number of common upload speeds (in MiB/s), please choose the one closest to your own. Do not put in your download speed; this setting is a measure of how fast a source you are likely to be for other users.
+This description will show in the user list. It can be overridden on a per-hub basis in the "Favorite Hub" Properties.
+This field is for sharing your email address, if you wish it.
+This nickname, or handle, will identify you when you join a hub. It can be overridden on a per-hub basis in the "Favorite Hub" Properties.
+This is general information about yourself. The nick is required, though it's suggested that you pick the correct connection type as well.
+The number of lines that will be read from the main chat log and displayed when a new "Hub" window is opened. (default: 10)\line Note that "main chat logging" must be enabled.
+The number of lines that will be read from the private message log and displayed when a new "사적인 메시지" window is opened. (default: 10)\line Note that "private message logging" must be enabled.
+The maximum number of recent "File List" windows that DC++ keeps track of.
+The maximum number of recent "Hub" windows that DC++ keeps track of.
+The maximum number of recent "사적인 메시지" windows that DC++ keeps track of.
+The number of old search lines that will be shown in the drop-down control of the "Search" window. (default: 10)
+All logs generated by DC++ will be put in this subdirectory.\line {\b Default:} The "Logs" subdirectory under where you've installed the application.
+Enables logging of completed downloads. File list downloads may not be logged if you've "disabled them".
+Add successful file list transfers to your upload and download logs. If this option is disabled, file list transfers do not appear in the "Finished downloads" and "Finished uploads" windows. Disabled by default.
+Enables logging of the main chat of any hubs you're in.
+Enables logging of Private Messages.
+Enables the logging of status messages. Examples of such messages are: Connected to (and disconnected from ) hub, kicked, and banned messages. In short all messages that would appear below the chat input in the hub windows.
+Enables logging of system-level messages. Examples of such messages are: notifications of files that have finished hashing, share refreshes, discovery of duplicate files, and disconnections of users who leave the hub (if "enabled").
+Enables logging of completed uploads. File list uploads may not be logged if you've "disabled them".
+This value defines the maximum number of characters allowed to appear on each tab. When the title of a tab exceeds that value, it is cut accordingly and appended with "...". A value of 0 means infinite. (default: 20)\line Note; any value lower than or equal to 3 also means infinite.\line Note; DC++ needs to be restarted for this setting to take effect.
+Select this mode if your computer is connected directly to the internet. {\b Do {\ul not} select this mode if you have a router or any external firewall.} If your computer is not behind a router all you have to do is to choose this option and usually you don't need to alter anything more in the connection settings. However, if you have a software firewall installed or built-in Windows firewall enabled, you may need further configuration in the firewall to allow Internet access for DC++.
+Select this mode if you can make unrestricted outbound connections. This includes connecting to any IP address on any port. Choose this option if unsure.
+This field specifies your external IP address. {\i If you unsure and use any conncetion mode option {\ul other than}} 'Manual port forwarding (I have configured my router by myself)' {\i then leave this field blank.} If your computer is directly connected to the internet, your internal and external IP is the same and can easily be automatically detected. Fill in this box {\b only} if you need to override the auto-detection. Ordinarily, only users behind a firewall/router (NAT device) may need to fill in this box. If you put a DNS name here, DC++ will try to resolve it into an IP address before use. To know how to determine your external IP address follow the "connection setup part" of the "Get Started guide" or the detailed "Active mode FAQ".
+Select this mode if you are behind a firewall (router), and will set up the TCP, UDP and TLS port forwarding on your own. You {\ul will} need to specify the external IP address of your router using the setting below if you want downloads to work properly. Use this mode only if the previous ones are not options for you. You can read the "Active mode guide" to get help how to set up manual port forwarding.
+Select this mode if none of the previous Active mode options apply. In this mode, DC++ will not try to make inbound connections, only outbound ones. This mode carries some serious limitations: only 5 results per user will be returned in response to searches; you will not be able to download from other passive users; you may won't be able to search and/or download on certain hubs;
+Select this mode if you are behind a firewall/router that supports the UPnP standard for program auto-configuration. Most routers do support UPnP but you may need to enable it in the router's configuration page. This way DC++ will automatically open the ports it needs and obtain your external IP address as well. This mode is available only in Windows XP and newer operating systems. In case of problems there is a complete "guide to configuring and troubleshooting UPnP".
+Enable this to always use the IP address in "External / WAN IP", and not let either UPnP or connected hubs change it. If unsure leave this setting disabled.
+This is the port that DC++ listens on for incoming client connections. If this port incorrectly forwarded you won't be able to download. {\i If you unsure and use any conncetion mode option {\ul other than}} 'Manual port forwarding (I have configured my router by myself)' {\i then leave this field blank.}
+This is the port that DC++ listens on for "TLS encrypted" connections. If this port incorrectly forwarded you won't be able to search and/or download on specific ADC hubs where secure connections required. {\i If you unsure and use any conncetion mode option {\ul other than}} 'Manual port forwarding (I have configured my router by myself)' {\i then leave this field blank.} However, if specified, {\b this port value should be different than the ones that used for TCP or UDP.}
+This is the port that DC++ listens on for incoming search results. If this port incorrectly forwarded you won't be able to receive search results. {\i If you unsure and use any conncetion mode option {\ul other than}} 'Manual port forwarding (I have configured my router by myself)' {\i then leave this field blank.}
+Select this mode if you want to make outbound connections through a SOCKS proxy. The caveats for Passive mode also apply here. SOCKS5 proxies are {\ul not} the same as HTTP proxies. DC++'s SOCKS5 support does {\ul not} include GSSAPI.
+Password for the SOCKS5 proxy; may be required.
+The port that your SOCKS5 server runs on. The default is 1080.
+Enable this to use the SOCKS5 proxy, instead of the local name server, to resolve host names into IP addresses.
+This is the IP, not host name, of your SOCKS5 server.
+Login name for the SOCKS5 proxy; may be required.
+Autodrop allows automatical removal (or disconnecting) of slow download sources. By default, slow sources are removed.\line All of these autodrop options are necessary to estimate and disconnect/drop sources properly.
+This option removes the slow sources for all queue items (except file lists).\line To enable autodrop, turn on either "Autodrop slow sources for all queue items" or "Remove slow file lists" (or both of them).
+With this option enabled, sources will only be disconnected but not removed from the queue.
+Amount of time (in seconds) that has to pass since the download started before a source can be dropped. (default: 15 s)
+With this option enabled, DC++ will delete a file list whose speed was recognized as too slow.\line To enable autodrop, turn on either "Autodrop slow sources for all queue items" or "Remove slow file lists" (or both of them).
+Minimum filesize before sources will be dropped (in KiB). (default: 0 KiB)
+This is the maximal time since the last chunk of data for the file was recieved. It is meant to improve speed measurement accuracy and to prevent dropping sources that are going to be disconnected only because of their current inactivity. (default: 10 s)
+Check every x second(s) if the source is slow. (default: 10 s)
+Minimum amount of sources before any sources will be dropped. (default: 1)
+If the download speed of a file is below the entered value, the source will be dropped. (default: 1024 B/s)
+Autoprio allows setting the queue item priority automatically when adding it to the download queue. A user can then change the priority of a file manually.\line Priority conditions are checked from the Highest to the Lowest priority, when assigning a priority to a new queue item. A zero means that the given priority level won't be used - except Normal priority, which is the default priority. Lowest possible value for the Highest priority is 16 KiB.
+Every few minutes, the client will search for files in your Download Queue to find more download locations (more users/sources). The autosearch will find exact matches by searching via hash. {\i  The drawback is that it may won't find much more sources and will prevent manual searches on hubs where a predefined search interval rule is in effect. } To avoid constant auto searches you can set the maximal number of sources that files can have when you specify a number in "Auto search limit" setting.
+Enable to automatically download a user's list and match them as sources for files in your Download Queue when they've been discovered as a source for one of the files you're downloading. If you download files in sets, that user is probably a source for many more files you're downloading. {\i Enable if unsure. The drawbacks are that it might add slower sources, possibly increasing the time needed to complete a download, and that you'll download a lot of file lists.}
+This option will stop you from downloading files which already exist in your queue.
+This option will stop you from downloading files which already exist in one of your shared directories.
+Enable this option if you want to keep downloaded files and folders in the download queue after they have been finished. After downloaded the queue items will have 'Finished' status and you can delete these finished entries anytime later. Using this function you can keep track of what files are already downloaded right there in the download queue without the need of checking the "Finished Downloads" window. Note that if you physically move/delete your downloaded files from their target location, it won't result automatic deletion of the corresponding finished entries from the queue. If you disable this function, it won't remove existing finished items from the queue either, you must do that manually.
+Files with the same or under the entered size, but above Highest prio max size, will be set to High as priority. (default: 0 KiB)
+Files with the same or under the entered size will be set to Highest as priority. (default: 64 KiB)
+Files with the same or under the entered size, but above Highest, High and Normal prio max size, will be set to Low as priority. (default: 0 KiB)
+With this enabled, files that are larger than Low prio max size are set to Lowest as priority. If disabled, the files will be set to Normal as priority.
+Files with the same or under the entered size, but above Highest and High prio max size, will be set to Normal as priority. (default: 0 KiB)
+When this option is enabled, any zero byte files you try to download will be silently skipped. Sometimes empty files contain information through their naming. However every file, even an empty one, will consume some drive space.
+Ask for a new name to identify the search type to add, then open a dialog to add file type extensions associated to the new search type.
+Erase all customized search types and reset the list to its default values. This action cannot be undone.
+Lists search types to be used when initiating a search via the "Search" window. Each search type is associated to a set of file type extensions which can be configured here.\line Note; Custom search types will only be applied to {\b ADC} hubs!\line On {\b NMDC} hubs, using a predefined search type will only search for a set of predefined, unconfigurable extensions; using a custom type will default to searching for any extension.
+Open a dialog to change the file type extensions associated to the currently selected search type.
+Remove the currently selected search type. Predefined types cannot be removed.
+Change the name of the currently selected search type. Predefined types cannot be renamed.
+When a download completes, the "Finished Downloads" tab will be highlighted if this option is selected.
+When an upload completes, the "Finished Uploads" tab will be highlighted if this option is selected.
+When the content of a "File List" window that's not focused has changed, the tab will be highlighted if you have this option selected.
+When a chat message appears in a "Hub" window that's not focused, the tab will be highlighted if you have this option selected.
+When a private message appears in a "Private message" window that's not focused, the tab will be highlighted if you have this option selected.
+This option controls whether or not the "Download Queue"'s tab will highlight itself when a queue item changes state or finishes.
+When a search result is received in a "Search" window that's not focused, the tab will be highlighted if you have this option selected.
+When an entry is added to the "Search Spy" window while it is out of focus, the tab will be highlighted if you have this option selected.
+When an entry is added to the "System Log" window while it is out of focus, the tab will be highlighted if you have this option selected.
+When a user or an item is added or removed to the "Waiting Users" window while it is out of focus, the tab will be highlighted if you have this option selected.
+여기에 설정 범주를 선택합니다.
+Open the User Command dialog to create a new user command and add it to the list.
+Open the currently selected user command in the User Command dialog in order to change it.
+List of your current user commands.
+Move the currently selected user command downwards in the list.
+Move the currently selected user command upwards in the list.
+Remove the currently selected user command.
+Browse for a new folder to add to your share. If another existing file shares that name, the new name will be made unique by adding another letter to its name. After selecting the directory to add, you will be able to pick the Virtual Name that it will be shown under when other users see your files. You are allowed to merge different folders into one virtual folder using the same Virtual Name. Their content will be shown as one folder in your filelist. If the newly added files have not been hashed, the Hash Progress Dialog will display. You can choose to let it display, or let hashing continue in the background.
+To add directories to your share, you can use the Add and Remove buttons, or drag and drop folders from a Windows Explorer window. Beginning with version 0.4032, files will be shared only once they have been hashed.
+If the average upload speed drops below the given number, an additional upload slot will be granted. These slots are granted once every 30 seconds at maximum. If the speed of the original uploads increases, the granted slot will not be closed.
+Remove the selected folder(s).
+Change the virtual name on a shared folder. Note: the client will appear to freeze when you exit settings, this is due to a refresh of the file list.
+Share files with the Hidden attribute set and files inside directory with the Hidden attribute set. With this option off, files starting with a . (full stop) will not be shared. Note: this option requires a refresh of the file list, and may cause the client to appear to freeze.
+Configure the number of slots that other users can occupy to download files from you. A remote user can use only one slot for each hub that they're on with you. DC++ supports uploading file lists and files below "64 KiB" to other DC++ users without requiring a slot. There's a max of 3 connections in addition to normal slots, these are called mini slots.\line Note: If a user leaves the hub, DC++ will close his slots; if the user is back within 10 minutes, DC++ will grant him a slot. (This will only happen if "Automatically disconnect users who leave the hub" is enabled.) This can cause your upload slots to go over the maximum set in settings.
+Enabling this option will cause DC++ to prompt before you remove an ADL Search item from the "ADL Search" window.
+Enabling this option will cause DC++ to prompt you before exiting.
+Enabling this option will cause DC++ to prompt before you close a "hub" window.
+Enabling this option will cause DC++ to prompt before you remove a favorite hub.
+Enabling this option will cause DC++ to prompt before you remove a file (or files) from the "download queue".
+Enabling this option will cause DC++ to prompt before you remove a favorite user.
+Enable this if you wish to ignore private messages from bots. However, these messages generally contain useful information, like hub specific rules or warnings.
+Enable this if you wish to ignore private messages from the hub. However, these messages generally contain useful information, like hub specific rules or warnings.
+When using /join <ip>, a new window with the hub will open.
+Keep this disabled if you want newly downloaded file lists to pop up in front of other windows. {\i It can be very annoying to have a new window pop up when you're typing something.}
+Keep this disabled if you want new private messages file lists to pop up in front of other windows.
+Enable this if you want messages from the hub in their own window. When disabled they get sent as a status message in main chat instead which is less annoying yet still informative. {\i This option only matters if you're not ignoring private messages from hubs.}
+Enable this if you want messages from hub bots in their own window. When disabled they get sent as a status message in main chat instead which is less annoying yet still informative. {\i This option only matters if you're not ignoring private messages from bots.}
+If you disable this option, a private message from a user appears as a status line in main chat instead of in a separate window. This could cause you to miss some messages if you don't check the chat regularly. {\i You may not care much for private messages from other users. Ignoring them however, not only lessens the (user-friendly) Direct Connect experience, but is not always wise because failing to reply to a message from an Operator can get you kicked or, in the worst case, permanently banned from that hub.}
+When being prompted for a password in a hub, you will with this option enabled have a box popup and will allow you to enter your password. With this option disabled, you will be prompted with a "/password" instead.
+With this option enabled, clicking on an active tab will mimic the behavior of Windows 98+ and send the currently active window to the background. The most recently accessed window will become the new active window.
+The amount of searches performed divided by the amount of seconds you have had this window open.
+The amount of search results your copy of DC++ has sent out in response to the searches you see in this window.
+Ratio between the total amount of searches versus the amount of hits.
+Check this checkbox to filter out TTH searches. Note that DC++ will still respond to them; you will just not see them in this window.
+The amount of total searches performed.
+Add the item specified in the field on the top left to the current list.
+Open a dialog to edit currently selected items.
+Use this input box to write a new item you want to add.
+Shows the current list. It will only be altered once you have pressed "OK".
+Move selected items downwards in the list.
+Move selected items upwards in the list.
+Remove selected items from the current list.
+Open the "ADL Search" window.
+Open the "Favorite Hubs" window.\line Use the arrow placed on the right of the icon to easily connect to one of your favorite hubs without having to open the "Favorite Hubs" window.\line Consult the help topic associated to the "Favorite hub groups" dialog to find out how to add sub-menus to the menu that appears under the arrow.
+Open the "Favorite Users" window.
+Open a file list previously saved on your disk (a dialog will appear so you can pick the one you wish to open).
+Open the "Finished Downloads" window.
+Open the "Finished Uploads" window.
+Follow the redirection offered by the hub which is currently in the foreground.
+Open the "Notepad" window.
+Open the "Public Hubs" window.
+Open the "Download Queue" window.
+Open menus with MRU lists of recently opened windows. The list is saved across DC++ restarts.
+Reconnect (disconnect and connect again) the hub which is currently in the foreground.
+Open the "Search" window.
+Open the "Search Spy" window.
+Open the Settings dialog.
+Open the "Waiting Users" window.
+You can get help on specific parts of DC++ by using the "What's This?" help button: click it once, and your mouse cursor will change into a help cursor; then click on the control you wish to get help for.
+Sends command as if you were typing it in the chat
+Command text (may contain any of the variables listed below). Use Ctrl + Enter to create a new line.
+Contexts determine where the command is shown.
+File list context menu
+Hub address as typed when connecting. "op" = NMDC hubs where you are an operator, "adc://" = all ADC hubs, "adc://op" = ADC hubs where you are an operator, "adcs://" = all "secured" ADC hubs. If empty, and the "Raw" type is selected, then only NMDC hubs will match; if empty, and the "Chat" or "Private Message" types are selected, then all hubs will match regardless of their protocol.
+Hub tab (at the top of the screen) context menu
+Name as displayed in the menu (use '/' to create sub-menus, and '//' to actually write a slash)
+Private Message recipient
+Send only once per user from search or file lists, regardless of how many files have been selected per user.
+Sends command as if you sent it by PM
+Sends raw command to the hub (experts only, end it with '|' in NMDC hubs and '\\n' in ADC hubs!)
+Search context menu
+Adds a separator to the menu
+User context menu in chat and PM tab menu

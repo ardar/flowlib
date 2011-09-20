@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<ScriptPlugin>
+	<Engine language="lua" scriptPath="scripts/">
+		<Script>access.lua</Script>
+		<Script>history.lua</Script>
+	</Engine>
+</ScriptPlugin>

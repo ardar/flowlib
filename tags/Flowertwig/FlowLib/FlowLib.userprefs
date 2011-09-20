@@ -1,0 +1,39 @@
+﻿<UserCombinePreferences version="1.0" filename="/home/mattias/SVN/FlowLib/trunk/FlowLib/FlowLib.sln">
+  <Files>
+    <File name="Utils/FileLists/FilelistXmlBz2.cs" line="197" column="41" />
+    <File name="Utils/Compression/ZLibSubMethods/PendingBuffer.cs" line="101" column="35" />
+    <File name="Utils/Compression/ZLibSubMethods/ZipOutputStream.cs" line="191" column="16" />
+    <File name="Utils/Compression/ZLibSubMethods/DeflaterHuffman.cs" line="206" column="55" />
+    <File name="Protocols/transfernmdcprotocol.cs" line="863" column="28" />
+    <File name="Managers/Transfermanager.cs" line="187" column="22" />
+    <File name="Connections/UdpConnection.cs" line="54" column="14" />
+    <File name="Connections/Hub.cs" line="367" column="17" />
+  </Files>
+  <Views>
+    <ViewMemento id="ProjectPad">
+      <Node expanded="True">
+        <Node name="FlowLib" expanded="True">
+          <Node name="Connections" expanded="True" />
+          <Node name="Containers" expanded="True">
+            <Node name="Security" expanded="True" selected="True" />
+          </Node>
+          <Node name="Managers" expanded="True" />
+          <Node name="Protocols" expanded="True" />
+          <Node name="Utils" expanded="True">
+            <Node name="Compression" expanded="True">
+              <Node name="ZLibSubMethods" expanded="True" />
+            </Node>
+            <Node name="FileLists" expanded="True" />
+          </Node>
+        </Node>
+      </Node>
+    </ViewMemento>
+    <ViewMemento id="ClassPad">
+      <Node expanded="True" />
+    </ViewMemento>
+  </Views>
+  <Properties>
+    <Property key="ActiveWindow" value="/home/mattias/SVN/FlowLib/trunk/FlowLib/Connections/Hub.cs" />
+    <Property key="ActiveConfiguration" value="Debug|Any CPU" />
+  </Properties>
+</UserCombinePreferences>
