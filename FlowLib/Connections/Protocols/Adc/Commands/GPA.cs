@@ -1,7 +1,7 @@
 ﻿
 /*
  *
- * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2010 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,15 +19,36 @@
  *
  */
 
-namespace FlowLib.Interfaces
+using Flowertwig.Utils.Connections.Interfaces;
+
+namespace FlowLib.Connections.Protocols.Adc.Commands
 {
-    public interface IBaseUpdater
+    #region Receive AND Send
+
+    #endregion
+    #region Send
+
+    #endregion
+    #region Receive
+
+    public class GPA : AdcBaseMessage
     {
-        #region Events
-        /// <summary>
-        /// This is so gui can send out events to the base class.
-        /// </summary>
-        event Flowertwig.Utils.Events.EventHandler UpdateBase;
-        #endregion
+        protected string randomData = null;
+
+        public string RandomData
+        {
+            get { return randomData; }
+        }
+
+        public GPA(IConnection con, string raw)
+            : base(con, raw)
+        {
+            if (param.Count >= 1)
+            {
+                randomData = param[0];
+                valid = true;
+            }
+        }
     }
+    #endregion
 }

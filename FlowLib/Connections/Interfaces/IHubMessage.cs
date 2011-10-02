@@ -19,15 +19,35 @@
  *
  */
 
-namespace FlowLib.Interfaces
+using Flowertwig.Utils.Connections.Interfaces;
+
+namespace FlowLib.Connections.Interfaces
 {
-    public interface IBaseUpdater
+    public interface IHubMessage : IConMessage
     {
-        #region Events
-        /// <summary>
-        /// This is so gui can send out events to the base class.
-        /// </summary>
-        event Flowertwig.Utils.Events.EventHandler UpdateBase;
-        #endregion
+        bool IsValid
+        {
+            get;
+            set;
+        }
+
+        //IHub Hub
+        //{
+        //    set;
+        //    get;
+        //}
+        string From
+        {
+            get;
+        }
+        string To
+        {
+            get;
+        }
+        string Raw
+        {
+            get;
+            set;
+        }
     }
 }

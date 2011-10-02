@@ -19,85 +19,72 @@
  *
  */
 
-namespace FlowLib.Interfaces
+using Flowertwig.Utils.Entities;
+using Flowertwig.Utils.Events;
+using FlowLib.Entities;
+
+namespace FlowLib.Connections.Interfaces
 {
-    public interface IErrorReporting
+    public interface ITransfer : IDirectConnectConnection
     {
         /// <summary>
-        /// Gets true if [OK] is reseived from server.
+        /// Occurs when DownloadItem has been changed.
         /// </summary>
-        bool ResponseOk
+        event EventHandler DownloadItemChanged;
+
+        SegmentInfo CurrentSegment
         {
             get;
+            set;
         }
-        /// <summary>
-        /// Gets response from server.
-        /// </summary>
-        string Response
+
+        long LastEventTimeStamp
         {
             get;
+            set;
         }
+
         /// <summary>
-        /// Has Report been sent?
+        /// Source releated to this transfer
         /// </summary>
-        bool ReportSent
+        Source Source
         {
             get;
+            set;
         }
+
         /// <summary>
-        /// Gets url used when report sent.
+        /// Current ContentInfo for this connection.
         /// </summary>
-        string Url
-        {
-            get;
-        }
-        /// <summary>
-        /// Gets/sets if clients unice id should be sent.
-        /// </summary>
-        bool SendUniceId
+        DownloadItem DownloadItem
         {
             get;
             set;
         }
         /// <summary>
-        /// Gets full report
+        /// User that representate us
         /// </summary>
-        string Report
+        UserInfo Me
         {
             get;
+            set;
         }
         /// <summary>
-        /// Gets error report.
+        /// Other user we are connected to
         /// </summary>
-        string ErrorReport
+        UserInfo User
         {
             get;
+            set;
         }
+
         /// <summary>
-        /// Gets environment report.
+        /// Current ContentInfo for this connection.
         /// </summary>
-        string EnvironmentReport
+        ContentInfo Content
         {
             get;
+            set;
         }
-        /// <summary>
-        /// Gets gui.
-        /// </summary>
-        IBaseUpdater Gui
-        {
-            get;
-        }
-        /// <summary>
-        /// Generating report.
-        /// </summary>
-        void GenerateReport();
-        /// <summary>
-        /// Try to send report to server.
-        /// </summary>
-        void SendReport();
-        /// <summary>
-        /// Parsing response from server.
-        /// </summary>
-        void ParseResponse();
     }
 }

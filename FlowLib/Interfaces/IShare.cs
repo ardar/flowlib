@@ -19,10 +19,9 @@
  *
  */
 
-using FlowLib.Containers;
 using System.Collections.Generic;
-using System;
-using FlowLib.Events;
+using Flowertwig.Utils.Entities;
+using Flowertwig.Utils.Events;
 
 namespace FlowLib.Interfaces
 {
@@ -31,32 +30,32 @@ namespace FlowLib.Interfaces
         /// <summary>
         /// Is triggered when a virtual directory has been added
         /// </summary>
-        event EventHandler<EventArgs> VirtualDirAdded;
+        event EventHandler VirtualDirAdded;
         /// <summary>
         /// Is triggered when a virtual directory has been removed
         /// </summary>
-        event EventHandler<EventArgs> VirtualDirRemoved;
+        event EventHandler VirtualDirRemoved;
         /// <summary>
         /// Is triggered when hashing process starts
         /// </summary>
-        event EventHandler<EventArgs> HashingStarted;
+        event EventHandler HashingStarted;
         /// <summary>
         /// Is triggered when hashing process ends
         /// </summary>
-        event EventHandler<EventArgs> HashingCompleted;
+        event EventHandler HashingCompleted;
         /// <summary>
         /// Is triggered when a ContentInfo should be hashed.
         /// This is so you can extend hashing and not use Tiger Tree Hash.
         /// </summary>
-        event FmdcEventHandler HashContentInfo;
+        event EventHandler HashContentInfo;
         /// <summary>
         /// Is triggered when a error is triggered
         /// </summary>
-        event FmdcEventHandler ErrorOccured;
+        event EventHandler ErrorOccured;
         /// <summary>
         /// Value indicating when share was updated has been changed
         /// </summary>
-        event FmdcEventHandler LastModifiedChanged;
+        event EventHandler LastModifiedChanged;
 
         /// <summary>
         /// Adds ContentInfo to share

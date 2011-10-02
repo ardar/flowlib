@@ -19,15 +19,20 @@
  *
  */
 
-namespace FlowLib.Interfaces
+using Flowertwig.Utils.Connections.Interfaces;
+using Flowertwig.Utils.Events;
+
+namespace FlowLib.Connections.Interfaces
 {
-    public interface IBaseUpdater
+    public interface IProtocolTransfer : IProtocol
     {
-        #region Events
-        /// <summary>
-        /// This is so gui can send out events to the base class.
-        /// </summary>
-        event Flowertwig.Utils.Events.EventHandler UpdateBase;
-        #endregion
+        event EventHandler ChangeDownloadItem;
+        event EventHandler RequestTransfer;
+        event EventHandler Error;
+
+        void OnDownload();
+        [System.Obsolete("This method is depricated. Please use GetSegment instead")]
+        void GetDownloadItem();
+        bool GetSegment(bool requestNewDownloadItem);
     }
 }
