@@ -19,15 +19,13 @@
  *
  */
 
-namespace FlowLib.Interfaces
+using Flowertwig.Utils.Events;
+using FlowLib.Interfaces;
+
+namespace FlowLib.Connections.Interfaces
 {
-    public interface IBaseUpdater
+    public interface IUPnPUpdater : IBaseUpdater
     {
-        #region Events
-        /// <summary>
-        /// This is so gui can send out events to the base class.
-        /// </summary>
-        event Flowertwig.Utils.Events.EventHandler UpdateBase;
-        #endregion
+        void FireUpdateBase(DefaultEventArgs e);
     }
 }

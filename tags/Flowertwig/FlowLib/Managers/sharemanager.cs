@@ -1,4 +1,4 @@
-
+﻿
 /*
  *
  * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
@@ -19,9 +19,10 @@
  *
  */
 
-using FlowLib.Containers;
 using System.Collections.Generic;
-using FlowLib.Events;
+using Flowertwig.Utils.Entities;
+using Flowertwig.Utils.IO;
+using FlowLib.Entities;
 using FlowLib.Interfaces;
 
 namespace FlowLib.Managers
@@ -226,8 +227,8 @@ namespace FlowLib.Managers
         public void Save(string dir)
         {
             directory = dir;
-            SettingsGroup setting = new SettingsGroup();
-            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            var setting = new SettingsGroup();
+            var sb = new System.Text.StringBuilder();
             foreach (KeyValuePair<string, IShare> item in shares)
             {
                 sb.Append(item.Key);
@@ -235,7 +236,7 @@ namespace FlowLib.Managers
             }
             if (sb.Length > 0)
                 setting.Add(IndexShareNames, new SettingItem(sb.ToString(), null));
-            FlowLib.Utils.FileOperations.PathExists(dir);
+            FileOperations.PathExists(dir);
             SettingsGroup.Save(dir + FileName + ".xml", setting, FileName);
             setting = null;
         }

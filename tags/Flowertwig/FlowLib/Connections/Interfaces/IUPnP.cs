@@ -19,15 +19,39 @@
  *
  */
 
-namespace FlowLib.Interfaces
+using System.Collections.Generic;
+using FlowLib.Entities.UPnP;
+
+namespace FlowLib.Connections.Interfaces
 {
-    public interface IBaseUpdater
+    public interface IUPnP
     {
-        #region Events
-        /// <summary>
-        /// This is so gui can send out events to the base class.
-        /// </summary>
-        event Flowertwig.Utils.Events.EventHandler UpdateBase;
-        #endregion
+        IProtocolUPnP ProtocolUPnP
+        {
+            get;
+            set;
+        }
+
+        bool IsListening
+        {
+            get;
+            set;
+        }
+
+        System.Net.IPEndPoint EndPoint
+        {
+            get;
+            set;
+        }
+
+        SortedList<string, UPnPDevice> RootDevices
+        {
+            get;
+            set;
+        }
+
+        void StartListen();
+        void Discover();
+
     }
 }

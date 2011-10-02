@@ -19,15 +19,11 @@
  *
  */
 
-namespace FlowLib.Interfaces
+using Flowertwig.Utils.Connections.Interfaces;
+
+namespace FlowLib.Connections.Interfaces
 {
-    public interface IBaseUpdater
+    public interface IProtocolUPnP : IProtocolUdp
     {
-        #region Events
-        /// <summary>
-        /// This is so gui can send out events to the base class.
-        /// </summary>
-        event Flowertwig.Utils.Events.EventHandler UpdateBase;
-        #endregion
     }
 }

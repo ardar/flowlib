@@ -1,4 +1,4 @@
-
+﻿
 /*
  *
  * Copyright (C) 2010 Mattias Blomqvist, patr-blo at dsv dot su dot se
@@ -19,11 +19,12 @@
  *
  */
 
-using FlowLib.Containers;
-using FlowLib.Events;
 using System.Collections.Generic;
-using FlowLib.Utils;
 using System.Xml.Serialization;
+using Flowertwig.Utils.Entities;
+using Flowertwig.Utils.Events;
+using Flowertwig.Utils.IO;
+using FlowLib.Entities;
 
 namespace FlowLib.Managers
 {
@@ -36,35 +37,35 @@ namespace FlowLib.Managers
         /// <summary>
         /// Downloading have been completed of segment
         /// </summary>
-        public event FmdcEventHandler SegmentCompleted;
+        public event EventHandler SegmentCompleted;
         /// <summary>
         /// Downloading of segment have been started
         /// </summary>
-        public event FmdcEventHandler SegmentStarted;
+        public event EventHandler SegmentStarted;
         /// <summary>
         /// Segment downloading have been canceled
         /// </summary>
-        public event FmdcEventHandler SegmentCanceled;
+        public event EventHandler SegmentCanceled;
         /// <summary>
         /// DownloadItem have been completed (Download)
         /// </summary>
-        public event FmdcEventHandler DownloadCompleted;
+        public event EventHandler DownloadCompleted;
         /// <summary>
         /// DownloadItem have been added to DownloadManager
         /// </summary>
-        public event FmdcEventHandler DownloadAdded;
+        public event EventHandler DownloadAdded;
         /// <summary>
         /// DownloadItem have been removed from DownloadManager
         /// </summary>
-        public event FmdcEventHandler DownloadRemoved;
+        public event EventHandler DownloadRemoved;
         /// <summary>
         /// Source have been added to DownloadManager
         /// </summary>
-        public event FmdcEventHandler SourceAdded;
+        public event EventHandler SourceAdded;
         /// <summary>
         /// Source have been removed from DownloadManager
         /// </summary>
-        public event FmdcEventHandler SourceRemoved;
+        public event EventHandler SourceRemoved;
 
         protected SortedList<DownloadItem, FlowSortedList<Source>> dwnItems = new SortedList<DownloadItem, FlowSortedList<Source>>();
         protected SortedList<Source, FlowSortedList<DownloadItem>> srcItems = new SortedList<Source, FlowSortedList<DownloadItem>>();
@@ -123,7 +124,7 @@ namespace FlowLib.Managers
                 {
                     foreach (var item in value)
                     {
-                        AddDownload(item.DownloadItem, item.Sources);
+                        AddDownload((DownloadItem) item.DownloadItem, (Source[]) item.Sources);
                     }
                 }
             }
@@ -143,25 +144,25 @@ namespace FlowLib.Managers
         {
             FileName = "Downloads";
 
-            SegmentCanceled = new FmdcEventHandler(DownloadManager_SegmentCanceled);
-            SegmentCompleted = new FmdcEventHandler(DownloadManager_SegmentCompleted);
-            SegmentStarted = new FmdcEventHandler(DownloadManager_SegmentStarted);
-            DownloadCompleted = new FmdcEventHandler(DownloadManager_DownloadCompleted);
+            SegmentCanceled = new EventHandler(DownloadManager_SegmentCanceled);
+            SegmentCompleted = new EventHandler(DownloadManager_SegmentCompleted);
+            SegmentStarted = new EventHandler(DownloadManager_SegmentStarted);
+            DownloadCompleted = new EventHandler(DownloadManager_DownloadCompleted);
 
-            DownloadAdded = new FmdcEventHandler(DownloadManager_DownloadAdded);
-            DownloadRemoved = new FmdcEventHandler(DownloadManager_DownloadRemoved);
-            SourceAdded = new FmdcEventHandler(DownloadManager_SourceAdded);
-            SourceRemoved = new FmdcEventHandler(DownloadManager_SourceRemoved);
+            DownloadAdded = new EventHandler(DownloadManager_DownloadAdded);
+            DownloadRemoved = new EventHandler(DownloadManager_DownloadRemoved);
+            SourceAdded = new EventHandler(DownloadManager_SourceAdded);
+            SourceRemoved = new EventHandler(DownloadManager_SourceRemoved);
         }
 
-        void DownloadManager_SourceRemoved(object sender, FmdcEventArgs e) { }
-        void DownloadManager_SourceAdded(object sender, FmdcEventArgs e) { }
-        void DownloadManager_DownloadRemoved(object sender, FmdcEventArgs e) { }
-        void DownloadManager_DownloadAdded(object sender, FmdcEventArgs e) { }
-        void DownloadManager_DownloadCompleted(object sender, FmdcEventArgs e) { }
-        void DownloadManager_SegmentStarted(object sender, FmdcEventArgs e) { }
-        void DownloadManager_SegmentCompleted(object sender, FmdcEventArgs e) { }
-        void DownloadManager_SegmentCanceled(object sender, FmdcEventArgs e) { }
+        void DownloadManager_SourceRemoved(object sender, DefaultEventArgs e) { }
+        void DownloadManager_SourceAdded(object sender, DefaultEventArgs e) { }
+        void DownloadManager_DownloadRemoved(object sender, DefaultEventArgs e) { }
+        void DownloadManager_DownloadAdded(object sender, DefaultEventArgs e) { }
+        void DownloadManager_DownloadCompleted(object sender, DefaultEventArgs e) { }
+        void DownloadManager_SegmentStarted(object sender, DefaultEventArgs e) { }
+        void DownloadManager_SegmentCompleted(object sender, DefaultEventArgs e) { }
+        void DownloadManager_SegmentCanceled(object sender, DefaultEventArgs e) { }
 
         /// <summary>
         /// Remove source from all downloads
@@ -202,7 +203,7 @@ namespace FlowLib.Managers
                     if (shouldLock)
                         System.Threading.Monitor.Exit(this);
                 }
-                SourceRemoved(this, new FmdcEventArgs(0, s));
+                SourceRemoved(this, new DefaultEventArgs(0, s));
             }
         }
         /// <summary>
@@ -245,7 +246,7 @@ namespace FlowLib.Managers
                     if (shouldLock)
                         System.Threading.Monitor.Exit(this);
                 }
-                DownloadRemoved(this, new FmdcEventArgs(0, d));
+                DownloadRemoved(this, new DefaultEventArgs(0, d));
                 d.DownloadCompleted -= d_DownloadCompleted;
                 d.SegmentCanceled -= d_SegmentCanceled;
                 d.SegmentCompleted -= d_SegmentCompleted;
@@ -278,14 +279,14 @@ namespace FlowLib.Managers
                 lock (this)
                 {
                     tmpDwn = new FlowSortedList<Source>();
-                    d.DownloadCompleted += new FmdcEventHandler(d_DownloadCompleted);
-                    d.SegmentCanceled += new FmdcEventHandler(d_SegmentCanceled);
-                    d.SegmentCompleted += new FmdcEventHandler(d_SegmentCompleted);
-                    d.SegmentStarted += new FmdcEventHandler(d_SegmentStarted);
+                    d.DownloadCompleted += new EventHandler(d_DownloadCompleted);
+                    d.SegmentCanceled += new EventHandler(d_SegmentCanceled);
+                    d.SegmentCompleted += new EventHandler(d_SegmentCompleted);
+                    d.SegmentStarted += new EventHandler(d_SegmentStarted);
 
                     dwnItems.Add(d, tmpDwn);
                 }
-                DownloadAdded(this, new FmdcEventArgs(0, d));
+                DownloadAdded(this, new DefaultEventArgs(0, d));
             }
             else
             {
@@ -310,7 +311,7 @@ namespace FlowLib.Managers
                         {
                             tmpSrc = new FlowSortedList<DownloadItem>();
                             srcItems.Add(s, tmpSrc);
-                            SourceAdded(this, new FmdcEventArgs(0, s));
+                            SourceAdded(this, new DefaultEventArgs(0, s));
                         }
                         else
                         {
@@ -351,28 +352,28 @@ namespace FlowLib.Managers
             }
         }
 
-        void d_SegmentStarted(object sender, FmdcEventArgs e)
+        void d_SegmentStarted(object sender, DefaultEventArgs e)
         {
             SegmentStarted(sender, e);
         }
-        void d_SegmentCompleted(object sender, FmdcEventArgs e)
+        void d_SegmentCompleted(object sender, DefaultEventArgs e)
         {
             SegmentCompleted(sender, e);
         }
 
-        void d_SegmentCanceled(object sender, FmdcEventArgs e)
+        void d_SegmentCanceled(object sender, DefaultEventArgs e)
         {
             SegmentCanceled(sender, e);
         }
 
-        private void d_DownloadCompleted(object sender, FmdcEventArgs e)
+        private void d_DownloadCompleted(object sender, DefaultEventArgs e)
         {
             DownloadItem dwnItm = sender as DownloadItem;
             if (dwnItm != null)
             {
                 //RemoveDownload((DownloadItem)sender);
                 RemoveDownload(dwnItm);
-                FlowLib.Utils.FileOperations.ForceClose(dwnItm.ContentInfo.Get(ContentInfo.STORAGEPATH));
+                FileOperations.ForceClose(dwnItm.ContentInfo.Get(ContentInfo.STORAGEPATH));
                 DownloadCompleted(sender, e);
             }
         }

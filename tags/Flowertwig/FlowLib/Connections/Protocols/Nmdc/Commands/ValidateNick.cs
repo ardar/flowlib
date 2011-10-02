@@ -1,7 +1,7 @@
 ﻿
 /*
  *
- * Copyright (C) 2009 Mattias Blomqvist, patr-blo at dsv dot su dot se
+ * Copyright (C) 2010 Mattias Blomqvist, patr-blo at dsv dot su dot se
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,18 +16,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- *
+ *  
  */
 
-namespace FlowLib.Interfaces
+using FlowLib.Connections.Entities;
+
+#if COMPACT_FRAMEWORK
+using FlowLib.Utils.CompactFramworkExtensionMethods;
+#endif
+
+namespace FlowLib.Connections.Protocols.Nmdc.Commands
 {
-    public interface IBaseUpdater
+    #region Receive AND Send
+
+    #endregion
+    #region Receive
+
+    #endregion
+    #region Send
+
+    public class ValidateNick : HubMessage
     {
-        #region Events
-        /// <summary>
-        /// This is so gui can send out events to the base class.
-        /// </summary>
-        event Flowertwig.Utils.Events.EventHandler UpdateBase;
-        #endregion
+        public ValidateNick(Hub hub)
+            : base(hub, null)
+        {
+            from = hub.HubSetting.DisplayName;
+            Raw = "$ValidateNick " + from + "|";
+            if (!string.IsNullOrEmpty(from))
+                IsValid = true;
+        }
     }
+    #endregion
 }

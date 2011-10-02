@@ -1,4 +1,4 @@
-
+﻿
 /*
  *
  * Copyright (C) 2010 Mattias Blomqvist, patr-blo at dsv dot su dot se
@@ -19,16 +19,14 @@
  *
  */
 
-using FlowLib.Events;
-using FlowLib.Interfaces;
-using FlowLib.Containers;
-using FlowLib.Connections;
-using FlowLib.Protocols;
-
-using System.Net;
-using System.Threading;
-using System.Net.Sockets;
 using System.Collections.Generic;
+using System.Threading;
+using Flowertwig.Utils.Connections;
+using Flowertwig.Utils.Events;
+using FlowLib.Connections;
+using FlowLib.Connections.Entities;
+using FlowLib.Connections.Interfaces;
+using FlowLib.Entities;
 
 #if COMPACT_FRAMEWORK
 using FlowLib.Utils.CompactFramworkExtensionMethods;
@@ -137,7 +135,7 @@ namespace FlowLib.Managers
 			//    return;
 			//}
 			RemoveTransfer(id);
-			trans.ConnectionStatusChange += new FmdcEventHandler(trans_ConnectionStatusChange);
+			trans.ConnectionStatusChange += new EventHandler(trans_ConnectionStatusChange);
 			// Add transfer to list.
 			lock (transfers)
 			{
@@ -183,17 +181,21 @@ namespace FlowLib.Managers
             AddTransfer(trans);
             // Connect transfer.
 #if !COMPACT_FRAMEWORK
-            Thread t = new Thread(new ParameterizedThreadStart(ConnectTransfer));
-            t.IsBackground = true;
+            var t = new Thread(ConnectTransfer)
+                           {
+                               Name = "TransferWorker",
+                               IsBackground = true
+                           };
             t.Start(trans);
 #else
             Thread t = new Thread(new ThreadStart(ConnectTransfer));
+            t.Name = "TransferCompactWorker";
             t.IsBackground = true;
             t.Start(trans);
 #endif
         }
 
-        void trans_ConnectionStatusChange(object sender, FmdcEventArgs e)
+        void trans_ConnectionStatusChange(object sender, DefaultEventArgs e)
         {
             ITransfer trans = sender as ITransfer;
             if (e.Action == TcpConnection.Disconnected)
