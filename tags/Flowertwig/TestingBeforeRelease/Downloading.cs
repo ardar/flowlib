@@ -3,16 +3,17 @@ using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using FlowLib.Containers;
 using FlowLib.Interfaces;
-using FlowLib.Events;
 using FlowLib.Managers;
 using TestingBeforeRelease.Utils;
 using FlowLib.Connections;
 using System.Threading;
-using FlowLib.Containers.Security;
-using FlowLib.Enums;
-using FlowLib.Utils.FileLists;
+using FlowLib.Entities;
+using Flowertwig.Utils.Events;
+using Flowertwig.Utils.Entities;
+using FlowLib.Filelists;
+using FlowLib.Connections.Entities;
+using FlowLib.Connections.Interfaces;
 
 namespace TestingBeforeRelease
 {
@@ -22,7 +23,7 @@ namespace TestingBeforeRelease
         private const long BIGSIZE = 524288000;
         private const long SMALLSIZE = 104857600;
 
-        public event FmdcEventHandler UpdateBase;
+        public event Flowertwig.Utils.Events.EventHandler UpdateBase;
 
         TransferManager transferManager = new TransferManager();
         DownloadManager downloadManager = new DownloadManager();
@@ -44,7 +45,7 @@ namespace TestingBeforeRelease
         private bool _gotBigContent;
         private bool _gotSmallContent;
         private bool _hasValidRequestTransfer;
-		private Hub _hubConnection;
+		private Client _clientConnection;
 
         [TestMethod]
         public void Downloading_In_ActiveMode_Nmdc()
@@ -361,15 +362,15 @@ namespace TestingBeforeRelease
         {
             _settings.Protocol = protocol;
 
-            _hubConnection = new Hub(_settings, this);
-            _hubConnection.ProtocolChange += new FmdcEventHandler(hubConnection_ProtocolChange);
+            _clientConnection = new Client(_settings, this);
+            _clientConnection.ProtocolChange += new Flowertwig.Utils.Events.EventHandler(hubConnection_ProtocolChange);
 
             // We need to have a share
-			_hubConnection.Share = new Share("temp");
+			_clientConnection.Share = new Share("temp");
 
-			_hubConnection.Me.TagInfo.Mode = connectionType;
+			_clientConnection.Me.TagInfo.Mode = connectionType;
 
-			_hubConnection.Connect();
+			_clientConnection.Connect();
 
 			//Thread thread = new Thread(new ThreadStart(AutoDownloadNewStuff));
 			//thread.IsBackground = true;
@@ -383,13 +384,13 @@ namespace TestingBeforeRelease
 
             // Close all open threads
 			//thread.Abort();
-            _hubConnection.Disconnect("Test time exceeded");
-            _hubConnection.Dispose();
+            _clientConnection.Disconnect("Test time exceeded");
+            _clientConnection.Dispose();
         }
 
         void AutoDownloadNewStuff()
         {
-			if (_hubConnection == null)
+			if (_clientConnection == null)
 				return;
 
 			Source[] sourcesToIgnore = transferManager.Transfers.Select(f => f.Value.Source).Distinct().ToArray();
@@ -410,21 +411,21 @@ namespace TestingBeforeRelease
 			foreach (Source src in sourcesToStartDownloadingFrom)
 			{
 				// This should never happen as we are in 1 hub only
-				if (!string.Equals(src.ConnectionId, _hubConnection.StoreId))
+				if (!string.Equals(src.ConnectionId, _clientConnection.StoreId))
 					continue;
 
-				User usr = _hubConnection.GetUserByStoredId(src.UserId);
+				User usr = _clientConnection.GetUserByStoredId(src.UserId);
 				// Check to see if user is in hub or not.
 				if (usr == null)
 					continue;
 
 				_testTimeoutLength += 60;
 				// Start transfer to user
-				UpdateBase(this, new FmdcEventArgs(Actions.StartTransfer, usr));
+                UpdateBase(this, new DefaultEventArgs(Actions.StartTransfer, usr));
 			}
         }
 
-        void downloadManager_DownloadCompleted(object sender, FmdcEventArgs e)
+        void downloadManager_DownloadCompleted(object sender, DefaultEventArgs e)
         {
             DownloadItem dwnItem = sender as DownloadItem;
             if (dwnItem == null)
@@ -487,40 +488,40 @@ namespace TestingBeforeRelease
 				_isFinished = true;
         }
 
-        void hubConnection_ProtocolChange(object sender, FmdcEventArgs e)
+        void hubConnection_ProtocolChange(object sender, DefaultEventArgs e)
         {
-            Hub hubConnection = sender as Hub;
-            if (hubConnection != null)
+            Client clientConnection = sender as Client;
+            if (clientConnection != null)
             {
-                hubConnection.Protocol.Update += new FmdcEventHandler(prot_Update);
+                clientConnection.Protocol.Update += new Flowertwig.Utils.Events.EventHandler(prot_Update);
             }
         }
 
-        void prot_Update(object sender, FmdcEventArgs e)
+        void prot_Update(object sender, DefaultEventArgs e)
         {
-            Hub hubConnection = sender as Hub;
-            if (hubConnection != null)
+            Client clientConnection = sender as Client;
+            if (clientConnection != null)
             {
                 switch (e.Action)
                 {
-                    case Actions.IsReady:
+                    case FlowLib.Connections.Protocols.BaseTransferProtocol.IsReady:
                         bool isReady = (bool)e.Data;
                         if (isReady)
                         {
                             // TODO: Start testing
-                            var usrlst = hubConnection.Userlist;
+                            var usrlst = clientConnection.Userlist;
                             User usr = null;
                             // Find usable user.
                             foreach (KeyValuePair<string, User> item in usrlst)
                             {
-								UserInfo me = hubConnection.Me;
+								UserInfo me = clientConnection.Me;
 								usr = item.Value;
 
 								// Check so we are not trying to download from our self.
 								if (me.ID == usr.ID)
 									continue;
 
-                                if (me.TagInfo.Mode == FlowLib.Enums.ConnectionTypes.Passive)
+                                if (me.TagInfo.Mode == ConnectionTypes.Passive)
                                 {
                                     if (usr.Tag.Mode == ConnectionTypes.Direct)
                                     {
@@ -545,10 +546,10 @@ namespace TestingBeforeRelease
 
                                 _filelistPath = currentDir + "Filelists" + System.IO.Path.DirectorySeparatorChar + "downloading" + ".filelist";
                                 info.Set(ContentInfo.STORAGEPATH, _filelistPath);
-                                info.Set("HubStoreId", hubConnection.StoreId);
+                                info.Set("HubStoreId", clientConnection.StoreId);
                                 info.Set(UserInfo.STOREID, usr.StoreID);
 
-                                downloadManager.AddDownload(new DownloadItem(info), new Source(hubConnection.StoreId, usr.StoreID));
+                                downloadManager.AddDownload(new DownloadItem(info), new Source(clientConnection.StoreId, usr.StoreID));
 
                                 _testTimeoutLength += 10;
                             }
@@ -570,8 +571,8 @@ namespace TestingBeforeRelease
                         {
                             // We could add a TransferRequest here if we wanted.
                             transferManager.StartTransfer(trans);
-                            trans.Protocol.ChangeDownloadItem += new FmdcEventHandler(Protocol_ChangeDownloadItem);
-                            trans.Protocol.RequestTransfer += new FmdcEventHandler(Protocol_RequestTransfer);
+                            trans.Protocol.ChangeDownloadItem += new Flowertwig.Utils.Events.EventHandler(Protocol_ChangeDownloadItem);
+                            trans.Protocol.RequestTransfer += new Flowertwig.Utils.Events.EventHandler(Protocol_RequestTransfer);
                         }
                         break;
                 }
@@ -579,7 +580,7 @@ namespace TestingBeforeRelease
         }
 
 
-        void Protocol_RequestTransfer(object sender, FmdcEventArgs e)
+        void Protocol_RequestTransfer(object sender, DefaultEventArgs e)
         {
             ITransfer trans = sender as ITransfer;
             TransferRequest req = e.Data as TransferRequest;
@@ -594,7 +595,7 @@ namespace TestingBeforeRelease
             }
         }
 
-        void Protocol_ChangeDownloadItem(object sender, FmdcEventArgs e)
+        void Protocol_ChangeDownloadItem(object sender, DefaultEventArgs e)
         {
             Transfer trans = sender as Transfer;
             if (trans == null)
@@ -609,19 +610,19 @@ namespace TestingBeforeRelease
             }
         }
 
-		void downloadManager_SourceAdded(object sender, FmdcEventArgs e)
+        void downloadManager_SourceAdded(object sender, DefaultEventArgs e)
 		{
 			// New Source added. Make sure we will try to start new transfer(s) to all none used soures.
 			AutoDownloadNewStuff();
 		}
 
-		void downloadManager_DownloadAdded(object sender, FmdcEventArgs e)
+        void downloadManager_DownloadAdded(object sender, DefaultEventArgs e)
 		{
 			// New download added. Make sure we will try to start new transfer(s) to all none used soures.
 			AutoDownloadNewStuff();
 		}
 
-		void Downloading_In_PassiveMode_UpdateBase(object sender, FlowLib.Events.FmdcEventArgs e) { }
+        void Downloading_In_PassiveMode_UpdateBase(object sender, DefaultEventArgs e) { }
 
         [TestInitialize()]
         public void Init()
@@ -630,12 +631,12 @@ namespace TestingBeforeRelease
 
             _testTimeoutLength = 20;
 
-            UpdateBase = new FlowLib.Events.FmdcEventHandler(Downloading_In_PassiveMode_UpdateBase);
+            UpdateBase = new Flowertwig.Utils.Events.EventHandler(Downloading_In_PassiveMode_UpdateBase);
 
-            downloadManager.DownloadCompleted += new FmdcEventHandler(downloadManager_DownloadCompleted);
-			downloadManager.DownloadAdded += new FmdcEventHandler(downloadManager_DownloadAdded);
-			downloadManager.SourceAdded += new FmdcEventHandler(downloadManager_SourceAdded);
-			downloadManager.SegmentCompleted += new FmdcEventHandler(downloadManager_SegmentCompleted);
+            downloadManager.DownloadCompleted += new Flowertwig.Utils.Events.EventHandler(downloadManager_DownloadCompleted);
+			downloadManager.DownloadAdded += new Flowertwig.Utils.Events.EventHandler(downloadManager_DownloadAdded);
+			downloadManager.SourceAdded += new Flowertwig.Utils.Events.EventHandler(downloadManager_SourceAdded);
+			downloadManager.SegmentCompleted += new Flowertwig.Utils.Events.EventHandler(downloadManager_SegmentCompleted);
 
             _settings = new HubSetting();
             _settings.Address = "127.0.0.1";
@@ -644,7 +645,7 @@ namespace TestingBeforeRelease
             _settings.Password = "Password";
         }
 
-		void downloadManager_SegmentCompleted(object sender, FmdcEventArgs e)
+        void downloadManager_SegmentCompleted(object sender, DefaultEventArgs e)
 		{
 			//DownloadItem di = sender as DownloadItem;
 			//if (di == null)

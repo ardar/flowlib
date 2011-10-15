@@ -75,7 +75,7 @@
 		<MinUploadSpeed type="int">0</MinUploadSpeed>
 		<GetUserInfo type="int">1</GetUserInfo>
 		<UrlHandler type="int">0</UrlHandler>
-		<MainWindowState type="int">1</MainWindowState>
+		<MainWindowState type="int">3</MainWindowState>
 		<MainWindowSizeX type="int">900</MainWindowSizeX>
 		<MainWindowSizeY type="int">746</MainWindowSizeY>
 		<MainWindowPosX type="int">379</MainWindowPosX>
@@ -163,8 +163,8 @@
 		<SlotsPrimaryLimiting type="int">3</SlotsPrimaryLimiting>
 		<TransfersPanedPos type="int">787</TransfersPanedPos>
 		<QueuePanedPos type="int">300</QueuePanedPos>
-		<TotalUpload type="int64">20102297708</TotalUpload>
-		<TotalDownload type="int64">2385043076</TotalDownload>
+		<TotalUpload type="int64">20102299242</TotalUpload>
+		<TotalDownload type="int64">2385050166</TotalDownload>
 	</Settings>
 	<SearchTypes>
 		<SearchType Id="5">bmp;ico;jpg;jpeg;png;gif;tga;ai;ps;pict;eps;img;pct;psp;tif;rle;pcx;sfw;psd;cdr</SearchType>
@@ -183,9 +183,29 @@
 			<Param Id="Title">-Flowertwig- (adcs://adcs.flowertwig.org:443)</Param>
 			<Param Id="Address">adcs://adcs.flowertwig.org:443</Param>
 		</Window>
+		<Window Id="Hub">
+			<Param Id="Title">YnHub - 1.036 (127.0.0.1)</Param>
+			<Param Id="Address">127.0.0.1</Param>
+		</Window>
+		<Window Id="Hub">
+			<Param Id="Title">ADCH++ - ADCH++ Test hub (adc://127.0.0.1:2780)</Param>
+			<Param Id="Address">adc://127.0.0.1:2780</Param>
+		</Window>
 	</Windows>
 	<Recent>
 		<Configuration Id="Hub" MaxItems="10"/>
+		<Window Id="Hub">
+			<Param Id="Title">adcs://127.0.0.1:2781</Param>
+			<Param Id="Address">adcs://127.0.0.1:2781</Param>
+		</Window>
+		<Window Id="Hub">
+			<Param Id="Title">ADCH++ - ADCH++ Test hub (adc://127.0.0.1:2780)</Param>
+			<Param Id="Address">adc://127.0.0.1:2780</Param>
+		</Window>
+		<Window Id="Hub">
+			<Param Id="Title">YnHub - 1.036 (127.0.0.1)</Param>
+			<Param Id="Address">127.0.0.1</Param>
+		</Window>
 		<Window Id="Hub">
 			<Param Id="Title">-Flowertwig- (adcs://adcs.flowertwig.org:443)</Param>
 			<Param Id="Address">adcs://adcs.flowertwig.org:443</Param>
@@ -193,18 +213,6 @@
 		<Window Id="Hub">
 			<Param Id="Title">adcs://192.168.1.5:443</Param>
 			<Param Id="Address">adcs://192.168.1.5:443</Param>
-		</Window>
-		<Window Id="Hub">
-			<Param Id="Title">adcs://127.0.0.1:2781</Param>
-			<Param Id="Address">adcs://127.0.0.1:2781</Param>
-		</Window>
-		<Window Id="Hub">
-			<Param Id="Title">adc://127.0.0.1:2780</Param>
-			<Param Id="Address">adc://127.0.0.1:2780</Param>
-		</Window>
-		<Window Id="Hub">
-			<Param Id="Title">127.0.0.1</Param>
-			<Param Id="Address">127.0.0.1</Param>
 		</Window>
 	</Recent>
 </DCPlusPlus>

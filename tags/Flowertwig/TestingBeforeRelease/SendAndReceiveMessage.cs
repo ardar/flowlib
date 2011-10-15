@@ -3,14 +3,14 @@ using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using FlowLib.Containers;
 using FlowLib.Connections;
 using FlowLib.Interfaces;
 using System.Threading;
-using FlowLib.Events;
-using FlowLib.Containers.Security;
-using FlowLib.Protocols.HubNmdc;
 using TestingBeforeRelease.Utils;
+using FlowLib.Entities;
+using Flowertwig.Utils.Events;
+using Flowertwig.Utils.Entities.Security;
+using Flowertwig.Utils.Connections;
 
 namespace TestingBeforeRelease
 {
@@ -18,7 +18,7 @@ namespace TestingBeforeRelease
     public class SendAndReceiveMessage : IBaseUpdater
     {
         #region IBaseUpdater Members
-        public event FlowLib.Events.FmdcEventHandler UpdateBase;
+        public event Flowertwig.Utils.Events.EventHandler UpdateBase;
         #endregion
 
         private bool _isFinished;
@@ -82,7 +82,7 @@ namespace TestingBeforeRelease
         {
             Application.InitilizeAll();
 
-            UpdateBase = new FlowLib.Events.FmdcEventHandler(SendMainChatOrPMToHub_UpdateBase);
+            UpdateBase = new Flowertwig.Utils.Events.EventHandler(SendMainChatOrPMToHub_UpdateBase);
 
             _settings = new HubSetting();
             _settings.Address = "127.0.0.1";
@@ -105,11 +105,11 @@ namespace TestingBeforeRelease
         {
             _settings.Protocol = protocol;
 
-            Hub hubConnection = new Hub(_settings, this);
-            hubConnection.SecureUpdate += new FmdcEventHandler(hubConnection_SecureUpdate);
-            hubConnection.ProtocolChange += new FmdcEventHandler(hubConnection_ProtocolChange);
+            Client clientConnection = new Client(_settings, this);
+            clientConnection.SecureUpdate += new Flowertwig.Utils.Events.EventHandler(hubConnection_SecureUpdate);
+            clientConnection.ProtocolChange += new Flowertwig.Utils.Events.EventHandler(hubConnection_ProtocolChange);
 
-            hubConnection.Connect();
+            clientConnection.Connect();
 
             int i = 0;
             while (!_isFinished && i++ < 20)
@@ -117,47 +117,47 @@ namespace TestingBeforeRelease
                 Thread.Sleep(500);
             }
 
-            hubConnection.Disconnect("Test time exceeded");
-            hubConnection.Dispose();
+            clientConnection.Disconnect("Test time exceeded");
+            clientConnection.Dispose();
         }
 
-        void hubConnection_ProtocolChange(object sender, FmdcEventArgs e)
+        void hubConnection_ProtocolChange(object sender, DefaultEventArgs e)
         {
-            Hub hubConnection = sender as Hub;
-            if (hubConnection != null)
+            Client clientConnection = sender as Client;
+            if (clientConnection != null)
             {
-                hubConnection.Protocol.Update += new FmdcEventHandler(prot_Update);
+                clientConnection.Protocol.Update += new Flowertwig.Utils.Events.EventHandler(prot_Update);
             }
         }
 
-        void prot_Update(object sender, FmdcEventArgs e)
+        void prot_Update(object sender, DefaultEventArgs e)
         {
-            Hub hubConnection = sender as Hub;
-            if (hubConnection != null)
+            Client clientConnection = sender as Client;
+            if (clientConnection != null)
             {
                 bool testFinishStatus = false;
                 switch (e.Action)
                 {
-                    case Actions.IsReady:
+                    case FlowLib.Connections.Protocols.BaseTransferProtocol.IsReady:
                         bool isReady = (bool)e.Data;
                         if (isReady)
                         {
                             // Create mainchat message.
-                            MainMessage msg = new MainMessage(hubConnection.Me.ID, "Testing - MainMessage");
+                            MainMessage msg = new MainMessage(clientConnection.Me.ID, "Testing - MainMessage");
                             // message will here be converted to right format and then be sent.
-                            UpdateBase(this, new FlowLib.Events.FmdcEventArgs(FlowLib.Events.Actions.MainMessage, msg));
+                            UpdateBase(this, new DefaultEventArgs(Actions.MainMessage, msg));
 
                             // Create private message.
-                            PrivateMessage privMsg = new PrivateMessage(hubConnection.Me.ID, hubConnection.Me.ID, "Testing - PrivateMessage");
+                            PrivateMessage privMsg = new PrivateMessage(clientConnection.Me.ID, clientConnection.Me.ID, "Testing - PrivateMessage");
 
                             // message will here be converted to right format and then be sent.
-                            UpdateBase(this, new FlowLib.Events.FmdcEventArgs(FlowLib.Events.Actions.PrivateMessage, privMsg));
+                            UpdateBase(this, new DefaultEventArgs(Actions.PrivateMessage, privMsg));
 
                         }
                         break;
                     case Actions.MainMessage:
                         MainMessage msgMain = e.Data as MainMessage;
-                        if (string.Equals(hubConnection.Me.ID, msgMain.From))
+                        if (string.Equals(clientConnection.Me.ID, msgMain.From))
                         {
                             _gotMyMainMessage = true;
                         }
@@ -165,7 +165,7 @@ namespace TestingBeforeRelease
                         break;
                     case Actions.PrivateMessage:
                         PrivateMessage msgPriv = e.Data as PrivateMessage;
-                        if (string.Equals(hubConnection.Me.ID, msgPriv.From))
+                        if (string.Equals(clientConnection.Me.ID, msgPriv.From))
                         {
                             _gotMyPrivateMessage = true;
                         }
@@ -184,11 +184,11 @@ namespace TestingBeforeRelease
 
         }
 
-        void hubConnection_SecureUpdate(object sender, FmdcEventArgs e)
+        void hubConnection_SecureUpdate(object sender, DefaultEventArgs e)
         {
             switch (e.Action)
             {
-                case Actions.SecurityValidateRemoteCertificate:
+                case TcpConnection.SecurityValidateRemoteCertificate:
                     CertificateValidationInfo ct = e.Data as CertificateValidationInfo;
                     if (ct != null)
                     {
@@ -200,6 +200,6 @@ namespace TestingBeforeRelease
             }
         }
 
-        void SendMainChatOrPMToHub_UpdateBase(object sender, FlowLib.Events.FmdcEventArgs e) { }
+        void SendMainChatOrPMToHub_UpdateBase(object sender, DefaultEventArgs e) { }
     }
 }

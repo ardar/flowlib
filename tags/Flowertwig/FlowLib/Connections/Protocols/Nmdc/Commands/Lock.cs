@@ -113,7 +113,7 @@ namespace FlowLib.Connections.Protocols.Nmdc.Commands
             Key = sKey;
         }
 
-        public Lock(Hub hub, string raw) : base(hub, raw)
+        public Lock(Client client, string raw) : base(client, raw)
         {
             /*********
              * This code has been copied from the CoreDC project.
@@ -131,7 +131,7 @@ namespace FlowLib.Connections.Protocols.Nmdc.Commands
             for (int i = 1; i < lck.Length; i++)
             {
                 //arrChar[i] = lck[i];
-                byte[] test = hub.Protocol.Encoding.GetBytes(new char[] { lck[i] });
+                byte[] test = client.Protocol.Encoding.GetBytes(new char[] { lck[i] });
                 arrChar[i] = (char)test[0];
                 arrRet[i] = arrChar[i] ^ arrChar[i - 1];
             }
@@ -152,7 +152,7 @@ namespace FlowLib.Connections.Protocols.Nmdc.Commands
                         sKey += string.Format("/%DCN{0:000}%/", j);
                         break;
                     default:
-                        sKey += hub.Protocol.Encoding.GetChars(new byte[] { System.Convert.ToByte((char)j) })[0];
+                        sKey += client.Protocol.Encoding.GetChars(new byte[] { System.Convert.ToByte((char)j) })[0];
                         break;
                 }
             }

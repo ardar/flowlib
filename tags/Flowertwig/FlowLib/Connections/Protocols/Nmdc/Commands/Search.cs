@@ -27,8 +27,8 @@ namespace FlowLib.Connections.Protocols.Nmdc.Commands
             }
         }
 
-        public Search(Hub hub, string raw)
-            : base(hub, raw)
+        public Search(Client client, string raw)
+            : base(client, raw)
         {
             bool validAddress = false;
 
@@ -176,33 +176,33 @@ namespace FlowLib.Connections.Protocols.Nmdc.Commands
             #endregion
         }
 
-        public Search(Hub hub, SearchInfo info)
-            : base(hub,null)
+        public Search(Client client, SearchInfo info)
+            : base(client,null)
         {
             this.info = info;
 
             #region Id
             string id = null;
-            switch (hub.Me.Mode)
+            switch (client.Me.Mode)
             {
                 case ConnectionTypes.Direct:
                 case ConnectionTypes.UPnP:
                 case ConnectionTypes.Forward:
-                    string port = hub.Share.Port.ToString();
-                    if (hub.Me.ContainsKey(UserInfo.UDPPORT))
-                        port = hub.Me.Get(UserInfo.UDPPORT);
+                    string port = client.Share.Port.ToString();
+                    if (client.Me.ContainsKey(UserInfo.UDPPORT))
+                        port = client.Me.Get(UserInfo.UDPPORT);
 
-                    if (hub.Me.ContainsKey(UserInfo.IP))
+                    if (client.Me.ContainsKey(UserInfo.IP))
                     {
-                        id = string.Format("{0}:{1}", hub.Me.Get(UserInfo.IP), port);
+                        id = string.Format("{0}:{1}", client.Me.Get(UserInfo.IP), port);
                     }
                     else
                     {
-                        id = string.Format("{0}:{1}", hub.LocalAddress.Address, port);
+                        id = string.Format("{0}:{1}", client.LocalAddress.Address, port);
                     }
                     break;
                 default:
-                    id = string.Format("Hub:{0}", hub.Me.ID);
+                    id = string.Format("Hub:{0}", client.Me.ID);
                     break;
             }
             #endregion

@@ -14,13 +14,13 @@ namespace FlowLib.Connections.Protocols.Nmdc.Commands
                 IsValid = !string.IsNullOrEmpty(pass);
             }
         }
-        public MyPass(Hub hub)
-            : base(hub, null)
+        public MyPass(Client client)
+            : base(client, null)
         {
-            Password = hub.HubSetting.Password;
+            Password = client.HubSetting.Password;
         }
-        public MyPass(Hub hub, string pass)
-            : base(hub, null)
+        public MyPass(Client client, string pass)
+            : base(client, null)
         {
             Password = pass;
         }

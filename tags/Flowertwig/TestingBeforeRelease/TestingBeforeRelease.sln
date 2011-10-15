@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestingBeforeRelease", "TestingBeforeRelease.csproj", "{DB001095-5636-4596-A702-C2B4728B5FB8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlowLib", "..\FlowLib\FlowLib.csproj", "{4C9A3F81-7660-4170-8D6B-62C239922C89}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlowLib", "..\FlowLib\FlowLib.csproj", "{20DC025A-2581-42ED-94C7-3CA62C04D7C4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlowertwigLibrary", "..\..\..\..\Flowertwig\trunk\FlowertwigLibrary.csproj", "{126BFACF-72BC-48A4-BED8-7FF3074AC0C0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,14 +21,20 @@ Global
 		{DB001095-5636-4596-A702-C2B4728B5FB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DB001095-5636-4596-A702-C2B4728B5FB8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DB001095-5636-4596-A702-C2B4728B5FB8}.Release|x64.ActiveCfg = Release|Any CPU
-		{4C9A3F81-7660-4170-8D6B-62C239922C89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4C9A3F81-7660-4170-8D6B-62C239922C89}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4C9A3F81-7660-4170-8D6B-62C239922C89}.Debug|x64.ActiveCfg = Debug|x64
-		{4C9A3F81-7660-4170-8D6B-62C239922C89}.Debug|x64.Build.0 = Debug|x64
-		{4C9A3F81-7660-4170-8D6B-62C239922C89}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4C9A3F81-7660-4170-8D6B-62C239922C89}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4C9A3F81-7660-4170-8D6B-62C239922C89}.Release|x64.ActiveCfg = Release|x64
-		{4C9A3F81-7660-4170-8D6B-62C239922C89}.Release|x64.Build.0 = Release|x64
+		{20DC025A-2581-42ED-94C7-3CA62C04D7C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20DC025A-2581-42ED-94C7-3CA62C04D7C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20DC025A-2581-42ED-94C7-3CA62C04D7C4}.Debug|x64.ActiveCfg = Debug|x64
+		{20DC025A-2581-42ED-94C7-3CA62C04D7C4}.Debug|x64.Build.0 = Debug|x64
+		{20DC025A-2581-42ED-94C7-3CA62C04D7C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20DC025A-2581-42ED-94C7-3CA62C04D7C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20DC025A-2581-42ED-94C7-3CA62C04D7C4}.Release|x64.ActiveCfg = Release|x64
+		{20DC025A-2581-42ED-94C7-3CA62C04D7C4}.Release|x64.Build.0 = Release|x64
+		{126BFACF-72BC-48A4-BED8-7FF3074AC0C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{126BFACF-72BC-48A4-BED8-7FF3074AC0C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{126BFACF-72BC-48A4-BED8-7FF3074AC0C0}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{126BFACF-72BC-48A4-BED8-7FF3074AC0C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{126BFACF-72BC-48A4-BED8-7FF3074AC0C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{126BFACF-72BC-48A4-BED8-7FF3074AC0C0}.Release|x64.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -9,8 +9,8 @@ namespace FlowLib.Connections.Protocols.Nmdc.Commands
         {
             get { return address; }
         }
-        public ForceMove(Hub hub, string raw)
-            : base(hub, raw)
+        public ForceMove(Client client, string raw)
+            : base(client, raw)
         {
             // $ForceMove flowlib.dummy.org
             string[] com = raw.Split(' ');

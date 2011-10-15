@@ -74,12 +74,12 @@ namespace FlowLib.Managers
         /// <param name="me">UserInfo of us where request comes from</param>
         /// <param name="share">Share to user for Transfer</param>
         /// <param name="user">UserInfo on user where made the request</param>
-        public void AddTransferReq(string key, Hub hub, UserInfo user)
+        public void AddTransferReq(string key, Client client, UserInfo user)
         {
             lock (requests)
             {
                 if (!requests.ContainsKey(key))
-                    requests.Add(key, new TransferRequest(key, hub, user));
+                    requests.Add(key, new TransferRequest(key, client, user));
             }
             // TODO : Add req limiter.
         }

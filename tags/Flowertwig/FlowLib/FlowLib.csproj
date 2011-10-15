@@ -116,9 +116,9 @@
     <Compile Include="Connections\Entities\StrMessage.cs" />
     <Compile Include="Connections\Entities\TransferRequest.cs" />
     <Compile Include="Connections\Detect.cs" />
-    <Compile Include="Connections\Hub.cs" />
+    <Compile Include="Connections\Client.cs" />
     <Compile Include="Connections\Interfaces\IDirectConnectConnection.cs" />
-    <Compile Include="Connections\Interfaces\IHub.cs" />
+    <Compile Include="Connections\Interfaces\IClient.cs" />
     <Compile Include="Connections\Interfaces\IHubMessage.cs" />
     <Compile Include="Connections\Interfaces\IProtocolHub.cs" />
     <Compile Include="Connections\Interfaces\IProtocolTransfer.cs" />
@@ -280,12 +280,11 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\FlowertwigLibrary\svn\trunk\FlowertwigLibrary.csproj">
+    <ProjectReference Include="..\..\..\..\Flowertwig\trunk\FlowertwigLibrary.csproj">
       <Project>{126BFACF-72BC-48A4-BED8-7FF3074AC0C0}</Project>
       <Name>FlowertwigLibrary</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

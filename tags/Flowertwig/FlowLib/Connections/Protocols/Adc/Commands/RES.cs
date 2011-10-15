@@ -103,7 +103,7 @@ namespace FlowLib.Connections.Protocols.Adc.Commands
                 }
                 catch { }
             }
-            else if (con is Hub)
+            else if (con is Client)
             {
                 type = "D";
             }

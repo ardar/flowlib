@@ -50,7 +50,7 @@ namespace FlowLib.Connections.Protocols.Nmdc
         public event EventHandler MessageToSend;
         #endregion
         #region Variables
-        protected Hub hub = null;
+        protected Client client = null;
         protected string recieved = "";
         protected long myInfoLastUpdated = 0;
         protected MyINFO lastMyInfo = null;
@@ -73,13 +73,13 @@ namespace FlowLib.Connections.Protocols.Nmdc
             set
             {
                 _isReady = value;
-                Update(hub, new DefaultEventArgs(BaseTransferProtocol.IsReady, value));
+                Update(client, new DefaultEventArgs(BaseTransferProtocol.IsReady, value));
             }
         }
 
         public IConMessage KeepAliveCommand
         {
-            get { return new HubMessage(hub, Seperator); }
+            get { return new HubMessage(client, Seperator); }
         }
 
         public IConMessage FirstCommand
@@ -116,13 +116,13 @@ namespace FlowLib.Connections.Protocols.Nmdc
         }
         #endregion
         #region Constructor(s)
-        public HubNmdcProtocol(Hub hub)
+        public HubNmdcProtocol(Client client)
         {
-            this.hub = hub;
-            hub.ConnectionStatusChange += new EventHandler(hub_ConnectionStatusChange);
-            if (hub.Share != null)
-                hub.Share.LastModifiedChanged += new EventHandler(Share_LastModifiedChanged);
-            Hub.RegModeUpdated += new EventHandler(Hub_RegModeUpdated);
+            this.client = client;
+            client.ConnectionStatusChange += new EventHandler(hub_ConnectionStatusChange);
+            if (client.Share != null)
+                client.Share.LastModifiedChanged += new EventHandler(Share_LastModifiedChanged);
+            Client.RegModeUpdated += new EventHandler(Hub_RegModeUpdated);
 
             TimerCallback updateCallback = new TimerCallback(OnUpdateMyInfo);
             updateMyInfoTimer = new Timer(updateCallback, this, Timeout.Infinite, Timeout.Infinite);
@@ -131,8 +131,8 @@ namespace FlowLib.Connections.Protocols.Nmdc
             MessageToSend = new EventHandler(OnMessageToSend);
         }
 
-        public HubNmdcProtocol(Hub hub, bool isSecure)
-            : this(hub)
+        public HubNmdcProtocol(Client client, bool isSecure)
+            : this(client)
         {
             // We are doing this to keep a good HubSettings
             if (isSecure)
@@ -143,12 +143,12 @@ namespace FlowLib.Connections.Protocols.Nmdc
         {
             if (!disposed)
             {
-                hub.ConnectionStatusChange -= hub_ConnectionStatusChange;
-                if (hub.Share != null)
-                    hub.Share.LastModifiedChanged -= Share_LastModifiedChanged;
-                Hub.RegModeUpdated -= Hub_RegModeUpdated;
+                client.ConnectionStatusChange -= hub_ConnectionStatusChange;
+                if (client.Share != null)
+                    client.Share.LastModifiedChanged -= Share_LastModifiedChanged;
+                Client.RegModeUpdated -= Hub_RegModeUpdated;
 
-                hub = null;
+                client = null;
                 updateMyInfoTimer.Dispose();
                 updateMyInfoTimer = null;
 
@@ -166,7 +166,7 @@ namespace FlowLib.Connections.Protocols.Nmdc
 
         void Hub_RegModeUpdated(object sender, DefaultEventArgs e)
         {
-            if (sender != hub && !e.Handled && hub.RegMode >= 0)
+            if (sender != client && !e.Handled && client.RegMode >= 0)
             {
                 UpdateMyInfo();
             }
@@ -182,11 +182,11 @@ namespace FlowLib.Connections.Protocols.Nmdc
         {
             if (new System.DateTime(myInfoLastUpdated).AddMinutes(15) < System.DateTime.Now)
             {
-                MyINFO tmp = new MyINFO(hub);
+                MyINFO tmp = new MyINFO(client);
                 if (lastMyInfo == null || (tmp.Raw != lastMyInfo.Raw))
                 {
                     lastMyInfo = tmp;
-                    hub.Send(lastMyInfo);
+                    client.Send(lastMyInfo);
                     myInfoLastUpdated = System.DateTime.Now.Ticks;
                     updateMyInfoTimer.Change(Timeout.Infinite, Timeout.Infinite);
                 }
@@ -207,7 +207,7 @@ namespace FlowLib.Connections.Protocols.Nmdc
                         h = new HubStatus(HubStatus.Codes.Disconnected, (System.Exception)e.Data);
                     else
                         h = new HubStatus(HubStatus.Codes.Disconnected);
-                    hub.RegMode = -1;
+                    client.RegMode = -1;
 					// Sets MyInfo Interval to 0 when connection is disconnected
 					this.myInfoLastUpdated = 0;
 					lastMyInfo = null;
@@ -221,8 +221,8 @@ namespace FlowLib.Connections.Protocols.Nmdc
                     h = new HubStatus(HubStatus.Codes.Connecting);
                     break;
             }
-            Update(hub, new DefaultEventArgs(Actions.StatusChange, h));
-            hub.Userlist.Clear();
+            Update(client, new DefaultEventArgs(Actions.StatusChange, h));
+            client.Userlist.Clear();
         }
         #endregion
 
@@ -253,17 +253,17 @@ namespace FlowLib.Connections.Protocols.Nmdc
                 raw = raw.Remove(0, pos);
                 // Plugin handling here
                 DefaultEventArgs e = new DefaultEventArgs(Actions.CommandIncomming, msg);
-                MessageReceived(hub, e);
+                MessageReceived(client, e);
                 if (!e.Handled && msg.IsValid)
                     ActOnInMessage(msg);
                 pos++;
             }
             // If wrong Protocol type has been set. change it to ADC
-            if (hub.RegMode == -1 && raw.StartsWith("ISUP")) 
+            if (client.RegMode == -1 && raw.StartsWith("ISUP")) 
             {   // Setting hubtype to ADC
-                Hub tmpHub = hub;
-                hub.Protocol = new AdcProtocol(hub);
-                tmpHub.Reconnect();
+                Client tmpClient = client;
+                client.Protocol = new AdcProtocol(client);
+                tmpClient.Reconnect();
             }
             // If Something is still left. Save it to buffer for later use.
             if (raw.Length > 0)
@@ -273,7 +273,7 @@ namespace FlowLib.Connections.Protocols.Nmdc
         protected HubMessage ParseMessage(string raw)
         {
             raw = raw.Replace(this.Seperator, "");
-            HubMessage msg = new HubMessage(hub, raw);
+            HubMessage msg = new HubMessage(client, raw);
             if (!string.IsNullOrEmpty(raw))
             {
                 switch (raw[0])
@@ -294,44 +294,44 @@ namespace FlowLib.Connections.Protocols.Nmdc
                         switch (cmd)
                         {
                             case "$lock":
-                                msg = new Lock(hub, raw); break;
+                                msg = new Lock(client, raw); break;
                             case "$supports":
-                                msg = new Supports(hub, raw); break;
+                                msg = new Supports(client, raw); break;
                             case "$hubname":
-                                msg = new HubName(hub, raw); break;
+                                msg = new HubName(client, raw); break;
                             case "$hello":
-                                msg = new Hello(hub, raw); break;
+                                msg = new Hello(client, raw); break;
                             case "$myinfo":
-                                msg = new MyINFO(hub, raw); break;
+                                msg = new MyINFO(client, raw); break;
                             case "$nicklist":
-                                msg = new NickList(hub, raw); break;
+                                msg = new NickList(client, raw); break;
                             case "$oplist":
-                                msg = new OpList(hub, raw); break;
+                                msg = new OpList(client, raw); break;
                             case "$to:":
-                                msg = new To(hub, raw); break;
+                                msg = new To(client, raw); break;
                             case "$quit":
-                                msg = new Quit(hub, raw); break;
+                                msg = new Quit(client, raw); break;
                             case "$getpass":
-                                msg = new GetPass(hub, raw); break;
+                                msg = new GetPass(client, raw); break;
                             case "$logedin":
-                                msg = new LogedIn(hub, raw); break;
+                                msg = new LogedIn(client, raw); break;
                             case "$validatedenide":
-                                msg = new ValidateDenide(hub, raw); break;
+                                msg = new ValidateDenide(client, raw); break;
                             case "$forcemove":
-                                msg = new ForceMove(hub, raw); break;
+                                msg = new ForceMove(client, raw); break;
                             case "$connecttome":
-                                msg = new ConnectToMe(hub, raw); break;
+                                msg = new ConnectToMe(client, raw); break;
                             case "$revconnecttome":
-                                msg = new RevConnectToMe(hub, raw); break;
+                                msg = new RevConnectToMe(client, raw); break;
                             case "$search":
-                                msg = new Search(hub, raw); break;
+                                msg = new Search(client, raw); break;
                             case "$sr":
-                                msg = new SR(hub, raw); break;
+                                msg = new SR(client, raw); break;
                         }
                         break;
                     default:
                         // No command. Assume MainChat.
-                        msg = new MainChat(hub, raw);
+                        msg = new MainChat(client, raw);
                         break;
                 }
             }
@@ -341,7 +341,7 @@ namespace FlowLib.Connections.Protocols.Nmdc
         public bool OnSend(IConMessage msg)
         {
             DefaultEventArgs e = new DefaultEventArgs(Actions.CommandOutgoing, msg);
-            MessageToSend(hub, e);
+            MessageToSend(client, e);
             if (!e.Handled)
             {
                 return true;
@@ -357,24 +357,24 @@ namespace FlowLib.Connections.Protocols.Nmdc
             {
                 MainChat main = (MainChat)message;
                 MainMessage msg = new MainMessage(main.From, main.Content);
-                Update(hub, new DefaultEventArgs(Actions.MainMessage, msg));
+                Update(client, new DefaultEventArgs(Actions.MainMessage, msg));
             }
             else if (message is To)
             {
                 To to = (To)message;
                 PrivateMessage pm = new PrivateMessage(to.To, to.From, to.Content);
-                Update(hub, new DefaultEventArgs(Actions.PrivateMessage, pm));
+                Update(client, new DefaultEventArgs(Actions.PrivateMessage, pm));
             }
             else if (message is SR)
             {
                 SR searchResult = (SR)message;
                 SearchResultInfo srinfo = new SearchResultInfo(searchResult.Info, searchResult.From);
-                Update(hub, new DefaultEventArgs(Actions.SearchResult, srinfo));
+                Update(client, new DefaultEventArgs(Actions.SearchResult, srinfo));
             }
             else if (message is Search)
             {
                 Search search = (Search)message;
-                if (hub.Share == null)
+                if (client.Share == null)
                     return;
                 int maxReturns = 5;
                 bool active = false;
@@ -385,10 +385,10 @@ namespace FlowLib.Connections.Protocols.Nmdc
                 }
                 var ret = new List<ContentInfo>(maxReturns);
                 // TODO : This lookup can be done nicer
-                lock (hub.Share)
+                lock (client.Share)
                 {
 
-                    foreach (KeyValuePair<string, ContentInfo> var in hub.Share)
+                    foreach (KeyValuePair<string, ContentInfo> var in client.Share)
                     {
                         if (var.Value == null)
                             continue;
@@ -405,7 +405,7 @@ namespace FlowLib.Connections.Protocols.Nmdc
                                     case "2":
 
                                         contentInfo.Set(ContentInfo.TTH, search.Info.Get(SearchInfo.SEARCH));
-                                        if (hub.Share.ContainsContent(ref contentInfo))
+                                        if (client.Share.ContainsContent(ref contentInfo))
                                         {
                                             ret.Add(contentInfo);
                                         }
@@ -464,7 +464,7 @@ namespace FlowLib.Connections.Protocols.Nmdc
                     // Should this be sent?
                     if (send)
                     {
-                        SR sr = new SR(hub, ret[i], (search.Info.ContainsKey(SearchInfo.EXTENTION) ? search.Info.Get(SearchInfo.EXTENTION).Equals("$0") : false), search.From);
+                        SR sr = new SR(client, ret[i], (search.Info.ContainsKey(SearchInfo.EXTENTION) ? search.Info.Get(SearchInfo.EXTENTION).Equals("$0") : false), search.From);
                         if (active)
                         {
                             // Send with UDP
@@ -473,16 +473,16 @@ namespace FlowLib.Connections.Protocols.Nmdc
                         else
                         {
                             // Send through hub
-                            hub.Send(sr);
+                            client.Send(sr);
                         }
                     }
                 }
             }
             else if (message is Lock)
             {
-                hub.Send(new Supports(hub));
-                hub.Send(new Key(hub, ((Lock)message).Key));
-                hub.Send(new ValidateNick(hub));
+                client.Send(new Supports(client));
+                client.Send(new Key(client, ((Lock)message).Key));
+                client.Send(new ValidateNick(client));
             }
             else if (message is HubName)
             {
@@ -492,7 +492,7 @@ namespace FlowLib.Connections.Protocols.Nmdc
                     name = new FlowLib.Entities.HubName(hubname.Name, hubname.Topic);
                 else
                     name = new FlowLib.Entities.HubName(hubname.Content);
-                Update(hub, new DefaultEventArgs(Actions.Name, name));
+                Update(client, new DefaultEventArgs(Actions.Name, name));
             }
             else if (message is NickList)
             {
@@ -501,9 +501,9 @@ namespace FlowLib.Connections.Protocols.Nmdc
                 {
                     var userInfo = new UserInfo();
                     userInfo.DisplayName = userid;
-                    userInfo.Set(UserInfo.STOREID, hub.StoreId + userid);
-                    if (hub.GetUserById(userid) == null)
-                        Update(hub, new DefaultEventArgs(Actions.UserOnline, userInfo));
+                    userInfo.Set(UserInfo.STOREID, client.StoreId + userid);
+                    if (client.GetUserById(userid) == null)
+                        Update(client, new DefaultEventArgs(Actions.UserOnline, userInfo));
                 }
             }
             else if (message is OpList)
@@ -513,15 +513,15 @@ namespace FlowLib.Connections.Protocols.Nmdc
                 {
                     UserInfo userInfo = new UserInfo();
                     userInfo.DisplayName = userid;
-                    userInfo.Set(UserInfo.STOREID, hub.StoreId + userid);
+                    userInfo.Set(UserInfo.STOREID, client.StoreId + userid);
                     userInfo.IsOperator = true;
                     User usr = null;
-                    if ((usr = hub.GetUserById(userid)) == null)
-                        Update(hub, new DefaultEventArgs(Actions.UserOnline, userInfo));
+                    if ((usr = client.GetUserById(userid)) == null)
+                        Update(client, new DefaultEventArgs(Actions.UserOnline, userInfo));
                     else
                     {
                         usr.UserInfo = userInfo;
-                        Update(hub, new DefaultEventArgs(Actions.UserInfoChange, usr.UserInfo));
+                        Update(client, new DefaultEventArgs(Actions.UserInfoChange, usr.UserInfo));
                     }
                 }
             }
@@ -529,48 +529,48 @@ namespace FlowLib.Connections.Protocols.Nmdc
             {
                 Quit quit = (Quit)message;
                 User usr = null;
-                if ((usr = hub.GetUserById(quit.From)) != null)
-                    Update(hub, new DefaultEventArgs(Actions.UserOffline, usr.UserInfo));
+                if ((usr = client.GetUserById(quit.From)) != null)
+                    Update(client, new DefaultEventArgs(Actions.UserOffline, usr.UserInfo));
             }
             else if (message is LogedIn)
-                hub.RegMode = 2;
+                client.RegMode = 2;
             else if (message is ValidateDenide)
-                Update(hub, new DefaultEventArgs(Actions.StatusChange, new HubStatus(HubStatus.Codes.Disconnected)));
+                Update(client, new DefaultEventArgs(Actions.StatusChange, new HubStatus(HubStatus.Codes.Disconnected)));
             else if (message is GetPass)
             {
-                hub.RegMode = 1;
-                if (hub.HubSetting.Password.Length == 0)
-                    Update(hub, new DefaultEventArgs(Actions.Password, null));
+                client.RegMode = 1;
+                if (client.HubSetting.Password.Length == 0)
+                    Update(client, new DefaultEventArgs(Actions.Password, null));
                 else
-                    hub.Send(new MyPass(hub));
+                    client.Send(new MyPass(client));
             }
             else if (message is MyINFO)
             {
                 MyINFO myinfo = (MyINFO)message;
                 User usr = null;
-                if ((usr = hub.GetUserById(message.From)) == null)
-                    Update(hub, new DefaultEventArgs(Actions.UserOnline, myinfo.UserInfo));
+                if ((usr = client.GetUserById(message.From)) == null)
+                    Update(client, new DefaultEventArgs(Actions.UserOnline, myinfo.UserInfo));
                 else
                 {
                     bool op = usr.IsOperator;
                     usr.UserInfo = myinfo.UserInfo;
                     usr.UserInfo.IsOperator = op;
-                    Update(hub, new DefaultEventArgs(Actions.UserInfoChange, usr.UserInfo));
+                    Update(client, new DefaultEventArgs(Actions.UserInfoChange, usr.UserInfo));
                 }
 
-                if (hub.RegMode >= 0 && string.Equals(myinfo.From, hub.Me.ID))
+                if (client.RegMode >= 0 && string.Equals(myinfo.From, client.Me.ID))
                 {
                     IsReady = true;
                 }
             }
             else if (message is Hello)
             {
-                if (hub.HubSetting.DisplayName.Equals(message.From))
+                if (client.HubSetting.DisplayName.Equals(message.From))
                 {
-                    hub.Send(new Version(hub));
-                    hub.Send(new GetNickList(hub));
-                    if (hub.RegMode < 0)
-                        hub.RegMode = 0;
+                    client.Send(new Version(client));
+                    client.Send(new GetNickList(client));
+                    if (client.RegMode < 0)
+                        client.RegMode = 0;
                     UpdateMyInfo();
                 }
             }
@@ -578,23 +578,23 @@ namespace FlowLib.Connections.Protocols.Nmdc
             {
                 ConnectToMe conToMe = (ConnectToMe)message;
                 Transfer trans = new Transfer(conToMe.Address, conToMe.Port);
-                trans.Share = this.hub.Share;
-                trans.Me = hub.Me;
-                trans.Source = new Source(hub.StoreId, null);
+                trans.Share = this.client.Share;
+                trans.Me = client.Me;
+                trans.Source = new Source(client.StoreId, null);
                 // Protocol has to be set last.
                 trans.Protocol = new TransferNmdcProtocol(trans);
 #if !COMPACT_FRAMEWORK
-                if (conToMe.TLS && hub.Me.ContainsKey(UserInfo.SECURE))
+                if (conToMe.TLS && client.Me.ContainsKey(UserInfo.SECURE))
                     trans.SecureProtocol = SecurityProtocols.TLS;
 #endif
-                Update(hub, new DefaultEventArgs(Actions.TransferStarted, trans));
+                Update(client, new DefaultEventArgs(Actions.TransferStarted, trans));
             }
             else if (message is RevConnectToMe)
             {
                 RevConnectToMe revConToMe = (RevConnectToMe)message;
                 User usr = null;
-                usr = hub.GetUserById(revConToMe.From);
-                if (hub.Me.Mode == ConnectionTypes.Passive)
+                usr = client.GetUserById(revConToMe.From);
+                if (client.Me.Mode == ConnectionTypes.Passive)
                 {
                     if (usr != null)
                     {
@@ -602,7 +602,7 @@ namespace FlowLib.Connections.Protocols.Nmdc
                         if (usr.UserInfo.Mode != ConnectionTypes.Passive)
                         {
                             usr.UserInfo.Mode = ConnectionTypes.Passive;
-                            hub.Send(new RevConnectToMe(revConToMe.From, hub));
+                            client.Send(new RevConnectToMe(revConToMe.From, client));
                         }
                     }
                 }
@@ -610,26 +610,26 @@ namespace FlowLib.Connections.Protocols.Nmdc
                 {
                     if (usr != null)
                     {
-                        Update(hub, new DefaultEventArgs(Actions.TransferRequest, new TransferRequest(usr.ID, hub, usr.UserInfo)));
+                        Update(client, new DefaultEventArgs(Actions.TransferRequest, new TransferRequest(usr.ID, client, usr.UserInfo)));
 #if !COMPACT_FRAMEWORK
                         // Security, Windows Mobile doesnt support SSLStream so we disable this feature for it.
                         if (
                             usr.UserInfo.ContainsKey(UserInfo.SECURE) &&
-                            hub.Me.ContainsKey(UserInfo.SECURE) &&
-                            !string.IsNullOrEmpty(hub.Me.Get(UserInfo.SECURE))
+                            client.Me.ContainsKey(UserInfo.SECURE) &&
+                            !string.IsNullOrEmpty(client.Me.Get(UserInfo.SECURE))
                             )
-                            hub.Send(new ConnectToMe(usr.ID, hub.Share.Port, hub, SecurityProtocols.TLS));
+                            client.Send(new ConnectToMe(usr.ID, client.Share.Port, client, SecurityProtocols.TLS));
                         else
 #endif
-                            hub.Send(new ConnectToMe(usr.ID, hub.Share.Port, hub));
+                            client.Send(new ConnectToMe(usr.ID, client.Share.Port, client));
                     }
                 }
             }
             else if (message is ForceMove)
             {
                 ForceMove forceMove = (ForceMove)message;
-                hub.Disconnect();
-                Update(hub, new DefaultEventArgs(Actions.Redirect, new RedirectInfo(forceMove.Address)));
+                client.Disconnect();
+                Update(client, new DefaultEventArgs(Actions.Redirect, new RedirectInfo(forceMove.Address)));
             }
         }
 
@@ -638,22 +638,22 @@ namespace FlowLib.Connections.Protocols.Nmdc
             if (e.Action.Equals(Actions.MainMessage))
             {
                 MainMessage main = (MainMessage)e.Data;
-                hub.Send(new MainChat(hub, hub.Me.ID, main.Content));
+                client.Send(new MainChat(client, client.Me.ID, main.Content));
             }
             else if (e.Action.Equals(Actions.PrivateMessage))
             {
                 PrivateMessage pm = (PrivateMessage)e.Data;
                 To to = null;
-                hub.Send(to = new To(hub, pm.To, pm.Content));
+                client.Send(to = new To(client, pm.To, pm.Content));
                 this.ParseRaw(to.Raw);
             }
             else if (e.Action.Equals(Actions.Password))
             {
-                hub.Send(new MyPass(hub, e.Data.ToString()));
+                client.Send(new MyPass(client, e.Data.ToString()));
             }
             else if (e.Action.Equals(Actions.Search))
             {
-                hub.Send(new Search(hub, (SearchInfo)e.Data));
+                client.Send(new Search(client, (SearchInfo)e.Data));
             }
             else if (e.Action.Equals(Actions.StartTransfer))
             {
@@ -672,23 +672,23 @@ namespace FlowLib.Connections.Protocols.Nmdc
                     usrInfo = usr.UserInfo;
                 }
 
-                switch (hub.Me.Mode)
+                switch (client.Me.Mode)
                 {
                     case ConnectionTypes.Direct:
                     case ConnectionTypes.UPnP:
                     case ConnectionTypes.Forward:
-                        Update(hub, new DefaultEventArgs(Actions.TransferRequest, new TransferRequest(usrInfo.ID, hub, usrInfo)));
+                        Update(client, new DefaultEventArgs(Actions.TransferRequest, new TransferRequest(usrInfo.ID, client, usrInfo)));
 #if !COMPACT_FRAMEWORK
 // Security, Windows Mobile doesnt support SSLStream so we disable this feature for it.
                         if (
                             usrInfo.ContainsKey(UserInfo.SECURE) && 
-                            hub.Me.ContainsKey(UserInfo.SECURE) &&
-                            !string.IsNullOrEmpty( hub.Me.Get(UserInfo.SECURE) )
+                            client.Me.ContainsKey(UserInfo.SECURE) &&
+                            !string.IsNullOrEmpty( client.Me.Get(UserInfo.SECURE) )
                             )
-                            hub.Send(new ConnectToMe(usrInfo.ID, hub.Share.Port, hub, SecurityProtocols.TLS));
+                            client.Send(new ConnectToMe(usrInfo.ID, client.Share.Port, client, SecurityProtocols.TLS));
                         else
 #endif
-                            hub.Send(new ConnectToMe(usrInfo.ID, hub.Share.Port, hub));
+                            client.Send(new ConnectToMe(usrInfo.ID, client.Share.Port, client));
                         break;
                     case ConnectionTypes.Passive:
                     case ConnectionTypes.Socket5:
@@ -698,7 +698,7 @@ namespace FlowLib.Connections.Protocols.Nmdc
                         {
                             break;
                         }
-                        hub.Send(new RevConnectToMe(usrInfo.ID, hub));
+                        client.Send(new RevConnectToMe(usrInfo.ID, client));
                         break;
                 }
             }

@@ -62,8 +62,8 @@ namespace FlowLib.Connections.Protocols.Nmdc.Commands
             get { return info; }
         }
         // Receiving
-        public MyINFO(Hub hub, string raw)
-            : base(hub, raw)
+        public MyINFO(Client client, string raw)
+            : base(client, raw)
         {
             int pos1, pos2;
             if ((pos1 = raw.IndexOf("$MyINFO $ALL ")) != -1)
@@ -76,7 +76,7 @@ namespace FlowLib.Connections.Protocols.Nmdc.Commands
                     string[] sections = temp.Split('$');
                     info = new UserInfo();
                     info.DisplayName = from;
-                    info.Set(UserInfo.STOREID, hub.StoreId + from);
+                    info.Set(UserInfo.STOREID, client.StoreId + from);
                     if (sections.Length == 6)
                     {
                         int pos = 0;
@@ -110,14 +110,14 @@ namespace FlowLib.Connections.Protocols.Nmdc.Commands
             }
         }
         // Sending
-        public MyINFO(Hub hub)
-            : this(hub, ConvertStatusFlagToByte(UserStatusFlag.Normal))
+        public MyINFO(Client client)
+            : this(client, ConvertStatusFlagToByte(UserStatusFlag.Normal))
         { }
 
-        public MyINFO(Hub hub, byte flg)
-            : base(hub, null)
+        public MyINFO(Client client, byte flg)
+            : base(client, null)
         {
-            this.info = hub.Me;
+            this.info = client.Me;
             this.statusFlag = flg;
             var tag = new System.Text.StringBuilder();
             tag.Append("<");
@@ -149,7 +149,7 @@ namespace FlowLib.Connections.Protocols.Nmdc.Commands
                   + tag
                   + "$ $"
                   + info.Connection
-                  + hub.Protocol.Encoding.GetString(new[] { ConvertStatusFlagToByte(status) }) + "$"
+                  + client.Protocol.Encoding.GetString(new[] { ConvertStatusFlagToByte(status) }) + "$"
                   + info.Email + "$"
                   + (string.IsNullOrEmpty(info.Share) ? "0" : info.Share)
                   + "$|";

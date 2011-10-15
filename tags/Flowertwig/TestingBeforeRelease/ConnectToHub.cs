@@ -3,13 +3,14 @@ using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using FlowLib.Containers;
 using FlowLib.Connections;
 using FlowLib.Interfaces;
 using System.Threading;
-using FlowLib.Events;
-using FlowLib.Containers.Security;
 using TestingBeforeRelease.Utils;
+using FlowLib.Entities;
+using Flowertwig.Utils.Events;
+using Flowertwig.Utils.Entities.Security;
+using Flowertwig.Utils.Connections;
 
 namespace TestingBeforeRelease
 {
@@ -107,12 +108,12 @@ namespace TestingBeforeRelease
         {
             _settings.Protocol = protocol;
 
-            Hub hubConnection = new Hub(_settings);
-            hubConnection.ConnectionStatusChange += new FlowLib.Events.FmdcEventHandler(OnConnectionStatusChange);
-            hubConnection.SecureUpdate += new FmdcEventHandler(hubConnection_SecureUpdate);
-            Hub.RegModeUpdated += new FmdcEventHandler(Hub_RegModeUpdated);
+            Client clientConnection = new Client(_settings);
+            clientConnection.ConnectionStatusChange += new Flowertwig.Utils.Events.EventHandler(OnConnectionStatusChange);
+            clientConnection.SecureUpdate += new Flowertwig.Utils.Events.EventHandler(hubConnection_SecureUpdate);
+            Client.RegModeUpdated += new Flowertwig.Utils.Events.EventHandler(Hub_RegModeUpdated);
 
-            hubConnection.Connect();
+            clientConnection.Connect();
 
             int i = 0;
             while (!_isFinished && i++ < 20)
@@ -120,16 +121,16 @@ namespace TestingBeforeRelease
                 Thread.Sleep(100);
             }
 
-            hubConnection.ConnectionStatusChange -= OnConnectionStatusChange;
-            hubConnection.Disconnect("Test time exceeded");
-            hubConnection.Dispose();
+            clientConnection.ConnectionStatusChange -= OnConnectionStatusChange;
+            clientConnection.Disconnect("Test time exceeded");
+            clientConnection.Dispose();
         }
 
-        void hubConnection_SecureUpdate(object sender, FmdcEventArgs e)
+        void hubConnection_SecureUpdate(object sender, DefaultEventArgs e)
         {
             switch (e.Action)
             {
-                case Actions.SecurityValidateRemoteCertificate:
+                case Flowertwig.Utils.Connections.TcpConnection.SecurityValidateRemoteCertificate:
                     CertificateValidationInfo ct = e.Data as CertificateValidationInfo;
                     if (ct != null)
                     {
@@ -141,10 +142,10 @@ namespace TestingBeforeRelease
             }
         }
 
-        void Hub_RegModeUpdated(object sender, FmdcEventArgs e)
+        void Hub_RegModeUpdated(object sender, DefaultEventArgs e)
         {
-            Hub hub = sender as Hub;
-            if (_settings == hub.HubSetting)
+            Client client = sender as Client;
+            if (_settings == client.HubSetting)
             {
                 _regMode = (int)e.Action;
                 if (_regMode >= 0)
@@ -153,8 +154,8 @@ namespace TestingBeforeRelease
                 }
             }
         }
-        
-        void OnConnectionStatusChange(object sender, FlowLib.Events.FmdcEventArgs e)
+
+        void OnConnectionStatusChange(object sender, DefaultEventArgs e)
         {
             switch (e.Action)
             {

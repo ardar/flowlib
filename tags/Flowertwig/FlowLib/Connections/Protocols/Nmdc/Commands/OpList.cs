@@ -9,8 +9,8 @@ namespace FlowLib.Connections.Protocols.Nmdc.Commands
         {
             get { return ops; }
         }
-        public OpList(Hub hub, string raw)
-            : base(hub, raw)
+        public OpList(Client client, string raw)
+            : base(client, raw)
         {
             int pos1;
             if ((pos1 = raw.IndexOf(" ")) != -1)

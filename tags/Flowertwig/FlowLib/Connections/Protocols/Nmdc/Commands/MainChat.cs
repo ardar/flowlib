@@ -10,8 +10,8 @@ namespace FlowLib.Connections.Protocols.Nmdc.Commands
             get { return content; }
         }
         // for receiving
-        public MainChat(Hub hub, string raw)
-            : base(hub, raw)
+        public MainChat(Client client, string raw)
+            : base(client, raw)
         {
             if (raw.StartsWith("<"))
             {
@@ -39,8 +39,8 @@ namespace FlowLib.Connections.Protocols.Nmdc.Commands
             valid = true;
         }
         // for sending
-        public MainChat(Hub hub, string from, string content)
-            : base(hub, null)
+        public MainChat(Client client, string from, string content)
+            : base(client, null)
         {
             // TODO : Fix so we dont have from as param as we is not using it.
             // We are just using this from to specify what constructor to use... we know it is ugly.

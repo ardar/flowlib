@@ -37,10 +37,10 @@ namespace FlowLib.Connections.Protocols.Nmdc.Commands
 
     public class ValidateNick : HubMessage
     {
-        public ValidateNick(Hub hub)
-            : base(hub, null)
+        public ValidateNick(Client client)
+            : base(client, null)
         {
-            from = hub.HubSetting.DisplayName;
+            from = client.HubSetting.DisplayName;
             Raw = "$ValidateNick " + from + "|";
             if (!string.IsNullOrEmpty(from))
                 IsValid = true;
