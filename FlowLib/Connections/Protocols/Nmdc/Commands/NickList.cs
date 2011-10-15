@@ -9,8 +9,8 @@ namespace FlowLib.Connections.Protocols.Nmdc.Commands
         {
             get { return nicks; }
         }
-        public NickList(Hub hub, string raw)
-            : base(hub, raw)
+        public NickList(Client client, string raw)
+            : base(client, raw)
         {
             // $NickList <nick1>$$<nick2>$$<nick3>$$
             int pos1;

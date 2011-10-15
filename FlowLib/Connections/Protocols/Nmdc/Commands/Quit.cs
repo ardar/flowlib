@@ -8,8 +8,8 @@ namespace FlowLib.Connections.Protocols.Nmdc.Commands
     /// </summary>
     public class Quit : HubMessage
     {
-        public Quit(Hub hub, string raw)
-            : base(hub, raw)
+        public Quit(Client client, string raw)
+            : base(client, raw)
         {
             int pos;
             if ((pos = raw.IndexOf(' ')) != -1)

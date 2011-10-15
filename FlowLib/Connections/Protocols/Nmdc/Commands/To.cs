@@ -10,8 +10,8 @@ namespace FlowLib.Connections.Protocols.Nmdc.Commands
             get { return content; }
         }
         // for receiving
-        public To(Hub hub, string raw)
-            : base(hub, raw)
+        public To(Client client, string raw)
+            : base(client, raw)
         {
             //$To: Flow84 From: PIP $<PIP> Hejsan|
             int pos1, pos2;
@@ -30,10 +30,10 @@ namespace FlowLib.Connections.Protocols.Nmdc.Commands
             }
         }
         // for sending 
-        public To(Hub hub, string to, string content)
-            : base(hub, null)
+        public To(Client client, string to, string content)
+            : base(client, null)
         {
-            this.from = hub.Me.DisplayName;
+            this.from = client.Me.DisplayName;
             this.to = to;
             this.content = "<" + this.from + "> " + content;
             this.Raw = "$To: " + this.to + " From: " + this.from + " $" + this.content + "|";

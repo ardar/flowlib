@@ -289,11 +289,11 @@ namespace FlowLib.Connections.Protocols.Nmdc.Commands
         /// <summary>
         /// This Constructor is for sending
         /// </summary>
-        /// <param name="hub"></param>
-        public Supports(Hub hub)
-            : base(hub, null)
+        /// <param name="client"></param>
+        public Supports(Client client)
+            : base(client, null)
         {
-            if (hub.Me.ContainsKey(UserInfo.SECURE))
+            if (client.Me.ContainsKey(UserInfo.SECURE))
                 Raw = "$Supports NoHello NoGetINFO TLS |";
             else
                 Raw = "$Supports NoHello NoGetINFO |";
@@ -303,10 +303,10 @@ namespace FlowLib.Connections.Protocols.Nmdc.Commands
         /// <summary>
         /// This Constructor is for receiving
         /// </summary>
-        /// <param name="hub"></param>
+        /// <param name="client"></param>
         /// <param name="raw"></param>
-        public Supports(Hub hub, string raw)
-            : base(hub, null)
+        public Supports(Client client, string raw)
+            : base(client, null)
         {
             Raw = raw;
         }

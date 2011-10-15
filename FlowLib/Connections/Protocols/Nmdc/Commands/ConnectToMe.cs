@@ -25,31 +25,31 @@ namespace FlowLib.Connections.Protocols.Nmdc.Commands
             get { return tls; }
         }
         #endregion
-        public ConnectToMe(string toNick, int port, Hub hub)
-            : this(toNick, port, hub, SecurityProtocols.None)
+        public ConnectToMe(string toNick, int port, Client client)
+            : this(toNick, port, client, SecurityProtocols.None)
         {
 
         }
-        public ConnectToMe(string toNick, int port, Hub hub, SecurityProtocols secProt)
-            : base(hub, null)
+        public ConnectToMe(string toNick, int port, Client client, SecurityProtocols secProt)
+            : base(client, null)
         {
             this.to = toNick;
             this.port = port;
 
-            this.address = hub.LocalAddress.Address.ToString();
-            if (hub.Me.ContainsKey(UserInfo.IP))
-                this.address = hub.Me.Get(UserInfo.IP);
+            this.address = client.LocalAddress.Address.ToString();
+            if (client.Me.ContainsKey(UserInfo.IP))
+                this.address = client.Me.Get(UserInfo.IP);
 
             if ((SecurityProtocols.TLS & secProt) == SecurityProtocols.TLS)
                 tls = true;
 
-            Raw = "$ConnectToMe "+this.to+" " + this.address + ":" + (tls ? hub.Me.Get(UserInfo.SECURE) + "S" : this.port.ToString()) + "|";
+            Raw = "$ConnectToMe "+this.to+" " + this.address + ":" + (tls ? client.Me.Get(UserInfo.SECURE) + "S" : this.port.ToString()) + "|";
             if (!string.IsNullOrEmpty(to) && port > 0 && port < 65535 && !string.IsNullOrEmpty(address))
                 IsValid = true;
         }
 
-        public ConnectToMe(Hub hub, string raw)
-            : base(hub, raw)
+        public ConnectToMe(Client client, string raw)
+            : base(client, raw)
         {
             // $ConnectToMe FMDC 82.182.95.201:6900
             string[] sections = raw.Split(' ');

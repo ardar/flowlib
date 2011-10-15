@@ -5,7 +5,7 @@ using System.Text;
 
 namespace FlowLib.Connections.Interfaces
 {
-    public interface IHub : IDirectConnectConnection
+    public interface IClient : IDirectConnectConnection
     {
 
     }

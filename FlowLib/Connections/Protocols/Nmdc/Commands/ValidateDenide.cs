@@ -8,6 +8,6 @@ namespace FlowLib.Connections.Protocols.Nmdc.Commands
     /// </summary>
     public class ValidateDenide : HubMessage
     {
-        public ValidateDenide(Hub hub, string raw) : base(hub, raw) { IsValid = true; }
+        public ValidateDenide(Client client, string raw) : base(client, raw) { IsValid = true; }
     }
 }

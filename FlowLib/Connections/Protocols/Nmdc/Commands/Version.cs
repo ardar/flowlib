@@ -9,8 +9,8 @@ namespace FlowLib.Connections.Protocols.Nmdc.Commands
         {
             get { return version; }
         }
-        public Version(Hub hub)
-            : base(hub, null)
+        public Version(Client client)
+            : base(client, null)
         {
             version = "1.0091";
             Raw = "$Version "+version+"|";

@@ -23,8 +23,8 @@ namespace FlowLib.Connections.Protocols.Nmdc.Commands
             get { return topic; }
         }
         #endregion
-        public HubName(Hub hub, string raw)
-            : base(hub, raw)
+        public HubName(Client client, string raw)
+            : base(client, raw)
         {
             int pos, pos2;
             if ((pos = raw.IndexOf(' ')) != -1)

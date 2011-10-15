@@ -34,8 +34,8 @@ namespace FlowLib.Connections.Protocols.Nmdc.Commands
             }
         }
 
-        public SR(Hub hub, string raw)
-            : base(hub, raw)
+        public SR(Client client, string raw)
+            : base(client, raw)
         {
             Parse();
         }
@@ -111,8 +111,8 @@ namespace FlowLib.Connections.Protocols.Nmdc.Commands
             }
         }
 
-        public SR(Hub hub, ContentInfo info, bool directoryOnly, string from)
-            : base(hub, null)
+        public SR(Client client, ContentInfo info, bool directoryOnly, string from)
+            : base(client, null)
         {
             this.info = info;
             // Directory
@@ -125,7 +125,7 @@ namespace FlowLib.Connections.Protocols.Nmdc.Commands
             else
                 content = info.Get(ContentInfo.VIRTUAL) + "\x005" + info.Size.ToString();
             // TODO : We are not supporting slot system right now so we will respond that we have all slots open.
-            string slots = string.Format("{0}/{0}", hub.Me.TagInfo.Slots); 
+            string slots = string.Format("{0}/{0}", client.Me.TagInfo.Slots); 
             // TODO : We are not saving hub name as it is now so we cant use it.
             string hubname = string.Empty;
             if (info.ContainsKey(ContentInfo.TTH) && !directoryOnly)
@@ -133,7 +133,7 @@ namespace FlowLib.Connections.Protocols.Nmdc.Commands
             string passive = string.Empty;
             if (!string.IsNullOrEmpty(from))
                 passive = "\x005" + from;
-            Raw = string.Format("$SR {0} {1} {2}\x005{3} ({4}:{5}){6}|", hub.Me.ID, content, slots, hubname, hub.RemoteAddress.Address.ToString(), hub.RemoteAddress.Port, passive);
+            Raw = string.Format("$SR {0} {1} {2}\x005{3} ({4}:{5}){6}|", client.Me.ID, content, slots, hubname, client.RemoteAddress.Address.ToString(), client.RemoteAddress.Port, passive);
         }
     }
 }

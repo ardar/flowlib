@@ -37,9 +37,9 @@ namespace FlowLib.Connections.Protocols.Adc.Commands
         public SUP(IConnection con)
             : base(con, null)
         {
-            if (con is Hub)
+            if (con is Client)
             {
-                if (((Hub)con).Me.ContainsKey(UserInfo.SECURE))
+                if (((Client)con).Me.ContainsKey(UserInfo.SECURE))
                     Raw = "HSUP " + AdcProtocol.Support + " ADADC0" + "\n";
                 else
                     Raw = "HSUP " + AdcProtocol.Support + "\n";

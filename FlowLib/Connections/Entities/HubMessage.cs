@@ -60,20 +60,20 @@ namespace FlowLib.Connections.Entities
         /// <summary>
         /// Creating HubMessage
         /// </summary>
-        /// <param name="hub">Hub that this message is related to</param>
+        /// <param name="client">Hub that this message is related to</param>
         /// <param name="raw">raw message</param>
-        public HubMessage(IConnection hub, string raw)
-            : this(hub, raw, null, null) { }
+        public HubMessage(IConnection client, string raw)
+            : this(client, raw, null, null) { }
 
         /// <summary>
         /// Creating HubMessage
         /// </summary>
-        /// <param name="hub">Hub that this message is related to</param>
+        /// <param name="client">Hub that this message is related to</param>
         /// <param name="raw">raw message</param>
         /// <param name="from">User id of the user message was from</param>
         /// <param name="to">User id of the user message is to</param>
-        public HubMessage(IConnection hub, string raw, string from, string to)
-            : base(hub,raw)
+        public HubMessage(IConnection client, string raw, string from, string to)
+            : base(client,raw)
         {
             this.from = from;
             this.to = to;

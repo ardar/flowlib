@@ -27,7 +27,7 @@ namespace FlowLib.Connections.Entities
     public class TransferRequest
     {
         UserInfo user;
-        Hub hub;
+        Client client;
         IShare share;
         string key;
         int meDownload = -1;      // Not set (We dont know who is going to download)
@@ -46,7 +46,7 @@ namespace FlowLib.Connections.Entities
 
         public UserInfo Me
         {
-            get { return hub.Me; }
+            get { return client.Me; }
         }
 
         public Source Source
@@ -56,9 +56,9 @@ namespace FlowLib.Connections.Entities
                 if (_source == null)
                 {
                     string conId = null;
-                    if (hub != null || hub.HubSetting != null)
+                    if (client != null || client.HubSetting != null)
                     {
-                        conId = hub.StoreId;
+                        conId = client.StoreId;
                     }
                     _source = new Source(conId, user.StoreID);
                 }
@@ -77,7 +77,7 @@ namespace FlowLib.Connections.Entities
             get
             {
                 if (share == null)
-                    return hub.Share;
+                    return client.Share;
                 return share;
             }
             set { share = value; }
@@ -87,8 +87,8 @@ namespace FlowLib.Connections.Entities
         {
             get
             {
-                if (hub.Share != null)
-                    return hub.Share.Port;
+                if (client.Share != null)
+                    return client.Share.Port;
                 return -1;
             }
         }
@@ -97,11 +97,11 @@ namespace FlowLib.Connections.Entities
         /// Creates a Transfer request
         /// </summary>
         /// <param name="pKey">Unique key that identifies this request</param>
-        /// <param name="pHub">Hub where request came from</param>
+        /// <param name="pClient">Hub where request came from</param>
         /// <param name="pUser">User that transfer request is for</param>
         /// <param name="download">telling if we know that _we_ will download</param>
-        public TransferRequest(string pKey, Hub pHub, UserInfo pUser, bool download)
-            : this(pKey, pHub, pUser)
+        public TransferRequest(string pKey, Client pClient, UserInfo pUser, bool download)
+            : this(pKey, pClient, pUser)
         {
             if (download)
                 meDownload = 1;
@@ -119,12 +119,12 @@ namespace FlowLib.Connections.Entities
         /// Creates a Transfer request
         /// </summary>
         /// <param name="pKey">Unique key that identifies this request</param>
-        /// <param name="pHub">Hub where request came from</param>
+        /// <param name="pClient">Hub where request came from</param>
         /// <param name="pUser">User that transfer request is for</param>
-        public TransferRequest(string pKey, Hub pHub, UserInfo pUser)
+        public TransferRequest(string pKey, Client pClient, UserInfo pUser)
         {
             key = pKey;
-            hub = pHub;
+            client = pClient;
             user = pUser;
         }
     }

@@ -4,18 +4,18 @@ namespace FlowLib.Connections.Protocols.Nmdc.Commands
 {
     public class RevConnectToMe : HubMessage
     {
-        public RevConnectToMe(string remoteNick, Hub hub)
-            : base(hub, null)
+        public RevConnectToMe(string remoteNick, Client client)
+            : base(client, null)
         {
-            from = hub.Me.DisplayName;
+            from = client.Me.DisplayName;
             to = remoteNick;
             Raw = "$RevConnectToMe " + from + " " + to + "|";
             if (!string.IsNullOrEmpty(to) && !string.IsNullOrEmpty(from))
                 IsValid = true;
         }
 
-        public RevConnectToMe(Hub hub, string raw)
-            : base(hub, raw)
+        public RevConnectToMe(Client client, string raw)
+            : base(client, raw)
         {
             int pos, pos2;
             if ((pos = raw.IndexOf(" ")) != -1)

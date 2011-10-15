@@ -27,8 +27,8 @@ namespace FlowLib.Connections.Protocols.Nmdc.Commands
                 valid = true;
             }
         }
-        public Key(Hub hub, string value)
-            : base(hub, null)
+        public Key(Client client, string value)
+            : base(client, null)
         {
             this.value = value;
             Raw = "$Key " + Content + "|";

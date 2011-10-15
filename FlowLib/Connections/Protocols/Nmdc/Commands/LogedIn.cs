@@ -8,8 +8,8 @@ namespace FlowLib.Connections.Protocols.Nmdc.Commands
     /// </summary>
     public class LogedIn : HubMessage
     {
-        public LogedIn(Hub hub, string raw)
-            : base(hub, raw)
+        public LogedIn(Client client, string raw)
+            : base(client, raw)
         {
             int pos;
             if ((pos = raw.IndexOf(' ')) != -1)

@@ -32,7 +32,7 @@ namespace FlowLib.Simplifiers
     public class SimpleHub : IBaseUpdater
     {
         public event EventHandler UpdateBase;
-        protected Hub _hubConnection = null;
+        protected Client _clientConnection = null;
         protected Share _share = null;
         protected string _clientName = FlowLibInfo.GetName();
         protected double _clientVersion = FlowLibInfo.GetRunningVersionNumber();
@@ -70,9 +70,9 @@ namespace FlowLib.Simplifiers
                 throw new System.ArgumentException("ClientVersion is invalid.");
             }
 
-            if (_hubConnection != null && _hubConnection.Me != null && _hubConnection.Me.TagInfo != null)
+            if (_clientConnection != null && _clientConnection.Me != null && _clientConnection.Me.TagInfo != null)
             {
-                _hubConnection.Me.TagInfo.Version = string.Format("{0} v:{1}", ClientName, ClientVersion.ToString(_cultureInfo.NumberFormat));
+                _clientConnection.Me.TagInfo.Version = string.Format("{0} v:{1}", ClientName, ClientVersion.ToString(_cultureInfo.NumberFormat));
             }
         }
 
@@ -82,15 +82,15 @@ namespace FlowLib.Simplifiers
             {
                 _share = value;
                 AddFilelistsToShare(value);
-                if (_hubConnection != null)
+                if (_clientConnection != null)
                 {
-                    _hubConnection.Share = value;
+                    _clientConnection.Share = value;
                 }
             }
         }
 
         public string BaseDirectory { get; set; }
-        public UserInfo ClientInfo { get { return (_hubConnection != null) ? _hubConnection.Me : null; } }
+        public UserInfo ClientInfo { get { return (_clientConnection != null) ? _clientConnection.Me : null; } }
 
         public SimpleHub(HubSetting settings)
         {
@@ -98,22 +98,22 @@ namespace FlowLib.Simplifiers
             Share = new Share("simpleHubShare");
             BaseDirectory = System.AppDomain.CurrentDomain.BaseDirectory;
 
-            _hubConnection = new Hub(settings, this);
+            _clientConnection = new Client(settings, this);
 
-            _hubConnection.Me.TagInfo.Slots = 2;
+            _clientConnection.Me.TagInfo.Slots = 2;
 
             // Set common values
-            _hubConnection.Me.Set(UserInfo.PID, settings.Get(UserInfo.PID));
-            _hubConnection.Me.Set(UserInfo.IP, settings.Get(UserInfo.IP));
-            _hubConnection.Me.Set(UserInfo.SECURE, settings.Get(UserInfo.SECURE));
-            _hubConnection.Me.Set(UserInfo.UDPPORT, settings.Get(UserInfo.UDPPORT));
+            _clientConnection.Me.Set(UserInfo.PID, settings.Get(UserInfo.PID));
+            _clientConnection.Me.Set(UserInfo.IP, settings.Get(UserInfo.IP));
+            _clientConnection.Me.Set(UserInfo.SECURE, settings.Get(UserInfo.SECURE));
+            _clientConnection.Me.Set(UserInfo.UDPPORT, settings.Get(UserInfo.UDPPORT));
 
             // Adds share to hub
-            _hubConnection.Share = Share;
+            _clientConnection.Share = Share;
 
 
-            _hubConnection.ConnectionStatusChange += OnConnectionStatusChange;
-            _hubConnection.ProtocolChange += OnProtocolChange;
+            _clientConnection.ConnectionStatusChange += OnConnectionStatusChange;
+            _clientConnection.ProtocolChange += OnProtocolChange;
         }
 
         protected void OnProtocolChange(object sender, DefaultEventArgs e)
@@ -135,7 +135,7 @@ namespace FlowLib.Simplifiers
         public void Connect()
         {
             AddFilelistsToShare(Share);
-            _hubConnection.Connect();
+            _clientConnection.Connect();
         }
 
         protected bool IsValidMessage(string message)
@@ -154,9 +154,9 @@ namespace FlowLib.Simplifiers
                 // TODO: Add some functionality for when it was not possible to send message.
             }
 
-            if (_hubConnection != null)
+            if (_clientConnection != null)
             {
-                UpdateBase(this, new DefaultEventArgs(Actions.MainMessage, new MainMessage(_hubConnection.Me.ID, message)));
+                UpdateBase(this, new DefaultEventArgs(Actions.MainMessage, new MainMessage(_clientConnection.Me.ID, message)));
             }
             else
             {
@@ -175,11 +175,11 @@ namespace FlowLib.Simplifiers
                 // TODO: Add some functionality for when it was not possible to send message.
             }
 
-            if (_hubConnection != null && _hubConnection.GetUserById(_hubConnection.Me.ID) != null)
+            if (_clientConnection != null && _clientConnection.GetUserById(_clientConnection.Me.ID) != null)
             {
                 UpdateBase(this,
                            new DefaultEventArgs(Actions.PrivateMessage,
-                                                            new PrivateMessage(userId, _hubConnection.Me.ID, message)));
+                                                            new PrivateMessage(userId, _clientConnection.Me.ID, message)));
             }
             else
             {
@@ -189,27 +189,27 @@ namespace FlowLib.Simplifiers
         
         public User GetUserById(string id)
         {
-            if (_hubConnection != null)
+            if (_clientConnection != null)
             {
-                return _hubConnection.GetUserById(id);
+                return _clientConnection.GetUserById(id);
             }
             return null;
         }
 
         public User GetUserByPermenantId(string storeId)
         {
-            if (_hubConnection != null)
+            if (_clientConnection != null)
             {
-                return _hubConnection.GetUserByStoredId(storeId);
+                return _clientConnection.GetUserByStoredId(storeId);
             }
             return null;
         }
 
         public User GetUserByNick(string nick)
         {
-            if (_hubConnection != null)
+            if (_clientConnection != null)
             {
-                return _hubConnection.GetUserByNick(nick);
+                return _clientConnection.GetUserByNick(nick);
             }
             return null;
         }

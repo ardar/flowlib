@@ -42,7 +42,7 @@ namespace FlowLib.Connections
     /// <summary>
     /// Class representing hub in the p2p network Direct Connect
     /// </summary>
-    public class Hub : TcpConnection, IHub
+    public class Client : TcpConnection, IClient
     {
         #region Events
         /// <summary>
@@ -222,10 +222,10 @@ namespace FlowLib.Connections
             me.UserInfo.TagInfo.OP = regmode_operator;
         }
 
-        public Hub(HubSetting infav)
+        public Client(HubSetting infav)
             : this(infav, null) { }
 
-        public Hub(HubSetting infav, IBaseUpdater gui)
+        public Client(HubSetting infav, IBaseUpdater gui)
             : base(infav.Address, infav.Port)
         {
             fav = infav;    // Sets Favorites.
@@ -267,7 +267,7 @@ namespace FlowLib.Connections
         /// <summary>
         /// Deconstructor
         /// </summary>
-        ~Hub()
+        ~Client()
         {
             Dispose();
         }
@@ -279,7 +279,7 @@ namespace FlowLib.Connections
                 if (baseUpdater != null)
                     baseUpdater.UpdateBase -= OnUpdateBase;
                 base.Dispose();
-                Hub.RegModeUpdated -= Hub_RegModeUpdated;
+                Client.RegModeUpdated -= Hub_RegModeUpdated;
                 UnknownProtocolId -= OnUnknownProtocolId;
                 ProtocolChange -= Hub_ProtocolChange;
                 if (updateInfoTimer != null)
@@ -476,7 +476,7 @@ namespace FlowLib.Connections
         #region OnEvent(s)
         private void Hub_RegModeUpdated(object sender, DefaultEventArgs e)
         {
-            Hub hub = sender as Hub;
+            Client client = sender as Client;
             if (!e.Handled)
                 UpdateRegMode();
         }
